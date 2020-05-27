@@ -1,0 +1,42 @@
+{
+  "pools": [
+    {
+      "name": "arrow",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "loot_table",
+          "name": "minecraft:entities/skeleton"
+        }
+      ]
+    },
+    {
+      "name": "cavenic_orb",
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "empty",
+          "weight": 3
+        },
+        {
+          "type": "item",
+          "name": "cavern:cave_item",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "set_data",
+              "data": 3
+            },
+            {
+              "function": "set_count",
+              "count": {
+                "min": 0,
+                "max": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

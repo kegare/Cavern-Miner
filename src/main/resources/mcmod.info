@@ -1,0 +1,10 @@
+[{
+  "modid": "cavern",
+  "name": "Cavern: Miner",
+  "description": "Have a nice miner life in the cave dimensions!",
+  "version": "3.0.0-alpha_2020.05.27",
+  "logoFile": "logo.png",
+  "url": "https://kegare.github.io",
+  "authorList": ["kegare", "bagu_chan"],
+  "credits": "Produced by kegare"
+}]
