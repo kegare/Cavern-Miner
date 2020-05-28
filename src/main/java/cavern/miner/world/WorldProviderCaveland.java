@@ -18,6 +18,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldProviderCaveland extends WorldProviderCavern
 {
+	public static final VeinProvider VEINS = new VeinProviderCaveland();
+
 	@Override
 	public IChunkGenerator createChunkGenerator()
 	{

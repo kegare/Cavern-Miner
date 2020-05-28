@@ -14,7 +14,6 @@ import cavern.miner.config.manager.CaveBiome;
 import cavern.miner.config.manager.CaveBiomeManager;
 import cavern.miner.config.manager.CaveVein;
 import cavern.miner.config.manager.CaveVeinManager;
-import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.config.property.ConfigEntities;
 import cavern.miner.config.property.ConfigItems;
 import cavern.miner.core.CavernMod;
@@ -65,7 +64,7 @@ public class CavernConfig
 	public static boolean keepPortalChunk;
 
 	public static boolean autoVeins;
-	public static ConfigBlocks autoVeinBlacklist = new ConfigBlocks();
+	public static String[] autoVeinBlacklist;
 
 	public static final CaveBiomeManager BIOMES = new CaveBiomeManager();
 	public static final CaveVeinManager VEINS = new CaveVeinManager();
@@ -231,7 +230,7 @@ public class CavernConfig
 		propOrder.add(prop.getName());
 		towerDungeonMobs.setValues(prop.getStringList());
 
-		prop = config.get(category, "monsterSpawn", 100);
+		prop = config.get(category, "monsterSpawn", 80);
 		prop.setMinValue(0).setMaxValue(5000);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
 		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
@@ -281,7 +280,7 @@ public class CavernConfig
 		comment += "Note: If multiplayer, server-side only.";
 		prop.setComment(comment);
 		propOrder.add(prop.getName());
-		autoVeinBlacklist.setValues(prop.getStringList());
+		autoVeinBlacklist = prop.getStringList();
 
 		config.setCategoryPropertyOrder(category, propOrder);
 

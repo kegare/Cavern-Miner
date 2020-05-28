@@ -7,6 +7,8 @@ import net.minecraft.world.gen.IChunkGenerator;
 
 public class WorldProviderHugeCavern extends WorldProviderCavern
 {
+	public static final VeinProvider VEINS = new VeinProviderHugeCavern();
+
 	@Override
 	public IChunkGenerator createChunkGenerator()
 	{

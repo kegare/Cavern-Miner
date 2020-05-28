@@ -31,6 +31,7 @@ import cavern.miner.config.manager.CaveVeinManager;
 import cavern.miner.util.BlockMeta;
 import cavern.miner.util.CaveFilters;
 import cavern.miner.util.CaveUtils;
+import cavern.miner.world.VeinProvider;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -53,7 +54,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiVeinsEditor extends GuiScreen
 {
 	protected final GuiScreen parent;
+
+	protected final VeinProvider provider;
 	protected final CaveVeinManager manager;
+	protected final String[] autoVeinsBlacklist;
 
 	protected VeinList veinList;
 
@@ -68,6 +72,7 @@ public class GuiVeinsEditor extends GuiScreen
 	protected GuiCheckBox instantFilter;
 
 	protected GuiTextField filterTextField;
+	protected GuiTextField autoConfigTextField;
 
 	protected boolean editMode;
 
@@ -95,10 +100,12 @@ public class GuiVeinsEditor extends GuiScreen
 	protected final List<String> editLabelList = Lists.newArrayList();
 	protected final List<GuiTextField> editFieldList = Lists.newArrayList();
 
-	public GuiVeinsEditor(GuiScreen parent, CaveVeinManager manager)
+	public GuiVeinsEditor(GuiScreen parent, VeinProvider provider, CaveVeinManager manager, String[] blacklist)
 	{
 		this.parent = parent;
+		this.provider = provider;
 		this.manager = manager;
+		this.autoVeinsBlacklist = blacklist;
 	}
 
 	@Override
@@ -210,6 +217,17 @@ public class GuiVeinsEditor extends GuiScreen
 
 		filterTextField.x = width / 2 - 200;
 		filterTextField.y = height - filterTextField.height - 6;
+
+		if (autoConfigTextField == null)
+		{
+			autoConfigTextField = new GuiTextField(1, fontRenderer, 0, 0, filterTextField.width, filterTextField.height);
+			autoConfigTextField.setText(I18n.format("cavern.config.auto"));
+			autoConfigTextField.setEnabled(false);
+			autoConfigTextField.setVisible(false);
+		}
+
+		autoConfigTextField.x = filterTextField.x;
+		autoConfigTextField.y = filterTextField.y;
 
 		detailHoverChecker = new HoverChecker(detailInfo, 800);
 		instantHoverChecker = new HoverChecker(instantFilter, 800);
@@ -598,8 +616,15 @@ public class GuiVeinsEditor extends GuiScreen
 		{
 			editButton.enabled = !veinList.selected.isEmpty();
 			removeButton.enabled = editButton.enabled;
+			clearButton.visible = !editButton.enabled && !veinList.veins.isEmpty();
 
-			filterTextField.updateCursorCounter();
+			filterTextField.setVisible(!veinList.veins.isEmpty());
+			autoConfigTextField.setVisible(!filterTextField.getVisible());
+
+			if (filterTextField.getVisible())
+			{
+				filterTextField.updateCursorCounter();
+			}
 		}
 	}
 
@@ -688,6 +713,7 @@ public class GuiVeinsEditor extends GuiScreen
 		else
 		{
 			filterTextField.drawTextBox();
+			autoConfigTextField.drawTextBox();
 		}
 
 		if (detailHoverChecker.checkHover(mouseX, mouseY))
@@ -833,20 +859,9 @@ public class GuiVeinsEditor extends GuiScreen
 				}
 			}
 		}
-		else
+		else if (!veinList.veins.isEmpty())
 		{
 			filterTextField.mouseClicked(x, y, code);
-		}
-	}
-
-	@Override
-	public void handleKeyboardInput() throws IOException
-	{
-		super.handleKeyboardInput();
-
-		if (Keyboard.getEventKey() == Keyboard.KEY_LSHIFT || Keyboard.getEventKey() == Keyboard.KEY_RSHIFT)
-		{
-			clearButton.visible = !editMode && Keyboard.getEventKeyState();
 		}
 	}
 
@@ -1072,6 +1087,7 @@ public class GuiVeinsEditor extends GuiScreen
 	{
 		protected final NonNullList<CaveVein> veins = NonNullList.create();
 		protected final NonNullList<CaveVein> contents = NonNullList.create();
+		protected final NonNullList<CaveVein> autoVeins;
 		protected final List<CaveVein> selected = Lists.newArrayList();
 		protected final List<CaveVein> copied = Lists.newArrayList();
 
@@ -1083,6 +1099,7 @@ public class GuiVeinsEditor extends GuiScreen
 		public VeinList()
 		{
 			super(GuiVeinsEditor.this.mc, 0, 0, 0, 0, 22);
+			this.autoVeins = GuiVeinsEditor.this.provider.getDummyVeins(GuiVeinsEditor.this.autoVeinsBlacklist);
 		}
 
 		@Override
@@ -1110,7 +1127,7 @@ public class GuiVeinsEditor extends GuiScreen
 		@Override
 		protected int getSize()
 		{
-			return contents.size();
+			return veins.isEmpty() ? autoVeins.size() : contents.size();
 		}
 
 		@Override
@@ -1122,7 +1139,8 @@ public class GuiVeinsEditor extends GuiScreen
 		@Override
 		protected void drawSlot(int slot, int par2, int par3, int par4, int mouseX, int mouseY, float partialTicks)
 		{
-			CaveVein vein = contents.get(slot);
+			boolean isAuto = veins.isEmpty();
+			CaveVein vein = isAuto ? autoVeins.get(slot) : contents.get(slot);
 			BlockMeta blockMeta = vein.getBlockMeta();
 			Block block = blockMeta.getBlock();
 			int meta = blockMeta.getMeta();
@@ -1166,15 +1184,22 @@ public class GuiVeinsEditor extends GuiScreen
 
 			if (detailInfo.isChecked())
 			{
-				drawItemStack(itemRender, blockMeta, width / 2 - 100, par3 + 1, fontRenderer, Integer.toString(vein.getSize()));
-				drawItemStack(itemRender, vein.getTarget(), width / 2 + 90, par3 + 1, fontRenderer, Integer.toString(vein.getWeight()));
+				if (isAuto)
+				{
+					drawItemStack(itemRender, blockMeta, width / 2 - 100, par3 + 1);
+				}
+				else
+				{
+					drawItemStack(itemRender, blockMeta, width / 2 - 100, par3 + 1, fontRenderer, Integer.toString(vein.getSize()));
+					drawItemStack(itemRender, vein.getTarget(), width / 2 + 90, par3 + 1, fontRenderer, Integer.toString(vein.getWeight()));
+				}
 			}
 		}
 
 		@Override
 		protected void elementClicked(int slot, boolean flag, int mouseX, int mouseY)
 		{
-			if (editMode)
+			if (editMode || veins.isEmpty())
 			{
 				return;
 			}
@@ -1195,7 +1220,7 @@ public class GuiVeinsEditor extends GuiScreen
 		@Override
 		protected boolean isSelected(int slot)
 		{
-			return selected.contains(contents.get(slot));
+			return !contents.isEmpty() && selected.contains(contents.get(slot));
 		}
 
 		@Override
@@ -1213,6 +1238,11 @@ public class GuiVeinsEditor extends GuiScreen
 
 		protected void setFilter(String filter)
 		{
+			if (veins.isEmpty())
+			{
+				return;
+			}
+
 			List<CaveVein> result;
 
 			if (Strings.isNullOrEmpty(filter))

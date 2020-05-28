@@ -1,7 +1,6 @@
 package cavern.miner.world;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -10,27 +9,27 @@ import com.google.common.collect.Lists;
 import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.config.manager.CaveVein;
 import cavern.miner.config.manager.CaveVeinManager;
-import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.util.BlockMeta;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.BiomeDictionary;
 
-public class VeinProviderHugeCavern extends VeinProviderCavern
+public class VeinProviderHugeCavern extends VeinProvider
 {
-	public VeinProviderHugeCavern(World world, Supplier<CaveVeinManager> manager)
+	@Override
+	public CaveVeinManager getVeinManager()
 	{
-		super(world, manager);
+		return HugeCavernConfig.autoVeins ? null : HugeCavernConfig.VEINS;
 	}
 
 	@Override
-	public ConfigBlocks getExemptBlocks()
+	public String[] getBlacklist()
 	{
 		return HugeCavernConfig.autoVeinBlacklist;
 	}
 
 	@Override
-	protected List<CaveVein> createVeins(String name, BlockMeta blockMeta, Rarity rarity)
+	protected List<CaveVein> createVeins(World world, BlockMeta blockMeta, Rarity rarity)
 	{
 		List<CaveVein> list = Lists.newArrayList();
 		int weight = 15;
@@ -94,7 +93,7 @@ public class VeinProviderHugeCavern extends VeinProviderCavern
 			list.add(new CaveVein(blockMeta, weight, size / 2, max / 3, max, biome));
 		}
 
-		if (name.startsWith("ore") && rarity == Rarity.COMMON)
+		if (rarity == Rarity.COMMON)
 		{
 			list.add(new CaveVein(blockMeta, weight / 2, size, min, 40, biome));
 		}

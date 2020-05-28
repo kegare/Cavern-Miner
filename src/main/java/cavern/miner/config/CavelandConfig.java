@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 
 import cavern.miner.client.config.CaveConfigEntries;
 import cavern.miner.config.manager.CaveVeinManager;
-import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.config.property.ConfigItems;
 import cavern.miner.core.CavernMod;
 import net.minecraftforge.common.config.Configuration;
@@ -30,7 +29,7 @@ public class CavelandConfig
 	public static boolean keepPortalChunk;
 
 	public static boolean autoVeins;
-	public static ConfigBlocks autoVeinBlacklist = new ConfigBlocks();
+	public static String[] autoVeinBlacklist;
 
 	public static final CaveVeinManager VEINS = new CaveVeinManager();
 
@@ -156,7 +155,7 @@ public class CavelandConfig
 		comment += "Note: If multiplayer, server-side only.";
 		prop.setComment(comment);
 		propOrder.add(prop.getName());
-		autoVeinBlacklist.setValues(prop.getStringList());
+		autoVeinBlacklist = prop.getStringList();
 
 		config.setCategoryPropertyOrder(category, propOrder);
 

@@ -11,58 +11,58 @@ public class MiningCache
 {
 	private final EntityPlayer player;
 
-	private IBlockState lastMiningBlock;
-	private int lastMiningPoint;
-	private int miningCombo;
-	private long lastMiningTime;
+	private IBlockState lastBlock;
+	private int lastPoint;
+	private int combo;
+	private long lastTime;
 
 	public MiningCache(EntityPlayer player)
 	{
 		this.player = player;
 	}
 
-	public IBlockState getLastMiningBlock()
+	public IBlockState getLastBlock()
 	{
-		return lastMiningBlock;
+		return lastBlock;
 	}
 
-	public int getLastMiningPoint()
+	public int getLastPoint()
 	{
-		return lastMiningPoint;
+		return lastPoint;
 	}
 
-	public int getMiningCombo()
+	public int getCombo()
 	{
-		return miningCombo;
+		return combo;
 	}
 
-	public long getLastMiningTime()
+	public long getLastTime()
 	{
-		return lastMiningTime;
+		return lastTime;
 	}
 
 	public void setLastMining(IBlockState state, int point)
 	{
-		lastMiningBlock = state;
-		lastMiningPoint = point;
-		lastMiningTime = player.world.getTotalWorldTime();
+		lastBlock = state;
+		lastPoint = point;
+		lastTime = player.world.getTotalWorldTime();
 
 		if (MiningConfig.miningCombo)
 		{
-			++miningCombo;
+			++combo;
 		}
 	}
 
 	public void onUpdate()
 	{
-		if (miningCombo == 0)
+		if (combo == 0)
 		{
 			return;
 		}
 
-		if (player.world.getTotalWorldTime()  - lastMiningTime > 15 * 20)
+		if (player.world.getTotalWorldTime()  - lastTime > 15 * 20)
 		{
-			miningCombo = 0;
+			combo = 0;
 		}
 	}
 

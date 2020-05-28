@@ -75,7 +75,7 @@ public class ChunkGeneratorCaveland implements IChunkGenerator
 	{
 		this.world = world;
 		this.rand = new Random(world.getSeed());
-		this.veinGenerator = new VeinGenerator(new VeinProviderCaveland(world, () -> CavelandConfig.autoVeins ? null : CavelandConfig.VEINS));
+		this.veinGenerator = new VeinGenerator(WorldProviderCaveland.VEINS);
 	}
 
 	public void setBlocksInChunk(ChunkPrimer primer)

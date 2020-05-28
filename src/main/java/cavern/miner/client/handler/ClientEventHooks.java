@@ -17,6 +17,9 @@ import cavern.miner.core.CavernMod;
 import cavern.miner.item.ItemCavenicBow;
 import cavern.miner.util.Version;
 import cavern.miner.world.CaveDimensions;
+import cavern.miner.world.WorldProviderCaveland;
+import cavern.miner.world.WorldProviderCavern;
+import cavern.miner.world.WorldProviderHugeCavern;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
@@ -91,9 +94,9 @@ public final class ClientEventHooks
 						CavernConfig.triggerItems.refreshItems();
 						CavernConfig.dungeonMobs.refreshEntities();
 						CavernConfig.towerDungeonMobs.refreshEntities();
-						CavernConfig.autoVeinBlacklist.refreshBlocks();
 					}
 
+					WorldProviderCavern.VEINS.clearCaches();
 					break;
 				case "dimension.hugeCavern":
 					HugeCavernConfig.syncConfig();
@@ -101,9 +104,9 @@ public final class ClientEventHooks
 					if (event.isWorldRunning())
 					{
 						HugeCavernConfig.triggerItems.refreshItems();
-						HugeCavernConfig.autoVeinBlacklist.refreshBlocks();
 					}
 
+					WorldProviderHugeCavern.VEINS.clearCaches();
 					break;
 				case "dimension.caveland":
 					CavelandConfig.syncConfig();
@@ -111,9 +114,9 @@ public final class ClientEventHooks
 					if (event.isWorldRunning())
 					{
 						CavelandConfig.triggerItems.refreshItems();
-						CavelandConfig.autoVeinBlacklist.refreshBlocks();
 					}
 
+					WorldProviderCaveland.VEINS.clearCaches();
 					break;
 			}
 		}

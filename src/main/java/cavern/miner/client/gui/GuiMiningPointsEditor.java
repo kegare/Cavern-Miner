@@ -794,7 +794,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 		@Override
 		protected int getSize()
 		{
-			return contents.isEmpty() ? autoEntries.size() : contents.size();
+			return points.isEmpty() ? autoEntries.size() : contents.size();
 		}
 
 		@Override
@@ -806,7 +806,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 		@Override
 		protected void drawSlot(int index, int par2, int par3, int par4, int mouseX, int mouseY, float partialTicks)
 		{
-			PointEntry entry = contents.isEmpty() ? autoEntries.get(index) : contents.get(index);
+			PointEntry entry = points.isEmpty() ? autoEntries.get(index) : contents.get(index);
 			String text = null;
 			ItemStack stack = null;
 

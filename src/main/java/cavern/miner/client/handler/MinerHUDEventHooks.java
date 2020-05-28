@@ -186,16 +186,16 @@ public final class MinerHUDEventHooks
 		boolean flag = false;
 
 		MiningCache cache = MiningCache.get(mc.player);
-		long processTime = mc.world.getTotalWorldTime() - cache.getLastMiningTime();
+		long processTime = mc.world.getTotalWorldTime() - cache.getLastTime();
 
-		if (cache.getLastMiningTime() > 0L && processTime < 50 && cache.getLastMiningBlock() != null && cache.getLastMiningPoint() != 0)
+		if (cache.getLastTime() > 0L && processTime < 50 && cache.getLastBlock() != null && cache.getLastPoint() != 0)
 		{
-			IBlockState state = cache.getLastMiningBlock();
+			IBlockState state = cache.getLastBlock();
 			ItemStack stack = new ItemStack(CaveRenderingRegistry.getRenderBlock(state.getBlock()), 1, state.getBlock().getMetaFromState(state));
 
 			RenderHelper.enableGUIStandardItemLighting();
 			renderItem.renderItemIntoGUI(stack, x, y);
-			renderItem.renderItemOverlayIntoGUI(renderer, stack, x, y, Integer.toString(cache.getLastMiningPoint()));
+			renderItem.renderItemOverlayIntoGUI(renderer, stack, x, y, Integer.toString(cache.getLastPoint()));
 			RenderHelper.disableStandardItemLighting();
 
 			rank = stack.getDisplayName();
@@ -234,7 +234,7 @@ public final class MinerHUDEventHooks
 
 		String combo = null;
 
-		if (cache.getMiningCombo() > 0)
+		if (cache.getCombo() > 0)
 		{
 			TextFormatting format = TextFormatting.WHITE;
 
@@ -247,7 +247,7 @@ public final class MinerHUDEventHooks
 				format = TextFormatting.GRAY;
 			}
 
-			combo = format + String.format("%d COMBO!", cache.getMiningCombo()) + TextFormatting.RESET;
+			combo = format + String.format("%d COMBO!", cache.getCombo()) + TextFormatting.RESET;
 		}
 
 		boolean showRank = MiningConfig.showMinerRank;

@@ -31,6 +31,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldProviderCavern extends WorldProvider implements CustomSeedProvider, IWorldEntitySpawner
 {
+	public static final VeinProvider VEINS = new VeinProviderCavern();
+
 	private CustomSeed seedData;
 
 	private final CaveEntitySpawner entitySpawner = new CaveEntitySpawner(this);

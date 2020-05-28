@@ -252,13 +252,10 @@ public final class CavernMod
 		CavernConfig.triggerItems.refreshItems();
 		CavernConfig.dungeonMobs.refreshEntities();
 		CavernConfig.towerDungeonMobs.refreshEntities();
-		CavernConfig.autoVeinBlacklist.refreshBlocks();
 
 		HugeCavernConfig.triggerItems.refreshItems();
-		HugeCavernConfig.autoVeinBlacklist.refreshBlocks();
 
 		CavelandConfig.triggerItems.refreshItems();
-		CavelandConfig.autoVeinBlacklist.refreshBlocks();
 
 		RandomiteHelper.refreshItems();
 	}

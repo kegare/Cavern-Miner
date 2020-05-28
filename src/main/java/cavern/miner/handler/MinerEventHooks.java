@@ -133,7 +133,7 @@ public final class MinerEventHooks
 
 		cache.setLastMining(state, point);
 
-		int combo = cache.getMiningCombo();
+		int combo = cache.getCombo();
 
 		if (combo > 0 && combo % 10 == 0)
 		{

@@ -2,8 +2,7 @@ package cavern.miner.world.gen;
 
 import java.util.Random;
 
-import cavern.miner.config.manager.CaveVein;
-import cavern.miner.world.VeinProviderCavern;
+import cavern.miner.world.VeinProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
@@ -13,9 +12,9 @@ import net.minecraft.world.chunk.ChunkPrimer;
 
 public class VeinGenerator
 {
-	private final VeinProviderCavern provider;
+	private final VeinProvider provider;
 
-	public VeinGenerator(VeinProviderCavern provider)
+	public VeinGenerator(VeinProvider provider)
 	{
 		this.provider = provider;
 	}
@@ -24,13 +23,8 @@ public class VeinGenerator
 	{
 		int max = world.getActualHeight() - 1;
 
-		for (CaveVein vein : provider.getVeins(chunkX, chunkZ))
+		provider.getVeins(world, chunkX, chunkZ).parallelStream().filter(vein -> vein != null && vein.getWeight() > 0 && vein.getSize() > 0).forEach(vein ->
 		{
-			if (vein == null || vein.getWeight() <= 0 || vein.getSize() <= 0)
-			{
-				continue;
-			}
-
 			for (int veinCount = 0; veinCount < vein.getWeight(); ++veinCount)
 			{
 				int yChance = rand.nextInt(3) + 3;
@@ -149,6 +143,6 @@ public class VeinGenerator
 					}
 				}
 			}
-		}
+		});
 	}
 }

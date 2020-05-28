@@ -64,7 +64,7 @@ public class ChunkGeneratorHugeCavern implements IChunkGenerator
 	{
 		this.world = world;
 		this.rand = new Random(world.getSeed());
-		this.veinGenerator = new VeinGenerator(new VeinProviderHugeCavern(world, () -> HugeCavernConfig.autoVeins ? null : HugeCavernConfig.VEINS));
+		this.veinGenerator = new VeinGenerator(WorldProviderHugeCavern.VEINS);
 	}
 
 	public void setBlocksInChunk(ChunkPrimer primer)

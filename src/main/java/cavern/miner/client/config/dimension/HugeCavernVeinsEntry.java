@@ -2,14 +2,15 @@ package cavern.miner.client.config.dimension;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 
 import cavern.miner.client.gui.GuiVeinsEditor;
 import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.config.manager.CaveVeinManager;
+import cavern.miner.world.WorldProviderHugeCavern;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.CategoryEntry;
@@ -26,10 +27,31 @@ public class HugeCavernVeinsEntry extends CategoryEntry
 		super(owningScreen, owningEntryList, configElement);
 	}
 
+	protected String[] getAutoVeinsBlacklist()
+	{
+		if (owningEntryList.listEntries != null)
+		{
+			for (IConfigEntry entry : owningEntryList.listEntries)
+			{
+				if (entry.getName().endsWith("autoVeinBlacklist") && entry instanceof GuiConfigEntries.ArrayEntry)
+				{
+					Object[] values = ((GuiConfigEntries.ArrayEntry)entry).getCurrentValues();
+
+					if (values.length > 0)
+					{
+						return Arrays.asList(values).toArray(new String[values.length]);
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+
 	@Override
 	protected GuiScreen buildChildScreen()
 	{
-		return new GuiVeinsEditor(owningScreen, HugeCavernConfig.VEINS);
+		return new GuiVeinsEditor(owningScreen, WorldProviderHugeCavern.VEINS, HugeCavernConfig.VEINS, getAutoVeinsBlacklist());
 	}
 
 	@Override
@@ -63,30 +85,5 @@ public class HugeCavernVeinsEntry extends CategoryEntry
 		{
 			((GuiVeinsEditor)childScreen).refreshVeins(manager.getCaveVeins());
 		}
-	}
-
-	@Override
-	public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partial)
-	{
-		super.drawEntry(slotIndex, x, y, listWidth, slotHeight, mouseX, mouseY, isSelected, partial);
-
-		btnSelectCategory.displayString = I18n.format(enabled() ? name : "cavern.config.auto");
-	}
-
-	@Override
-	public boolean enabled()
-	{
-		if (owningEntryList.listEntries != null)
-		{
-			for (IConfigEntry entry : owningEntryList.listEntries)
-			{
-				if (entry.getName().endsWith("autoVeins") && entry instanceof GuiConfigEntries.BooleanEntry)
-				{
-					return !((GuiConfigEntries.BooleanEntry)entry).getCurrentValue();
-				}
-			}
-		}
-
-		return super.enabled();
 	}
 }

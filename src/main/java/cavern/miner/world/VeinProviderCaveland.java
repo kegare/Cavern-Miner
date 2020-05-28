@@ -2,16 +2,14 @@ package cavern.miner.world;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 
 import cavern.miner.config.CavelandConfig;
 import cavern.miner.config.manager.CaveVein;
 import cavern.miner.config.manager.CaveVeinManager;
-import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.util.BlockMeta;
 import cavern.miner.util.CaveLog;
 import net.minecraft.block.Block;
@@ -20,77 +18,93 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class VeinProviderCaveland extends VeinProviderCavern
+public class VeinProviderCaveland extends VeinProvider
 {
-	public VeinProviderCaveland(World world, Supplier<CaveVeinManager> manager)
+	@Override
+	public CaveVeinManager getVeinManager()
 	{
-		super(world, manager);
+		return CavelandConfig.autoVeins ? null : CavelandConfig.VEINS;
 	}
 
 	@Override
-	public ConfigBlocks getExemptBlocks()
+	public String[] getBlacklist()
 	{
 		return CavelandConfig.autoVeinBlacklist;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
-	protected void getSubVeins(List<CaveVein> list)
+	public NonNullList<Pair<String, BlockMeta>> getStoneBlocks()
 	{
-		List<String> oreNames = Arrays.stream(OreDictionary.getOreNames())
-			.filter(name -> name.startsWith("stone") && name.length() > 5).sorted().collect(Collectors.toList());
-
-		oreNames.add("dirt");
-		oreNames.add("gravel");
-		oreNames.add("sand");
-
-		int max = world.provider.getAverageGroundLevel() - 4;
-
-		for (String name : oreNames)
+		if (stoneBlocks != null)
 		{
-			for (ItemStack stack : OreDictionary.getOres(name, false))
+			return stoneBlocks;
+		}
+
+		NonNullList<Pair<String, BlockMeta>> list = NonNullList.create();
+		String[] others = {"dirt", "gravel", "sand"};
+
+		Arrays.stream(OreDictionary.getOreNames())
+			.filter(name -> getBlacklist() != null && !ArrayUtils.contains(getBlacklist(), name))
+			.filter(name -> name.startsWith("stone") && name.length() > 5 && Character.isUpperCase(name.charAt(5)) || ArrayUtils.contains(others, name))
+			.forEach(name ->
 			{
-				try
+				for (ItemStack stack : OreDictionary.getOres(name, false))
 				{
-					if (stack.isEmpty() || stack.getItem() == Items.AIR || !(stack.getItem() instanceof ItemBlock))
+					try
 					{
-						continue;
+						if (stack.isEmpty() || stack.getItem() == Items.AIR || !(stack.getItem() instanceof ItemBlock))
+						{
+							continue;
+						}
+
+						Block block = ((ItemBlock)stack.getItem()).getBlock();
+
+						if (block == null || block instanceof BlockAir)
+						{
+							continue;
+						}
+
+						IBlockState state = block.getStateFromMeta(stack.getItemDamage());
+
+						list.add(Pair.of(name, new BlockMeta(state)));
 					}
-
-					Block block = ((ItemBlock)stack.getItem()).getBlock();
-
-					if (block == null || block instanceof BlockAir)
+					catch (Exception e)
 					{
-						continue;
+						CaveLog.log(Level.WARN, e, "An error occurred while setup. Skip: {%s} %s", name, stack.toString());
 					}
-
-					IBlockState state = block.getStateFromMeta(stack.getItemDamage());
-
-					if (getExemptBlocks() != null && getExemptBlocks().hasBlockState(state))
-					{
-						continue;
-					}
-
-					int weight = MathHelper.getInt(rand, 3, 8);
-					int size = MathHelper.getInt(rand, 5, 10);
-
-					list.add(new CaveVein(new BlockMeta(state), weight, size, 1, max));
-				}
-				catch (Exception e)
-				{
-					CaveLog.log(Level.ERROR, "An error occurred while setup. Skip: {%s} %s", name, stack.toString());
 				}
 			}
+		);
+
+		stoneBlocks = list;
+
+		return list;
+	}
+
+	@Override
+	protected void getSubVeins(World world, int chunkX, int chunkZ, List<CaveVein> list)
+	{
+		NonNullList<Pair<String, BlockMeta>> stones = getStoneBlocks();
+		int max = world.provider.getAverageGroundLevel() - 4;
+
+		for (Pair<String, BlockMeta> stone : stones)
+		{
+			int weight = MathHelper.getInt(rand, 3, 8);
+			int size = MathHelper.getInt(rand, 5, 10);
+
+			list.add(new CaveVein(stone.getRight(), weight, size, 1, max));
 		}
 	}
 
 	@Override
-	protected CaveVein createVein(String name, BlockMeta blockMeta, Rarity rarity)
+	protected CaveVein createVein(World world, BlockMeta blockMeta, Rarity rarity)
 	{
 		int weight = 5;
 		int size = 5;
