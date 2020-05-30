@@ -26,9 +26,9 @@ public class MapGenCavernRavine extends MapGenRavine
 
 	public void generate(World worldIn, int x, int z, ChunkPrimer primer, Biome[] biomes)
 	{
-		super.generate(worldIn, x, z, primer);
-
 		biomesForGeneration = biomes;
+
+		super.generate(worldIn, x, z, primer);
 	}
 
 	@Override

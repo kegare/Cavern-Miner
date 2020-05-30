@@ -47,16 +47,16 @@ public class MapGenCavelandRavine extends MapGenCavernRavine
 		}
 		else if (y < ground)
 		{
-			Biome biome = biomesForGeneration[x * 16 + z];
 			IBlockState state = FLOWING_WATER;
 
-			if (BiomeDictionary.hasType(biome, Type.SANDY))
+			if (biomesForGeneration != null)
 			{
-				state = FLOWING_LAVA;
-			}
-			else if (BiomeDictionary.hasType(biome, Type.COLD) && rand.nextInt(3) == 0)
-			{
-				state = BLK_ICE;
+				Biome biome = biomesForGeneration[x * 16 + z];
+
+				if (biome != null && BiomeDictionary.hasType(biome, Type.COLD) && rand.nextInt(3) == 0)
+				{
+					state = BLK_ICE;
+				}
 			}
 
 			data.setBlockState(x, y, z, state);

@@ -2,7 +2,7 @@
   "modid": "cavern",
   "name": "Cavern: Miner",
   "description": "Have a nice miner life in the cave dimensions!",
-  "version": "3.0.0.200530-alpha",
+  "version": "3.0.0.200530.1-alpha",
   "logoFile": "logo.png",
   "url": "https://kegare.github.io",
   "authorList": ["kegare", "bagu_chan"],
