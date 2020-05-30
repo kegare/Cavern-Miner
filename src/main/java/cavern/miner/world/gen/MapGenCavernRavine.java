@@ -6,6 +6,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenRavine;
 
@@ -20,6 +21,15 @@ public class MapGenCavernRavine extends MapGenRavine
 	protected static final IBlockState BLK_ICE = Blocks.ICE.getDefaultState();
 
 	private final float[] parabolicField = new float[1024];
+
+	protected Biome[] biomesForGeneration;
+
+	public void generate(World worldIn, int x, int z, ChunkPrimer primer, Biome[] biomes)
+	{
+		super.generate(worldIn, x, z, primer);
+
+		biomesForGeneration = biomes;
+	}
 
 	@Override
 	protected void addTunnel(long ravineSeed, int chunkX, int chunkZ, ChunkPrimer primer, double blockX, double blockY, double blockZ, float scale, float leftRightRadian, float upDownRadian, int currentY, int targetY, double scaleHeight)

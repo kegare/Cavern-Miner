@@ -2,7 +2,6 @@ package cavern.miner.world.gen;
 
 import java.util.Random;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -92,7 +91,7 @@ public class MapGenHugeCaves extends MapGenCavernCaves
 					int xLow = Math.max(MathHelper.floor(blockX - roomWidth) - chunkX * 16 - 1, 0);
 					int xHigh = Math.min(MathHelper.floor(blockX + roomWidth) - chunkX * 16 + 1, 16);
 					int yLow = Math.max(MathHelper.floor(blockY - roomHeight) - 1, 10);
-					int yHigh = Math.min(MathHelper.floor(blockY + roomHeight) + 1, max - 10);
+					int yHigh = Math.min(MathHelper.floor(blockY + roomHeight) + 1, max - 5);
 					int zLow = Math.max(MathHelper.floor(blockZ - roomWidth) - chunkZ * 16 - 1, 0);
 					int zHigh = Math.min(MathHelper.floor(blockZ + roomWidth) - chunkZ * 16 + 1, 16);
 
@@ -132,12 +131,13 @@ public class MapGenHugeCaves extends MapGenCavernCaves
 	protected void recursiveGenerate(World world, int chunkX, int chunkZ, int x, int z, ChunkPrimer primer)
 	{
 		int max = world.getActualHeight() - 1;
+		boolean half = max < 128;
 		int chance = rand.nextInt(rand.nextInt(rand.nextInt(6) + 1) + 1);
 
 		for (int i = 0; i < chance; ++i)
 		{
 			double blockX = (chunkX << 4) + 8;
-			double blockY = 60 + rand.nextInt(5);
+			double blockY = (half ? 45 : 70) + rand.nextInt(5) + 20;
 			double blockZ = (chunkZ << 4) + 8;
 			int count = 1;
 
@@ -154,19 +154,13 @@ public class MapGenHugeCaves extends MapGenCavernCaves
 				float upDownRadian = (rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
 				float scale = rand.nextFloat() * 18.0F + rand.nextFloat();
 
-				if (rand.nextInt(3) == 0)
+				if (rand.nextInt(4) == 0)
 				{
-					scale *= rand.nextFloat() * rand.nextFloat() * 2.0F + 1.0F;
+					scale *= rand.nextFloat() * rand.nextFloat() * 1.75F + 1.0F;
 				}
 
-				addTunnel(rand.nextLong(), x, z, primer, blockX, blockY, blockZ, scale, leftRightRadian, upDownRadian, 0, 0, max > 128 ? 2.75D : 2.35D);
+				addTunnel(rand.nextLong(), x, z, primer, blockX, blockY, blockZ, scale, leftRightRadian, upDownRadian, 0, 0, half ? 1.75D : 2.45D);
 			}
 		}
-	}
-
-	@Override
-	protected void digBlock(ChunkPrimer data, int x, int y, int z, int chunkX, int chunkZ, boolean foundTop, IBlockState state, IBlockState up)
-	{
-		data.setBlockState(x, y, z, BLK_AIR);
 	}
 }

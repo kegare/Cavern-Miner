@@ -2,6 +2,8 @@ package cavern.miner.client.config;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import cavern.miner.client.gui.GuiSelectItem;
 import cavern.miner.client.gui.ISelectorCallback;
 import cavern.miner.util.ItemMeta;
@@ -28,7 +30,7 @@ public class SelectItemsEntry extends ArrayEntry implements ISelectorCallback<It
 	{
 		super.updateValueButtonText();
 
-		if (isDefault())
+		if (isDefault() && ArrayUtils.isEmpty(configElement.getDefaults()))
 		{
 			btnValue.displayString = I18n.format("gui.default");
 		}

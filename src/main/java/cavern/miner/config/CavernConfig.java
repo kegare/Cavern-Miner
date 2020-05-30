@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import com.google.common.collect.Lists;
@@ -270,7 +271,7 @@ public class CavernConfig
 		propOrder.add(prop.getName());
 		autoVeins = prop.getBoolean(autoVeins);
 
-		String[] blacklist = {"stoneGranitePolished", "stoneDioritePolished", "stoneAndesitePolished", "oreQuartz"};
+		String[] blacklist = {"oreQuartz", "stoneAndesitePolished", "stoneDioritePolished", "stoneGranitePolished"};
 
 		prop = config.get(category, "autoVeinBlacklist", blacklist);
 		prop.setConfigEntryClass(CaveConfigEntries.selectVeins);
@@ -349,7 +350,7 @@ public class CavernConfig
 			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
 			prop.setComment(comment);
 			propOrder.add(prop.getName());
-			prop.set(caveBiome.getTerrainBlock().getMetaString());
+			prop.set(caveBiome.getTerrainBlock().getMeta());
 
 			prop = manager.config.get(entry, "topBlock", biome.topBlock.getBlock().getRegistryName().toString());
 			prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
@@ -363,7 +364,7 @@ public class CavernConfig
 			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
 			prop.setComment(comment);
 			propOrder.add(prop.getName());
-			prop.set(caveBiome.getTopBlock().getMetaString());
+			prop.set(caveBiome.getTopBlock().getMeta());
 
 			manager.config.setCategoryPropertyOrder(entry, propOrder);
 
@@ -391,8 +392,29 @@ public class CavernConfig
 
 			CaveBiome caveBiome = new CaveBiome(biome);
 
-			caveBiome.setTerrainBlock(new BlockMeta(terrainBlock, terrainBlockMeta));
-			caveBiome.setTopBlock(new BlockMeta(topBlock, topBlockMeta));
+			int terrainMeta;
+			int topMeta;
+
+			try
+			{
+				terrainMeta = Integer.parseInt(terrainBlockMeta);
+			}
+			catch (NumberFormatException e)
+			{
+				terrainMeta = 0;
+			}
+
+			try
+			{
+				topMeta = Integer.parseInt(topBlockMeta);
+			}
+			catch (NumberFormatException e)
+			{
+				topMeta = 0;
+			}
+
+			caveBiome.setTerrainBlock(new BlockMeta(terrainBlock, Blocks.STONE, terrainMeta));
+			caveBiome.setTopBlock(new BlockMeta(topBlock, Blocks.STONE, topMeta));
 
 			manager.addCaveBiome(caveBiome);
 		}
@@ -423,7 +445,7 @@ public class CavernConfig
 			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
 			prop.setComment(comment);
 			propOrder.add(prop.getName());
-			prop.set(vein.getBlockMeta().getMetaString());
+			prop.set(vein.getBlockMeta().getMeta());
 
 			prop = manager.config.get(entry, "targetBlock", blockDefault);
 			prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
@@ -437,7 +459,7 @@ public class CavernConfig
 			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
 			prop.setComment(comment);
 			propOrder.add(prop.getName());
-			prop.set(vein.getTarget().getMetaString());
+			prop.set(vein.getTarget().getMeta());
 
 			prop = manager.config.get(entry, "weight", 1);
 			prop.setMinValue(0).setMaxValue(100);
@@ -481,7 +503,7 @@ public class CavernConfig
 			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
 			prop.setComment(comment);
 			propOrder.add(prop.getName());
-			prop.set(vein.getBiomes());
+			prop.set(ObjectUtils.defaultIfNull(vein.getBiomes(), new String[0]));
 
 			manager.config.setCategoryPropertyOrder(entry, propOrder);
 
@@ -514,9 +536,29 @@ public class CavernConfig
 					String[] biomes = category.get("biomes").getStringList();
 
 					CaveVein vein = new CaveVein();
+					int meta;
+					int targetMeta;
 
-					vein.setBlockMeta(new BlockMeta(block, blockMeta));
-					vein.setTarget(new BlockMeta(targetBlock, targetBlockMeta));
+					try
+					{
+						meta = Integer.parseInt(blockMeta);
+					}
+					catch (NumberFormatException e)
+					{
+						meta = 0;
+					}
+
+					try
+					{
+						targetMeta = Integer.parseInt(targetBlockMeta);
+					}
+					catch (NumberFormatException e)
+					{
+						targetMeta = 0;
+					}
+
+					vein.setBlockMeta(new BlockMeta(block, Blocks.STONE, meta));
+					vein.setTarget(new BlockMeta(targetBlock, Blocks.STONE, targetMeta));
 					vein.setWeight(weight);
 					vein.setSize(size);
 					vein.setMinHeight(minHeight);

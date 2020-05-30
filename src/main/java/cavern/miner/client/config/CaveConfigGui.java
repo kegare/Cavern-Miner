@@ -2,6 +2,8 @@ package cavern.miner.client.config;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.Lists;
 
 import cavern.miner.client.config.common.GeneralConfigEntry;
@@ -13,6 +15,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.DummyConfigElement.DummyCategoryElement;
 import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.GuiConfigEntries.IConfigEntry;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -49,5 +52,25 @@ public class CaveConfigGui extends GuiConfig
 		}
 
 		super.initGui();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public static <T extends IConfigEntry> T getConfigEntry(List<IConfigEntry> entries, String name, Class<T> type)
+	{
+		if (entries == null || entries.isEmpty())
+		{
+			return null;
+		}
+
+		for (IConfigEntry entry : entries)
+		{
+			if (entry.getName().equals(name) && type.isAssignableFrom(entry.getClass()))
+			{
+				return (T)entry;
+			}
+		}
+
+		return null;
 	}
 }

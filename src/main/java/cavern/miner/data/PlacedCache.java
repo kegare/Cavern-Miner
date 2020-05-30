@@ -1,4 +1,4 @@
-package cavern.miner.handler;
+package cavern.miner.data;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

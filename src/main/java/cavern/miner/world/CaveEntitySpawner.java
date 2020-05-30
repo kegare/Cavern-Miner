@@ -2,12 +2,12 @@ package cavern.miner.world;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityList;
@@ -33,7 +33,7 @@ public class CaveEntitySpawner
 {
     private static final int MOB_COUNT_DIV = (int)Math.pow(17.0D, 2.0D);
 
-	private final Set<ChunkPos> eligibleChunksForSpawning = Sets.newHashSet();
+	private final Map<ChunkPos, BlockPos> eligibleChunksForSpawning = Maps.newHashMap();
 	private final IWorldEntitySpawner entitySpawner;
 
 	public CaveEntitySpawner()
@@ -56,7 +56,6 @@ public class CaveEntitySpawner
 		eligibleChunksForSpawning.clear();
 
 		int playerCount = 0;
-		double playerHeight = 0.0D;
 
 		for (EntityPlayer player : world.playerEntities)
 		{
@@ -76,11 +75,9 @@ public class CaveEntitySpawner
 					boolean flag = rx == -range || rx == range || rz == -range || rz == range;
 					ChunkPos pos = new ChunkPos(rx + x, rz + z);
 
-					if (!eligibleChunksForSpawning.contains(pos))
+					if (!eligibleChunksForSpawning.containsKey(pos))
 					{
 						++playerCount;
-
-						playerHeight += player.posY;
 
 						if (!flag && world.getWorldBorder().contains(pos))
 						{
@@ -88,7 +85,7 @@ public class CaveEntitySpawner
 
 							if (entry != null && entry.isSentToPlayers())
 							{
-								eligibleChunksForSpawning.add(pos);
+								eligibleChunksForSpawning.put(pos, player.getPosition());
 							}
 						}
 					}
@@ -96,7 +93,6 @@ public class CaveEntitySpawner
 			}
 		}
 
-		int playerY = playerHeight > 0.0D ? MathHelper.ceil(playerHeight / playerCount) : 50;
 		int totalCount = 0;
 		BlockPos spawnPos = world.getSpawnPoint();
 
@@ -115,14 +111,14 @@ public class CaveEntitySpawner
 				continue;
 			}
 
-			List<ChunkPos> shuffled = Lists.newArrayList(eligibleChunksForSpawning);
+			List<ChunkPos> shuffled = Lists.newArrayList(eligibleChunksForSpawning.keySet());
 			Collections.shuffle(shuffled);
 
 			MutableBlockPos pos = new MutableBlockPos();
 
 			outside: for (ChunkPos chunkpos : shuffled)
 			{
-				BlockPos blockpos = getRandomPosition(world, chunkpos.x, playerY, chunkpos.z);
+				BlockPos blockpos = getRandomPosition(world, chunkpos);
 				IBlockState state = world.getBlockState(blockpos);
 
 				if (state.isNormalCube())
@@ -270,11 +266,31 @@ public class CaveEntitySpawner
 		return 24.0D;
 	}
 
-	protected BlockPos getRandomPosition(World world, int chunkX, int y, int chunkZ)
+	protected BlockPos getRandomPosition(World world, ChunkPos pos)
 	{
-		int posX = (chunkX << 4) + world.rand.nextInt(16);
-		int posZ = (chunkZ << 4) + world.rand.nextInt(16);
-		int posY = MathHelper.getInt(world.rand, Math.max(y - 50, 1), Math.min(y + 50, world.getActualHeight()));
+		BlockPos blockpos = eligibleChunksForSpawning.get(pos);
+		int y = 0;
+
+		if (blockpos != null)
+		{
+			y = blockpos.getY();
+		}
+
+		int posX = (pos.x << 4) + world.rand.nextInt(16);
+		int posZ = (pos.z << 4) + world.rand.nextInt(16);
+		int posY;
+
+		if (y > 0)
+		{
+			int max = world.getActualHeight() - 1;
+			int range = max < 128 ? 50 : 70;
+
+			posY = MathHelper.getInt(world.rand, Math.max(y - range, 1), Math.min(y + range, max));
+		}
+		else
+		{
+			posY = MathHelper.getInt(world.rand, 1, world.getActualHeight() - 1);
+		}
 
 		return new BlockPos(posX, posY, posZ);
 	}

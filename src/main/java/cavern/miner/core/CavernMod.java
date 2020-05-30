@@ -1,6 +1,7 @@
 package cavern.miner.core;
 
-import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import cavern.miner.api.CavernAPI;
 import cavern.miner.block.CaveBlocks;
@@ -29,7 +30,6 @@ import cavern.miner.handler.api.DimensionHandler;
 import cavern.miner.item.CaveItems;
 import cavern.miner.network.CaveNetworkRegistry;
 import cavern.miner.plugin.HaCPlugin;
-import cavern.miner.util.CaveLog;
 import cavern.miner.world.CaveDimensions;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.color.BlockColors;
@@ -63,11 +63,14 @@ import net.minecraftforge.registries.IForgeRegistry;
 (
 	modid = CavernMod.MODID,
 	dependencies = "required:forge@[14.23.5.2854,);",
-	guiFactory = "cavern.miner.client.config.CaveGuiFactory"
+	guiFactory = "cavern.miner.client.config.CaveGuiFactory",
+	updateJSON = "https://raw.githubusercontent.com/kegare/Cavern-Miner/master/cavern.json",
+	certificateFingerprint = "f7dbdf91b21b3a98a6349513d64acb3a602c2a3d"
 )
 public final class CavernMod
 {
 	public static final String MODID = "cavern";
+	public static final Logger LOG = LogManager.getLogger(MODID);
 
 	@Instance(MODID)
 	public static CavernMod instance;
@@ -230,7 +233,7 @@ public final class CavernMod
 			}
 			catch (Exception e)
 			{
-				CaveLog.log(Level.WARN, e, "Failed to load the Heat&Climate mod plugin.");
+				LOG.warn("Failed to load the Heat&Climate mod plugin.", e);
 			}
 		}
 

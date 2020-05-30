@@ -1,5 +1,7 @@
 package cavern.miner.client.config;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import cavern.miner.client.gui.GuiSelectBlock;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -23,7 +25,7 @@ public class SelectBlocksEntry extends ArrayEntry
 	{
 		super.updateValueButtonText();
 
-		if (isDefault())
+		if (isDefault() && ArrayUtils.isEmpty(configElement.getDefaults()))
 		{
 			btnValue.displayString = I18n.format("gui.default");
 		}

@@ -6,11 +6,10 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.logging.log4j.Level;
 
 import com.google.common.collect.Maps;
 
-import cavern.miner.util.CaveLog;
+import cavern.miner.core.CavernMod;
 import cavern.miner.util.CaveUtils;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
@@ -63,7 +62,7 @@ public class CaveConfiguration extends Configuration implements Comparator<Strin
 		}
 		catch (Throwable e)
 		{
-			CaveLog.log(Level.WARN, e, "An error occurred on replace configuration categories map.");
+			CavernMod.LOG.warn("An error occurred on replace configuration categories map.", e);
 		}
 	}
 

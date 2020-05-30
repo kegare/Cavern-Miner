@@ -184,7 +184,7 @@ public class GuiMiningRecords extends GuiScreen
 
 				totalCount += count;
 
-				int amount = MiningConfig.miningPoints.getPoint(blockMeta.getBlockState());
+				int amount = MiningConfig.miningPoints.getPoint(blockMeta);
 
 				if (count > 1)
 				{
@@ -229,7 +229,7 @@ public class GuiMiningRecords extends GuiScreen
 
 			if (nameType == 1)
 			{
-				name = blockMeta.getName();
+				name = blockMeta.toString();
 			}
 			else if (stack.getItem() != Items.AIR)
 			{

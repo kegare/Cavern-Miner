@@ -22,7 +22,6 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.feature.WorldGenBush;
 import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.feature.WorldGenLiquids;
@@ -48,7 +47,7 @@ public class ChunkGeneratorHugeCavern implements IChunkGenerator
 
 	private Biome[] biomesForGeneration;
 
-	private final MapGenBase caveGenerator = new MapGenHugeCaves();
+	private final MapGenHugeCaves caveGenerator = new MapGenHugeCaves();
 
 	private final VeinGenerator veinGenerator;
 
@@ -125,35 +124,12 @@ public class ChunkGeneratorHugeCavern implements IChunkGenerator
 		}
 	}
 
-	public Biome[] replaceBiomes(Biome[] biomes)
-	{
-		Biome[] newBiomes = biomes.clone();
-
-		for (int i = 0, j = biomes.length; i < j; ++i)
-		{
-			Biome biome = biomes[i];
-
-			if (biome.isMutation())
-			{
-				Biome newBiome = Biome.getMutationForBiome(biome);
-
-				if (newBiome != null && !biome.isMutation())
-				{
-					newBiomes[i] = newBiome;
-				}
-			}
-		}
-
-		return newBiomes;
-	}
-
 	@Override
 	public Chunk generateChunk(int chunkX, int chunkZ)
 	{
 		rand.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
 
 		biomesForGeneration = world.getBiomeProvider().getBiomes(biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
-		biomesForGeneration = replaceBiomes(biomesForGeneration);
 
 		ChunkPrimer primer = new ChunkPrimer();
 
@@ -161,7 +137,7 @@ public class ChunkGeneratorHugeCavern implements IChunkGenerator
 
 		if (HugeCavernConfig.generateCaves)
 		{
-			caveGenerator.generate(world, chunkX, chunkZ, primer);
+			caveGenerator.generate(world, chunkX, chunkZ, primer, biomesForGeneration);
 		}
 
 		replaceBiomeBlocks(chunkX, chunkZ, primer);

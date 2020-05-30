@@ -1,33 +1,23 @@
 package cavern.miner.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.regex.Pattern;
-
 import javax.annotation.Nonnull;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class BlockMeta implements Comparable<BlockMeta>
 {
 	private final Block block;
+	private final int meta;
 
-	private int meta;
+	private IBlockState stateCache;
 
 	public BlockMeta(Block block, int meta)
 	{
@@ -38,17 +28,17 @@ public class BlockMeta implements Comparable<BlockMeta>
 	public BlockMeta(IBlockState state)
 	{
 		this(state.getBlock(), state.getBlock().getMetaFromState(state));
+		this.stateCache = state;
 	}
 
 	public BlockMeta(String name, int meta)
 	{
-		this(ObjectUtils.defaultIfNull(Block.getBlockFromName(name), Blocks.AIR), meta);
+		this(name, Blocks.AIR, meta);
 	}
 
-	public BlockMeta(String name, String meta)
+	public BlockMeta(String name, Block defaultValue, int meta)
 	{
-		this(name, -1);
-		this.meta = getMetaFromString(block, meta);
+		this(ObjectUtils.defaultIfNull(Block.getBlockFromName(name), defaultValue), meta);
 	}
 
 	@Nonnull
@@ -65,7 +55,12 @@ public class BlockMeta implements Comparable<BlockMeta>
 	@SuppressWarnings("deprecation")
 	public IBlockState getBlockState()
 	{
-		return block.getStateFromMeta(meta);
+		if (stateCache == null)
+		{
+			stateCache = block.getStateFromMeta(meta);
+		}
+
+		return stateCache;
 	}
 
 	public String getBlockName()
@@ -73,22 +68,8 @@ public class BlockMeta implements Comparable<BlockMeta>
 		return block.getRegistryName().toString();
 	}
 
-	public String getMetaName()
-	{
-		return getMetaName(block, meta);
-	}
-
-	public String getMetaString()
-	{
-		return getMetaString(block, meta);
-	}
-
-	public String getName()
-	{
-		return getName(false);
-	}
-
-	public String getName(boolean metaName)
+	@Override
+	public String toString()
 	{
 		String name = getBlockName();
 
@@ -97,25 +78,7 @@ public class BlockMeta implements Comparable<BlockMeta>
 			return name;
 		}
 
-		return name + ":" + (metaName ? getMetaString() : meta);
-	}
-
-	@Override
-	public String toString()
-	{
-		String name = getBlockName();
-
-		if (!Item.getItemFromBlock(block).getHasSubtypes())
-		{
-			return name;
-		}
-
-		if (meta < 0 || meta == OreDictionary.WILDCARD_VALUE)
-		{
-			return name + ",meta=all";
-		}
-
-		return name + ",meta=" + meta;
+		return name + ":" + meta;
 	}
 
 	@Override
@@ -166,178 +129,9 @@ public class BlockMeta implements Comparable<BlockMeta>
 
 		if (i == 0 && blockMeta != null)
 		{
-			i = getName().compareTo(blockMeta.getName());
+			i = toString().compareTo(blockMeta.toString());
 		}
 
 		return i;
-	}
-
-	private static final Pattern NUMBER_PATTERN = Pattern.compile("^[0-9]+$");
-
-	private static final LoadingCache<Pair<Block, String>, Integer> STRING_META_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<Pair<Block, String>, Integer>()
-	{
-		@Override
-		public Integer load(Pair<Block, String> key) throws Exception
-		{
-			Block block = key.getLeft();
-			String str = key.getRight();
-
-			if (block == null || Strings.isNullOrEmpty(str) || str.equalsIgnoreCase("all") || str.equalsIgnoreCase("null"))
-			{
-				return -1;
-			}
-
-			str = str.trim();
-
-			if (NUMBER_PATTERN.matcher(str).matches())
-			{
-				try
-				{
-					return Integer.parseInt(str, 10);
-				}
-				catch (Exception e) {}
-			}
-
-			Class<?> clazz = null;
-
-			for (Field field : block.getClass().getDeclaredFields())
-			{
-				if ((field.getModifiers() & 0x1) != 0 && (field.getModifiers() & 0x8) != 0)
-				{
-					if (field.getType() == PropertyEnum.class)
-					{
-						try
-						{
-							clazz = ((PropertyEnum<?>)field.get(null)).getValueClass();
-						}
-						catch (Exception e) {}
-					}
-				}
-			}
-
-			if (clazz == null)
-			{
-				return -1;
-			}
-
-			for (Object obj : clazz.getEnumConstants())
-			{
-				if (obj instanceof IStringSerializable)
-				{
-					String name = ((IStringSerializable)obj).getName();
-
-					if (str.equalsIgnoreCase(name))
-					{
-						for (Method method : obj.getClass().getDeclaredMethods())
-						{
-							if (method.getReturnType() == Integer.TYPE && method.getParameterTypes().length == 0)
-							{
-								try
-								{
-									return (Integer)method.invoke(obj, new Object[0]);
-								}
-								catch (Exception e) {}
-							}
-						}
-					}
-				}
-			}
-
-			return -1;
-		};
-	});
-
-	private static final LoadingCache<Pair<Block, Integer>, String> META_STRING_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<Pair<Block, Integer>, String>()
-	{
-		@Override
-		public String load(Pair<Block, Integer> key) throws Exception
-		{
-			Block block = key.getLeft();
-			int meta = key.getRight();
-
-			if (block == null)
-			{
-				return null;
-			}
-
-			if (meta < 0)
-			{
-				return "all";
-			}
-
-			Class<?> clazz = null;
-
-			for (Field field : block.getClass().getDeclaredFields())
-			{
-				if ((field.getModifiers() & 0x1) != 0 && (field.getModifiers() & 0x8) != 0)
-				{
-					if (field.getType() == PropertyEnum.class)
-					{
-						try
-						{
-							clazz = ((PropertyEnum<?>)field.get(null)).getValueClass();
-						}
-						catch (Exception e) {}
-					}
-				}
-			}
-
-			if (clazz == null)
-			{
-				return "null";
-			}
-
-			for (Object obj : clazz.getEnumConstants())
-			{
-				if (obj instanceof IStringSerializable)
-				{
-					String name = ((IStringSerializable)obj).getName();
-
-					for (Method method : obj.getClass().getDeclaredMethods())
-					{
-						if (method.getReturnType() == Integer.TYPE && method.getParameterTypes().length == 0)
-						{
-							try
-							{
-								if (((Integer)method.invoke(obj, new Object[0])).intValue() == meta)
-								{
-									return name;
-								}
-							}
-							catch (Exception e) {}
-						}
-					}
-				}
-			}
-
-			return "null";
-		}
-	});
-
-	public static int getMetaFromString(Block block, String str)
-	{
-		return STRING_META_CACHE.getUnchecked(Pair.of(block, str));
-	}
-
-	public static String getMetaName(Block block, int meta)
-	{
-		if (block.getRegistryName().getResourceDomain().equals("minecraft"))
-		{
-			return META_STRING_CACHE.getUnchecked(Pair.of(block, meta));
-		}
-
-		return Integer.toString(meta);
-	}
-
-	public static String getMetaString(Block block, int meta)
-	{
-		String name = getMetaName(block, meta);
-
-		if (Strings.isNullOrEmpty(name) || name.equals("null"))
-		{
-			return Integer.toString(0);
-		}
-
-		return name;
 	}
 }

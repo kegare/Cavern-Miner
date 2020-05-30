@@ -211,18 +211,18 @@ public final class ClientEventHooks
 	{
 		Entity entity = event.getEntity();
 
-		if (CavernAPI.dimension.isInCaveland(entity))
-		{
-			GlStateManager.setFog(GlStateManager.FogMode.EXP);
-
-			event.setDensity((float)Math.abs(Math.pow((Math.min(entity.posY, 20) - 63) / (255 - 63), 4)));
-			event.setCanceled(true);
-		}
-		else if (CavernAPI.dimension.isInHugeCavern(entity))
+		if (HugeCavernConfig.caveFog && CavernAPI.dimension.isInHugeCavern(entity))
 		{
 			GlStateManager.setFog(GlStateManager.FogMode.EXP);
 
 			event.setDensity(0.005F);
+			event.setCanceled(true);
+		}
+		else if (CavelandConfig.caveFog && CavernAPI.dimension.isInCaveland(entity))
+		{
+			GlStateManager.setFog(GlStateManager.FogMode.EXP);
+
+			event.setDensity((float)Math.abs(Math.pow((Math.min(entity.posY, 20) - 63) / (255 - 63), 4)));
 			event.setCanceled(true);
 		}
 	}
@@ -233,11 +233,11 @@ public final class ClientEventHooks
 		Entity entity = event.getEntity();
 		float var1 = 0.0F;
 
-		if (CavernAPI.dimension.isInHugeCavern(entity))
+		if (HugeCavernConfig.caveFog && CavernAPI.dimension.isInHugeCavern(entity))
 		{
 			var1 = 0.8F;
 		}
-		else if (CavernAPI.dimension.isInCaveland(entity))
+		else if (CavelandConfig.caveFog && CavernAPI.dimension.isInCaveland(entity))
 		{
 			var1 = 0.7F;
 		}

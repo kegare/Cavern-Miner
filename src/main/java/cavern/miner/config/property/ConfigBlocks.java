@@ -117,8 +117,18 @@ public class ConfigBlocks
 				if (value.indexOf(':') != value.lastIndexOf(':'))
 				{
 					int i = value.lastIndexOf(':');
+					int meta;
 
-					blockMeta = new BlockMeta(value.substring(0, i), value.substring(i + 1));
+					try
+					{
+						meta = Integer.parseInt(value.substring(i + 1));
+					}
+					catch (NumberFormatException e)
+					{
+						meta = 0;
+					}
+
+					blockMeta = new BlockMeta(value.substring(0, i), meta);
 				}
 				else
 				{

@@ -2,6 +2,8 @@ package cavern.miner.client.config;
 
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import cavern.miner.client.gui.GuiSelectBlock;
 import cavern.miner.client.gui.GuiSelectOreDict;
 import cavern.miner.client.gui.GuiSelectOreDict.OreDictEntry;
@@ -30,7 +32,7 @@ public class SelectBlocksAndOreDictsEntry extends ArrayEntry
 	{
 		super.updateValueButtonText();
 
-		if (isDefault())
+		if (isDefault() && ArrayUtils.isEmpty(configElement.getDefaults()))
 		{
 			btnValue.displayString = I18n.format("gui.default");
 		}

@@ -17,16 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.logging.log4j.Level;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import cavern.miner.core.CavernMod;
 import cavern.miner.data.PortalCache;
 import cavern.miner.network.CaveNetworkRegistry;
 import cavern.miner.network.client.RegenerationGuiMessage;
 import cavern.miner.network.client.RegenerationGuiMessage.EnumType;
-import cavern.miner.util.CaveLog;
 import cavern.miner.world.CaveDimensions;
 import cavern.miner.world.CustomSeed;
 import cavern.miner.world.CustomSeedProvider;
@@ -308,7 +307,7 @@ public class RegenerationMessage implements ISimpleMessage<RegenerationMessage, 
 		}
 		catch (IOException e)
 		{
-			CaveLog.log(Level.WARN, e, "An error occurred archiving the " + parent + "directory.");
+			CavernMod.LOG.warn("An error occurred archiving the " + parent + "directory.", e);
 		}
 
 		return false;

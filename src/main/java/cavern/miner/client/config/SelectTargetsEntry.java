@@ -1,5 +1,7 @@
 package cavern.miner.client.config;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;
@@ -20,7 +22,7 @@ public class SelectTargetsEntry extends SelectBlocksAndOreDictsEntry
 	{
 		super.updateValueButtonText();
 
-		if (btnValue.displayString.isEmpty())
+		if (isDefault() && ArrayUtils.isEmpty(configElement.getDefaults()))
 		{
 			btnValue.displayString = I18n.format("cavern.config.auto");
 		}

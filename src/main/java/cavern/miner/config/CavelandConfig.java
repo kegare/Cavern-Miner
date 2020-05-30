@@ -25,7 +25,10 @@ public class CavelandConfig
 	public static boolean generateLakes;
 
 	public static int monsterSpawn;
+
 	public static double caveBrightness;
+	public static boolean caveFog;
+
 	public static boolean keepPortalChunk;
 
 	public static boolean autoVeins;
@@ -116,14 +119,27 @@ public class CavelandConfig
 		propOrder.add(prop.getName());
 		monsterSpawn = prop.getInt(monsterSpawn);
 
-		prop = config.get(category, "caveBrightness", 0.06D);
-		prop.setMinValue(0.0D).setMaxValue(1.0D);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [range: " + prop.getMinValue() + " ~ " + prop.getMaxValue() + ", default: " + prop.getDefault() + "]";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		caveBrightness = prop.getDouble(caveBrightness);
+		if (GeneralConfig.SIDE.isClient())
+		{
+			prop = config.get(category, "caveBrightness", 0.07D);
+			prop.setMinValue(0.0D).setMaxValue(1.0D);
+			prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
+			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
+			comment += " [range: " + prop.getMinValue() + " ~ " + prop.getMaxValue() + ", default: " + prop.getDefault() + "]";
+			prop.setComment(comment);
+			propOrder.add(prop.getName());
+			caveBrightness = prop.getDouble(caveBrightness);
+
+			prop = config.get(category, "caveFog", true);
+			prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
+			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
+			comment += " [default: " + prop.getDefault() + "]";
+			comment += Configuration.NEW_LINE;
+			comment += "Note: If multiplayer, server-side only.";
+			prop.setComment(comment);
+			propOrder.add(prop.getName());
+			caveFog = prop.getBoolean(caveFog);
+		}
 
 		prop = config.get(category, "keepPortalChunk", false);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
@@ -145,7 +161,7 @@ public class CavelandConfig
 		propOrder.add(prop.getName());
 		autoVeins = prop.getBoolean(autoVeins);
 
-		String[] blacklist = {"stoneGranitePolished", "stoneDioritePolished", "stoneAndesitePolished", "oreQuartz"};
+		String[] blacklist = {"oreQuartz", "stoneAndesitePolished", "stoneDioritePolished", "stoneGranitePolished"};
 
 		prop = config.get(category, "autoVeinBlacklist", blacklist);
 		prop.setConfigEntryClass(CaveConfigEntries.selectVeins);

@@ -33,7 +33,7 @@ public class CavernBiomesEntry extends CategoryEntry
 	@Override
 	public boolean isDefault()
 	{
-		return false;
+		return CavernConfig.BIOMES.getCaveBiomes().isEmpty();
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class CavernBiomesEntry extends CategoryEntry
 
 		if (childScreen != null && childScreen instanceof GuiBiomesEditor)
 		{
-			((GuiBiomesEditor)childScreen).refreshBiomes(manager.getCaveBiomes().values());
+			((GuiBiomesEditor)childScreen).refreshBiomes();
 		}
 	}
 }

@@ -2,7 +2,6 @@ package cavern.miner.client.gui;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +89,7 @@ public class GuiBiomesEditor extends GuiScreen
 		{
 			biomeList = new BiomeList();
 
-			refreshBiomes(manager.getCaveBiomes().values());
+			refreshBiomes();
 		}
 
 		biomeList.setDimensions(width, height, 32, height - (editMode ? 78 : 28));
@@ -281,9 +280,18 @@ public class GuiBiomesEditor extends GuiScreen
 
 								if (block != null && block != Blocks.AIR)
 								{
-									int meta = BlockMeta.getMetaFromString(block, terrainBlockMetaField.getText());
+									int meta;
 
-									if (meta < 0)
+									try
+									{
+										meta = Integer.parseInt(terrainBlockMetaField.getText());
+
+										if (meta < 0)
+										{
+											meta = 0;
+										}
+									}
+									catch (NumberFormatException e)
 									{
 										meta = 0;
 									}
@@ -298,9 +306,18 @@ public class GuiBiomesEditor extends GuiScreen
 
 								if (block != null && block != Blocks.AIR)
 								{
-									int meta = BlockMeta.getMetaFromString(block, topBlockMetaField.getText());
+									int meta;
 
-									if (meta < 0)
+									try
+									{
+										meta = Integer.parseInt(topBlockMetaField.getText());
+
+										if (meta < 0)
+										{
+											meta = 0;
+										}
+									}
+									catch (NumberFormatException e)
 									{
 										meta = 0;
 									}
@@ -368,9 +385,9 @@ public class GuiBiomesEditor extends GuiScreen
 							if (biome != null)
 							{
 								terrainBlockField.setText(biome.getTerrainBlock().getBlockName());
-								terrainBlockMetaField.setText(biome.getTerrainBlock().getMetaString());
+								terrainBlockMetaField.setText(Integer.toString(biome.getTerrainBlock().getMeta()));
 								topBlockField.setText(biome.getTopBlock().getBlockName());
-								topBlockMetaField.setText(biome.getTopBlock().getMetaString());
+								topBlockMetaField.setText(Integer.toString(biome.getTopBlock().getMeta()));
 							}
 						}
 					}
@@ -396,7 +413,7 @@ public class GuiBiomesEditor extends GuiScreen
 						@Override
 						public boolean isValidEntry(Biome entry)
 						{
-							return entry != null && !invisibleBiomes.contains(entry) && !entry.isMutation();
+							return entry != null && !invisibleBiomes.contains(entry);
 						}
 
 						@Override
@@ -434,7 +451,7 @@ public class GuiBiomesEditor extends GuiScreen
 					biomeList.selected.clear();
 					break;
 				case 5:
-					biomeList.biomes.forEach(entry -> biomeList.selected.add(entry));
+					biomeList.biomes.forEach(biomeList.selected::add);
 
 					actionPerformed(removeButton);
 					break;
@@ -530,8 +547,8 @@ public class GuiBiomesEditor extends GuiScreen
 			List<String> info = Lists.newArrayList();
 			String prefix = TextFormatting.GRAY.toString();
 
-			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.terrainBlock") + ": " + caveBiome.getTerrainBlock().getName());
-			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.topBlock") + ": " + caveBiome.getTopBlock().getName());
+			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.terrainBlock") + ": " + caveBiome.getTerrainBlock().toString());
+			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.topBlock") + ": " + caveBiome.getTopBlock().toString());
 
 			drawHoveringText(info, mouseX, mouseY);
 		}
@@ -722,12 +739,17 @@ public class GuiBiomesEditor extends GuiScreen
 		biomeList.currentPanoramaPaths = null;
 	}
 
-	public void refreshBiomes(Collection<CaveBiome> biomes)
+	public void refreshBiomes()
 	{
+		if (biomeList == null)
+		{
+			return;
+		}
+
 		biomeList.biomes.clear();
 		biomeList.contents.clear();
 
-		biomes.stream().sorted().forEach(biome ->
+		manager.getCaveBiomes().values().stream().sorted().forEach(biome ->
 		{
 			biomeList.biomes.add(biome);
 			biomeList.contents.add(biome);
@@ -871,7 +893,21 @@ public class GuiBiomesEditor extends GuiScreen
 
 		protected boolean filterMatch(CaveBiome entry, String filter)
 		{
-			return CaveFilters.biomeFilter(entry.getBiome(), filter) || CaveFilters.blockFilter(entry.getTerrainBlock(), filter) || CaveFilters.blockFilter(entry.getTopBlock(), filter);
+			if (filter.startsWith("terrain:"))
+			{
+				filter = filter.substring(filter.indexOf(":") + 1);
+
+				return CaveFilters.blockFilter(entry.getTerrainBlock(), filter);
+			}
+
+			if (filter.startsWith("top:"))
+			{
+				filter = filter.substring(filter.indexOf(":") + 1);
+
+				return CaveFilters.blockFilter(entry.getTopBlock(), filter);
+			}
+
+			return CaveFilters.biomeFilter(entry.getBiome(), filter);
 		}
 	}
 }

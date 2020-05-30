@@ -5,10 +5,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-import org.apache.logging.log4j.Level;
-
 import cavern.miner.core.CavernMod;
-import cavern.miner.util.CaveLog;
 import cavern.miner.util.CaveUtils;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockDirt;
@@ -146,7 +143,7 @@ public class BlockCavenicBush extends BlockBush
 				}
 				catch (Exception e)
 				{
-					CaveLog.log(Level.WARN, e, "Couldn't transform entity NBT data: {%s}", key.toString());
+					CavernMod.LOG.warn("Couldn't transform entity NBT data: {}", key.toString(), e);
 				}
 
 				world.spawnEntity(newEntity);

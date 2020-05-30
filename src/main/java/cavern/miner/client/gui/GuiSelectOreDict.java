@@ -182,13 +182,13 @@ public class GuiSelectOreDict extends GuiScreen
 				}
 				else
 				{
-					arrayEntry.setListFromChildScreen(oreDictList.selected.stream().map(OreDictEntry::getName).collect(Collectors.toList()).toArray());
+					arrayEntry.setListFromChildScreen(oreDictList.selected.stream().map(OreDictEntry::getName).toArray(String[]::new));
 				}
 			}
 			else if (!oreDictList.selected.isEmpty())
 			{
 				Object[] values = arrayEntry.getCurrentValues();
-				Object[] newValues = oreDictList.selected.stream().map(OreDictEntry::getName).collect(Collectors.toList()).toArray();
+				Object[] newValues = oreDictList.selected.stream().map(OreDictEntry::getName).toArray(String[]::new);
 
 				if (values == null || values.length <= 0)
 				{

@@ -200,13 +200,13 @@ public class GuiSelectBlock extends GuiScreen
 				}
 				else
 				{
-					arrayEntry.setListFromChildScreen(blockList.selected.stream().map(BlockMeta::getName).collect(Collectors.toList()).toArray());
+					arrayEntry.setListFromChildScreen(blockList.selected.stream().map(BlockMeta::toString).collect(Collectors.toList()).toArray());
 				}
 			}
 			else if (!blockList.selected.isEmpty())
 			{
 				Object[] values = arrayEntry.getCurrentValues();
-				Object[] newValues = blockList.selected.stream().map(BlockMeta::getName).collect(Collectors.toList()).toArray();
+				Object[] newValues = blockList.selected.stream().map(BlockMeta::toString).collect(Collectors.toList()).toArray();
 
 				if (values == null || values.length <= 0)
 				{
@@ -240,7 +240,7 @@ public class GuiSelectBlock extends GuiScreen
 
 			if (metaField != null)
 			{
-				metaField.setText(blockMeta.getMetaString());
+				metaField.setText(Integer.toString(blockMeta.getMeta()));
 			}
 
 			break;
@@ -506,15 +506,23 @@ public class GuiSelectBlock extends GuiScreen
 			if (nameField != null)
 			{
 				String name = nameField.getText();
-				String meta = Integer.toString(-1);
 
-				if (metaField != null)
+				if (!Strings.isNullOrEmpty(name))
 				{
-					meta = metaField.getText();
-				}
+					int meta = 0;
 
-				if (!Strings.isNullOrEmpty(name) && !Strings.isNullOrEmpty(meta))
-				{
+					if (metaField != null)
+					{
+						try
+						{
+							meta = Integer.parseInt(metaField.getText());
+						}
+						catch (NumberFormatException e)
+						{
+							meta = 0;
+						}
+					}
+
 					select.add(new BlockMeta(name, meta));
 				}
 			}
@@ -533,8 +541,18 @@ public class GuiSelectBlock extends GuiScreen
 					if (value.indexOf(':') != value.lastIndexOf(':'))
 					{
 						int i = value.lastIndexOf(':');
+						int meta;
 
-						blockMeta = new BlockMeta(value.substring(0, i), value.substring(i + 1));
+						try
+						{
+							meta = Integer.parseInt(value.substring(i + 1));
+						}
+						catch (NumberFormatException e)
+						{
+							meta = -1;
+						}
+
+						blockMeta = new BlockMeta(value.substring(0, i), meta);
 					}
 					else
 					{
@@ -548,7 +566,7 @@ public class GuiSelectBlock extends GuiScreen
 				});
 			}
 
-			for (BlockMeta blockMeta : EntryListHelper.getBlockEntiries())
+			for (BlockMeta blockMeta : EntryListHelper.getBlockEntries())
 			{
 				if (selectorCallback == null || selectorCallback.isValidEntry(blockMeta))
 				{
@@ -620,7 +638,7 @@ public class GuiSelectBlock extends GuiScreen
 
 			if (nameType == 1)
 			{
-				name = blockMeta.getName();
+				name = blockMeta.toString();
 			}
 			else if (stack.getItem() != Items.AIR)
 			{

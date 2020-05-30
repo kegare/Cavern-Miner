@@ -127,6 +127,8 @@ public final class CavebornEventHooks
 			}
 		}
 
+		player.setSpawnChunk(pos, true, player.dimension);
+
 		double x = player.posX;
 		double y = player.posY + 0.25D;
 		double z = player.posZ;

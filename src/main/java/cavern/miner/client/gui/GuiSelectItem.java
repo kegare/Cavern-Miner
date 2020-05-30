@@ -464,7 +464,7 @@ public class GuiSelectItem extends GuiScreen
 				});
 			}
 
-			for (ItemMeta itemMeta : EntryListHelper.getItemEntiries())
+			for (ItemMeta itemMeta : EntryListHelper.getItemEntries())
 			{
 				if (selectorCallback == null || selectorCallback.isValidEntry(itemMeta))
 				{

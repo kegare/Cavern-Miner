@@ -69,7 +69,18 @@ public class ConfigMiningPoints
 				{
 					i = str.lastIndexOf(':');
 
-					blockMeta = new BlockMeta(str.substring(0, i), str.substring(i + 1));
+					int meta;
+
+					try
+					{
+						meta = Integer.parseInt(str.substring(i + 1));
+					}
+					catch (NumberFormatException e)
+					{
+						meta = 0;
+					}
+
+					blockMeta = new BlockMeta(str.substring(0, i), meta);
 				}
 				else
 				{
@@ -124,13 +135,24 @@ public class ConfigMiningPoints
 		}
 	}
 
-	public int getPoint(IBlockState state)
+	public int getPoint(BlockMeta blockMeta)
 	{
-		Block block = state.getBlock();
-		int meta = state.getBlock().getMetaFromState(state);
-
 		if (!points.isEmpty())
 		{
+			Integer ret = points.get(blockMeta.getBlock(), blockMeta.getMeta());
+
+			return ret == null ? 0 : ret;
+		}
+
+		return MiningPointHelper.getPoint(blockMeta);
+	}
+
+	public int getPoint(IBlockState state)
+	{
+		if (!points.isEmpty())
+		{
+			Block block = state.getBlock();
+			int meta = block.getMetaFromState(state);
 			Integer ret = points.get(block, meta);
 
 			return ret == null ? 0 : ret;

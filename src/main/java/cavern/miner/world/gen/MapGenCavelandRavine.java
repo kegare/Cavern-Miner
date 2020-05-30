@@ -1,7 +1,6 @@
 package cavern.miner.world.gen;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -48,7 +47,7 @@ public class MapGenCavelandRavine extends MapGenCavernRavine
 		}
 		else if (y < ground)
 		{
-			Biome biome = world.getBiome(new BlockPos(x + chunkX * 16, 0, z + chunkZ * 16));
+			Biome biome = biomesForGeneration[x * 16 + z];
 			IBlockState state = FLOWING_WATER;
 
 			if (BiomeDictionary.hasType(biome, Type.SANDY))

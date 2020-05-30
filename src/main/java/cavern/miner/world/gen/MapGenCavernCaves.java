@@ -2,10 +2,13 @@ package cavern.miner.world.gen;
 
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenCaves;
 
@@ -15,6 +18,40 @@ public class MapGenCavernCaves extends MapGenCaves
 	protected static final IBlockState BLK_DIRT = Blocks.DIRT.getDefaultState();
 	protected static final IBlockState BLK_GRASS = Blocks.GRASS.getDefaultState();
 	protected static final IBlockState BLK_WATER = Blocks.WATER.getDefaultState();
+
+	protected Biome[] biomesForGeneration;
+
+	public void generate(World worldIn, int x, int z, ChunkPrimer primer, Biome[] biomes)
+	{
+		super.generate(worldIn, x, z, primer);
+
+		biomesForGeneration = biomes;
+	}
+
+	@Nullable
+	protected Biome getBaseBiome()
+	{
+		if (biomesForGeneration == null)
+		{
+			return null;
+		}
+
+		Biome baseBiome = null;
+
+		for (Biome biome : biomesForGeneration)
+		{
+			if (baseBiome == null)
+			{
+				baseBiome = biome;
+			}
+			else if (baseBiome != biome)
+			{
+				return null;
+			}
+		}
+
+		return baseBiome;
+	}
 
 	@Override
 	protected void addTunnel(long caveSeed, int chunkX, int chunkZ, ChunkPrimer primer, double blockX, double blockY, double blockZ, float scale, float leftRightRadian, float upDownRadian, int currentY, int targetY, double scaleHeight)

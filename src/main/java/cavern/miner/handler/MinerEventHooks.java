@@ -13,6 +13,7 @@ import cavern.miner.config.MiningConfig;
 import cavern.miner.data.Miner;
 import cavern.miner.data.MinerRank;
 import cavern.miner.data.MiningCache;
+import cavern.miner.data.PlacedCache;
 import cavern.miner.enchantment.MiningUnit;
 import cavern.miner.network.CaveNetworkRegistry;
 import cavern.miner.network.client.MiningMessage;

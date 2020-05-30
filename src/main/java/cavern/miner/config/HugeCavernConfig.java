@@ -5,14 +5,10 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import cavern.miner.client.config.CaveConfigEntries;
-import cavern.miner.config.manager.CaveBiome;
 import cavern.miner.config.manager.CaveBiomeManager;
 import cavern.miner.config.manager.CaveVeinManager;
 import cavern.miner.config.property.ConfigItems;
 import cavern.miner.core.CavernMod;
-import cavern.miner.util.BlockMeta;
-import net.minecraft.init.Biomes;
-import net.minecraft.init.Blocks;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
@@ -29,7 +25,10 @@ public class HugeCavernConfig
 	public static boolean generateLakes;
 
 	public static int monsterSpawn;
+
 	public static double caveBrightness;
+	public static boolean caveFog;
+
 	public static boolean keepPortalChunk;
 
 	public static boolean autoVeins;
@@ -110,14 +109,27 @@ public class HugeCavernConfig
 		propOrder.add(prop.getName());
 		monsterSpawn = prop.getInt(monsterSpawn);
 
-		prop = config.get(category, "caveBrightness", 0.05D);
-		prop.setMinValue(0.0D).setMaxValue(1.0D);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [range: " + prop.getMinValue() + " ~ " + prop.getMaxValue() + ", default: " + prop.getDefault() + "]";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		caveBrightness = prop.getDouble(caveBrightness);
+		if (GeneralConfig.SIDE.isClient())
+		{
+			prop = config.get(category, "caveBrightness", 0.05D);
+			prop.setMinValue(0.0D).setMaxValue(1.0D);
+			prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
+			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
+			comment += " [range: " + prop.getMinValue() + " ~ " + prop.getMaxValue() + ", default: " + prop.getDefault() + "]";
+			prop.setComment(comment);
+			propOrder.add(prop.getName());
+			caveBrightness = prop.getDouble(caveBrightness);
+
+			prop = config.get(category, "caveFog", true);
+			prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
+			comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
+			comment += " [default: " + prop.getDefault() + "]";
+			comment += Configuration.NEW_LINE;
+			comment += "Note: If multiplayer, server-side only.";
+			prop.setComment(comment);
+			propOrder.add(prop.getName());
+			caveFog = prop.getBoolean(caveFog);
+		}
 
 		prop = config.get(category, "keepPortalChunk", false);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
@@ -139,7 +151,7 @@ public class HugeCavernConfig
 		propOrder.add(prop.getName());
 		autoVeins = prop.getBoolean(autoVeins);
 
-		String[] blacklist = {"stoneGranitePolished", "stoneDioritePolished", "stoneAndesitePolished", "oreQuartz"};
+		String[] blacklist = {"oreQuartz", "stoneAndesitePolished", "stoneDioritePolished", "stoneGranitePolished"};
 
 		prop = config.get(category, "autoVeinBlacklist", blacklist);
 		prop.setConfigEntryClass(CaveConfigEntries.selectVeins);
@@ -167,17 +179,7 @@ public class HugeCavernConfig
 			BIOMES.getCaveBiomes().clear();
 		}
 
-		if (BIOMES.config.getCategoryNames().isEmpty())
-		{
-			List<CaveBiome> biomes = Lists.newArrayList();
-
-			biomes.add(new CaveBiome(Biomes.JUNGLE).setTopBlock(new BlockMeta(Blocks.GRAVEL.getDefaultState())));
-			biomes.add(new CaveBiome(Biomes.JUNGLE_HILLS).setTopBlock(new BlockMeta(Blocks.GRAVEL.getDefaultState())));
-			biomes.add(new CaveBiome(Biomes.MESA).setTopBlock(new BlockMeta(Blocks.RED_SANDSTONE.getDefaultState())));
-
-			CavernConfig.generateBiomesConfig(BIOMES, biomes);
-		}
-		else
+		if (!BIOMES.config.getCategoryNames().isEmpty())
 		{
 			CavernConfig.addBiomesFromConfig(BIOMES);
 		}

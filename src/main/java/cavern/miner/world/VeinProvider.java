@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Level;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -19,9 +18,9 @@ import cavern.miner.block.BlockCave;
 import cavern.miner.block.CaveBlocks;
 import cavern.miner.config.manager.CaveVein;
 import cavern.miner.config.manager.CaveVeinManager;
+import cavern.miner.core.CavernMod;
 import cavern.miner.handler.CaveEventHooks;
 import cavern.miner.util.BlockMeta;
-import cavern.miner.util.CaveLog;
 import cavern.miner.util.CaveUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -137,6 +136,12 @@ public class VeinProvider
 							String variant = name.substring(3).toLowerCase();
 
 							int harvestLevel = block.getHarvestLevel(state);
+
+							if (harvestLevel < 0 || !block.getHarvestTool(state).equals("pickaxe"))
+							{
+								continue;
+							}
+
 							int level = harvestLevel;
 
 							Item pickaxe = ForgeRegistries.ITEMS.getValue(new ResourceLocation(block.getRegistryName().getResourceDomain(), variant + "_pickaxe"));
@@ -184,7 +189,7 @@ public class VeinProvider
 					}
 					catch (Exception e)
 					{
-						CaveLog.log(Level.WARN, e, "An error occurred while setup. Skip: {%s} %s", name, stack.toString());
+						CavernMod.LOG.warn("An error occurred while setup. Skip: {} | {}", name, stack.toString(), e);
 					}
 				}
 			}
@@ -233,7 +238,7 @@ public class VeinProvider
 					}
 					catch (Exception e)
 					{
-						CaveLog.log(Level.WARN, e, "An error occurred while setup. Skip: {%s} %s", name, stack.toString());
+						CavernMod.LOG.warn("An error occurred while setup. Skip: {} | {}", name, stack.toString(), e);
 					}
 				}
 			}
@@ -244,12 +249,33 @@ public class VeinProvider
 		return list;
 	}
 
+	@Nullable
+	public String getEntryName(BlockMeta blockMeta)
+	{
+		for (Pair<String, BlockMeta> ore : getOreBlocks())
+		{
+			if (ore.getRight().equals(blockMeta))
+			{
+				return ore.getLeft();
+			}
+		}
+
+		for (Pair<String, BlockMeta> stone : getStoneBlocks())
+		{
+			if (stone.getRight().equals(blockMeta))
+			{
+				return stone.getLeft();
+			}
+		}
+
+		return null;
+	}
+
 	public NonNullList<CaveVein> getDummyVeins(@Nullable String[] blacklist)
 	{
 		NonNullList<CaveVein> veins = NonNullList.create();
-		NonNullList<Pair<String, BlockMeta>> ores = getOreBlocks();
 
-		for (Pair<String, BlockMeta> ore : ores)
+		for (Pair<String, BlockMeta> ore : getOreBlocks())
 		{
 			Rarity rarity = RARITY_MAP.get(ore.getRight());
 
@@ -264,9 +290,7 @@ public class VeinProvider
 			}
 		}
 
-		NonNullList<Pair<String, BlockMeta>> stones = getStoneBlocks();
-
-		for (Pair<String, BlockMeta> stone : stones)
+		for (Pair<String, BlockMeta> stone : getStoneBlocks())
 		{
 			if (blacklist == null || !ArrayUtils.contains(blacklist, stone.getLeft()))
 			{

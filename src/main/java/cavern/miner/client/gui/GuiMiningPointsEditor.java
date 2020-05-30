@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -265,7 +266,14 @@ public class GuiMiningPointsEditor extends GuiScreen
 					}
 					else
 					{
-						arrayEntry.setListFromChildScreen(pointList.points.stream().map(PointEntry::toString).collect(Collectors.toList()).toArray());
+						if (pointList.points.isEmpty())
+						{
+							arrayEntry.setListFromChildScreen(new String[0]);
+						}
+						else
+						{
+							arrayEntry.setListFromChildScreen(pointList.points.stream().map(PointEntry::toString).collect(Collectors.toList()).toArray());
+						}
 
 						actionPerformed(cancelButton);
 
@@ -465,13 +473,9 @@ public class GuiMiningPointsEditor extends GuiScreen
 			removeButton.enabled = editButton.enabled;
 			clearButton.visible = !editButton.enabled && !pointList.points.isEmpty();
 
-			filterTextField.setVisible(!pointList.points.isEmpty());
-			autoConfigTextField.setVisible(!filterTextField.getVisible());
+			autoConfigTextField.setVisible(pointList.points.isEmpty() && !filterTextField.isFocused() && Strings.isNullOrEmpty(filterTextField.getText()));
 
-			if (filterTextField.getVisible())
-			{
-				filterTextField.updateCursorCounter();
-			}
+			filterTextField.updateCursorCounter();
 		}
 	}
 
@@ -525,9 +529,16 @@ public class GuiMiningPointsEditor extends GuiScreen
 		{
 			drawHoveringText(fontRenderer.listFormattedStringToWidth(I18n.format(Config.LANG_KEY + "instant.hover"), 300), mouseX, mouseY);
 		}
-		else if (pointList.isMouseYWithinSlotBounds(mouseY) && isCtrlKeyDown())
+		else if (!pointList.contents.isEmpty() && pointList.isMouseYWithinSlotBounds(mouseY) && isCtrlKeyDown())
 		{
-			PointEntry entry = pointList.contents.get(pointList.getSlotIndexFromScreenCoords(mouseX, mouseY));
+			int index = pointList.getSlotIndexFromScreenCoords(mouseX, mouseY);
+
+			if (index < 0)
+			{
+				return;
+			}
+
+			PointEntry entry = pointList.contents.get(index);
 			List<String> info = Lists.newArrayList();
 			String prefix = TextFormatting.GRAY.toString();
 
@@ -537,7 +548,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 			}
 			else
 			{
-				info.add(prefix + I18n.format(Config.LANG_KEY + "points.block") + ": " + entry.getBlockMeta().getBlockName() + ":" + entry.getBlockMeta().getMetaString());
+				info.add(prefix + I18n.format(Config.LANG_KEY + "points.block") + ": " + entry.getBlockMeta().getBlockName() + ":" + entry.getBlockMeta().getMeta());
 			}
 
 			info.add(prefix + I18n.format(Config.LANG_KEY + "points.point") + ": " + entry.getPoint());
@@ -589,7 +600,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 		{
 			pointField.mouseClicked(x, y, code);
 		}
-		else if (!pointList.points.isEmpty())
+		else if (!pointList.points.isEmpty() || !pointList.autoEntries.isEmpty())
 		{
 			filterTextField.mouseClicked(x, y, code);
 		}
@@ -648,9 +659,9 @@ public class GuiMiningPointsEditor extends GuiScreen
 				{
 					actionPerformed(doneButton);
 				}
-				else if (code == Keyboard.KEY_BACK)
+				else if (code == Keyboard.KEY_F || code == mc.gameSettings.keyBindChat.getKeyCode())
 				{
-					pointList.selected.clear();
+					filterTextField.setFocused(true);
 				}
 				else if (code == Keyboard.KEY_TAB)
 				{
@@ -667,10 +678,6 @@ public class GuiMiningPointsEditor extends GuiScreen
 				{
 					pointList.scrollToEnd();
 				}
-				else if (code == Keyboard.KEY_SPACE)
-				{
-					pointList.scrollToSelected();
-				}
 				else if (code == Keyboard.KEY_PRIOR)
 				{
 					pointList.scrollToPrev();
@@ -679,9 +686,19 @@ public class GuiMiningPointsEditor extends GuiScreen
 				{
 					pointList.scrollToNext();
 				}
-				else if (code == Keyboard.KEY_F || code == mc.gameSettings.keyBindChat.getKeyCode())
+
+				if (pointList.points.isEmpty())
 				{
-					filterTextField.setFocused(true);
+					return;
+				}
+
+				if (code == Keyboard.KEY_BACK)
+				{
+					pointList.selected.clear();
+				}
+				else if (code == Keyboard.KEY_SPACE)
+				{
+					pointList.scrollToSelected();
 				}
 				else if (isCtrlKeyDown() && code == Keyboard.KEY_A)
 				{
@@ -712,8 +729,10 @@ public class GuiMiningPointsEditor extends GuiScreen
 		private final NonNullList<PointEntry> points = NonNullList.create();
 		private final NonNullList<PointEntry> contents = NonNullList.create();
 		private final NonNullList<PointEntry> autoEntries = NonNullList.create();
+		private final NonNullList<PointEntry> autoContents = NonNullList.create();
 		private final Set<PointEntry> selected = Sets.newTreeSet(this);
 		private final Map<String, List<PointEntry>> filterCache = Maps.newHashMap();
+		private final Map<String, List<PointEntry>> autoFilterCache = Maps.newHashMap();
 
 		private int nameType;
 		private boolean clickFlag;
@@ -749,7 +768,18 @@ public class GuiMiningPointsEditor extends GuiScreen
 					{
 						i = str.lastIndexOf(':');
 
-						blockMeta = new BlockMeta(str.substring(0, i), str.substring(i + 1));
+						int meta;
+
+						try
+						{
+							meta = Integer.parseInt(str.substring(i + 1));
+						}
+						catch (NumberFormatException e)
+						{
+							meta = 0;
+						}
+
+						blockMeta = new BlockMeta(str.substring(0, i), meta);
 					}
 					else
 					{
@@ -766,7 +796,13 @@ public class GuiMiningPointsEditor extends GuiScreen
 				}
 			});
 
-			MiningPointHelper.getEntries().entrySet().stream().map(entry -> new PointEntry(entry.getKey(), entry.getValue())).forEach(autoEntries::add);
+			for (Entry<BlockMeta, Integer> entry : MiningPointHelper.getEntries().entrySet())
+			{
+				PointEntry pointEntry = new PointEntry(entry.getKey(), entry.getValue());
+
+				autoEntries.add(pointEntry);
+				autoContents.add(pointEntry);
+			}
 		}
 
 		@Override
@@ -794,7 +830,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 		@Override
 		protected int getSize()
 		{
-			return points.isEmpty() ? autoEntries.size() : contents.size();
+			return points.isEmpty() ? autoContents.size() : contents.size();
 		}
 
 		@Override
@@ -806,7 +842,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 		@Override
 		protected void drawSlot(int index, int par2, int par3, int par4, int mouseX, int mouseY, float partialTicks)
 		{
-			PointEntry entry = points.isEmpty() ? autoEntries.get(index) : contents.get(index);
+			PointEntry entry = points.isEmpty() ? autoContents.get(index) : contents.get(index);
 			String text = null;
 			ItemStack stack = null;
 
@@ -833,7 +869,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 
 				if (nameType == 1)
 				{
-					text = blockMeta.getName();
+					text = blockMeta.toString();
 				}
 				else if (hasItem)
 				{
@@ -900,35 +936,55 @@ public class GuiMiningPointsEditor extends GuiScreen
 
 		private void setFilter(String filter)
 		{
-			if (points.isEmpty())
-			{
-				return;
-			}
-
 			List<PointEntry> result;
 
-			if (Strings.isNullOrEmpty(filter))
+			if (points.isEmpty())
 			{
-				result = points;
-			}
-			else if (filter.equals("selected"))
-			{
-				result = Lists.newArrayList(selected);
+				if (Strings.isNullOrEmpty(filter))
+				{
+					result = autoEntries;
+				}
+				else
+				{
+					if (!autoFilterCache.containsKey(filter))
+					{
+						autoFilterCache.put(filter, autoEntries.parallelStream().filter(e -> filterMatch(e, filter)).collect(Collectors.toList()));
+					}
+
+					result = autoFilterCache.get(filter);
+				}
+
+				if (!autoContents.equals(result))
+				{
+					autoContents.clear();
+					autoContents.addAll(result);
+				}
 			}
 			else
 			{
-				if (!filterCache.containsKey(filter))
+				if (Strings.isNullOrEmpty(filter))
 				{
-					filterCache.put(filter, points.parallelStream().filter(e -> filterMatch(e, filter)).collect(Collectors.toList()));
+					result = points;
+				}
+				else if (filter.equals("selected"))
+				{
+					result = Lists.newArrayList(selected);
+				}
+				else
+				{
+					if (!filterCache.containsKey(filter))
+					{
+						filterCache.put(filter, points.parallelStream().filter(e -> filterMatch(e, filter)).collect(Collectors.toList()));
+					}
+
+					result = filterCache.get(filter);
 				}
 
-				result = filterCache.get(filter);
-			}
-
-			if (!contents.equals(result))
-			{
-				contents.clear();
-				contents.addAll(result);
+				if (!contents.equals(result))
+				{
+					contents.clear();
+					contents.addAll(result);
+				}
 			}
 		}
 
@@ -949,7 +1005,14 @@ public class GuiMiningPointsEditor extends GuiScreen
 
 			if (i == 0 && o1 != null && o2 != null)
 			{
-				i = Integer.compare(points.indexOf(o1), points.indexOf(o2));
+				if (points.isEmpty())
+				{
+					i = Integer.compare(autoEntries.indexOf(o1), autoEntries.indexOf(o2));
+				}
+				else
+				{
+					i = Integer.compare(points.indexOf(o1), points.indexOf(o2));
+				}
 			}
 
 			return i;
@@ -997,7 +1060,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 
 		public String getName()
 		{
-			return isOreDict() ? oreDict.toString() : blockMeta.getName(true);
+			return isOreDict() ? oreDict.toString() : blockMeta.toString();
 		}
 
 		public int getPoint()

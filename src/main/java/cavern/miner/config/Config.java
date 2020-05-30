@@ -4,9 +4,7 @@ import java.io.File;
 
 import javax.annotation.Nullable;
 
-import org.apache.logging.log4j.Level;
-
-import cavern.miner.util.CaveLog;
+import cavern.miner.core.CavernMod;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
 
@@ -51,7 +49,7 @@ public class Config
 
 			file.renameTo(dest);
 
-			CaveLog.log(Level.ERROR, e, "A critical error occured reading the " + file.getName() + " file, defaults will be used - the invalid file is backed up at " + dest.getName());
+			CavernMod.LOG.error("A critical error occured reading the " + file.getName() + " file, defaults will be used - the invalid file is backed up at " + dest.getName(), e);
 		}
 
 		return config;
@@ -89,7 +87,7 @@ public class Config
 
 			file.renameTo(dest);
 
-			CaveLog.log(Level.ERROR, e, "A critical error occured reading the " + file.getName() + " file, defaults will be used - the invalid file is backed up at " + dest.getName());
+			CavernMod.LOG.error("A critical error occured reading the " + file.getName() + " file, defaults will be used - the invalid file is backed up at " + dest.getName(), e);
 		}
 
 		return config;

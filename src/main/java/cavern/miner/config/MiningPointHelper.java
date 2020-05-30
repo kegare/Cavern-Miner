@@ -2,18 +2,14 @@ package cavern.miner.config;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.Level;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import cavern.miner.api.block.CaveOre;
+import cavern.miner.core.CavernMod;
 import cavern.miner.handler.CaveEventHooks;
 import cavern.miner.util.BlockMeta;
-import cavern.miner.util.CaveLog;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockOre;
@@ -41,11 +37,10 @@ public final class MiningPointHelper
 	@SuppressWarnings("deprecation")
 	public static void setupPoints()
 	{
-		Set<String> oreNames = Arrays.stream(OreDictionary.getOreNames())
-			.filter(name -> name.startsWith("ore") && name.length() > 3 && Character.isUpperCase(name.charAt(3)))
-			.sorted().collect(Collectors.toSet());
+		POINTS.put(new BlockMeta(Blocks.REDSTONE_ORE, 0), 2);
+		POINTS.put(new BlockMeta(Blocks.LIT_REDSTONE_ORE, 0), 2);
 
-		for (String name : oreNames)
+		Arrays.stream(OreDictionary.getOreNames()).filter(name -> name.startsWith("ore") && name.length() > 3 && Character.isUpperCase(name.charAt(3))).forEach(name ->
 		{
 			for (ItemStack stack : OreDictionary.getOres(name, false))
 			{
@@ -64,6 +59,25 @@ public final class MiningPointHelper
 					}
 
 					IBlockState state = block.getStateFromMeta(stack.getItemDamage());
+					BlockMeta blockMeta = new BlockMeta(state);
+
+					if (POINTS.containsKey(blockMeta))
+					{
+						continue;
+					}
+
+					if (block instanceof CaveOre)
+					{
+						int point = ((CaveOre)block).getMiningPoint(state);
+
+						if (point > 0)
+						{
+							POINTS.put(blockMeta, point);
+						}
+
+						continue;
+					}
+
 					int harvestLevel = block.getHarvestLevel(state);
 
 					if (harvestLevel < 0 || !block.getHarvestTool(state).equals("pickaxe"))
@@ -105,25 +119,29 @@ public final class MiningPointHelper
 						}
 					}
 
-					POINTS.put(new BlockMeta(state), amount);
+					POINTS.put(blockMeta, amount);
 				}
 				catch (Exception e)
 				{
-					CaveLog.log(Level.ERROR, "An error occurred while setup. Skip: {%s} %s", name, stack.toString());
+					CavernMod.LOG.error("An error occurred while setup. Skip: {} | {}", name, stack.toString(), e);
 				}
 			}
-		}
+		});
 
-		for (BlockMeta blockMeta : EntryListHelper.getBlockEntiries())
+		for (BlockMeta blockMeta : EntryListHelper.getBlockEntries())
 		{
+			if (POINTS.containsKey(blockMeta))
+			{
+				continue;
+			}
+
 			Block block = blockMeta.getBlock();
 
 			if (block instanceof BlockOre || block instanceof BlockRedstoneOre)
 			{
-				POINTS.putIfAbsent(blockMeta, 1);
+				POINTS.put(blockMeta, 1);
 			}
-
-			if (block instanceof CaveOre)
+			else if (block instanceof CaveOre)
 			{
 				int point = ((CaveOre)block).getMiningPoint(blockMeta.getBlockState());
 
@@ -133,9 +151,11 @@ public final class MiningPointHelper
 				}
 			}
 		}
+	}
 
-		POINTS.put(new BlockMeta(Blocks.REDSTONE_ORE, 0), 2);
-		POINTS.put(new BlockMeta(Blocks.LIT_REDSTONE_ORE, 0), 2);
+	public static int getPoint(BlockMeta blockMeta)
+	{
+		return POINTS.getOrDefault(blockMeta, 0);
 	}
 
 	public static int getPoint(IBlockState state)

@@ -2,10 +2,10 @@ package cavern.miner.client.config.dimension;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 
+import cavern.miner.client.config.CaveConfigGui;
 import cavern.miner.client.gui.GuiVeinsEditor;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.manager.CaveVeinManager;
@@ -14,7 +14,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;
 import net.minecraftforge.fml.client.config.GuiConfigEntries.CategoryEntry;
-import net.minecraftforge.fml.client.config.GuiConfigEntries.IConfigEntry;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -27,37 +26,50 @@ public class CavernVeinsEntry extends CategoryEntry
 		super(owningScreen, owningEntryList, prop);
 	}
 
-	protected String[] getAutoVeinsBlacklist()
+	protected GuiConfigEntries.BooleanEntry getAutoVeins()
 	{
-		if (owningEntryList.listEntries != null)
-		{
-			for (IConfigEntry entry : owningEntryList.listEntries)
-			{
-				if (entry.getName().endsWith("autoVeinBlacklist") && entry instanceof GuiConfigEntries.ArrayEntry)
-				{
-					Object[] values = ((GuiConfigEntries.ArrayEntry)entry).getCurrentValues();
+		return CaveConfigGui.getConfigEntry(owningEntryList.listEntries, "autoVeins", GuiConfigEntries.BooleanEntry.class);
+	}
 
-					if (values.length > 0)
-					{
-						return Arrays.asList(values).toArray(new String[values.length]);
-					}
-				}
-			}
-		}
-
-		return null;
+	protected GuiConfigEntries.ArrayEntry getAutoVeinsBlacklist()
+	{
+		return CaveConfigGui.getConfigEntry(owningEntryList.listEntries, "autoVeinBlacklist", GuiConfigEntries.ArrayEntry.class);
 	}
 
 	@Override
 	protected GuiScreen buildChildScreen()
 	{
-		return new GuiVeinsEditor(owningScreen, WorldProviderCavern.VEINS, CavernConfig.VEINS, getAutoVeinsBlacklist());
+		return new GuiVeinsEditor(owningScreen, WorldProviderCavern.VEINS, () -> getAutoVeins(), () -> getAutoVeinsBlacklist());
+	}
+
+	protected void refreshChildScreen()
+	{
+		if (childScreen != null && childScreen instanceof GuiVeinsEditor)
+		{
+			((GuiVeinsEditor)childScreen).refreshVeins();
+		}
+	}
+
+	@Override
+	public boolean mousePressed(int index, int x, int y, int mouseEvent, int relativeX, int relativeY)
+	{
+		if (!super.mousePressed(index, x, y, mouseEvent, relativeX, relativeY))
+		{
+			return false;
+		}
+
+		if (btnSelectCategory.mousePressed(mc, x, y))
+		{
+			refreshChildScreen();
+		}
+
+		return true;
 	}
 
 	@Override
 	public boolean isDefault()
 	{
-		return false;
+		return CavernConfig.VEINS.getCaveVeins().isEmpty();
 	}
 
 	@Override
@@ -81,9 +93,6 @@ public class CavernVeinsEntry extends CategoryEntry
 		manager.config = null;
 		CavernConfig.syncVeinsConfig();
 
-		if (childScreen != null && childScreen instanceof GuiVeinsEditor)
-		{
-			((GuiVeinsEditor)childScreen).refreshVeins(manager.getCaveVeins());
-		}
+		refreshChildScreen();
 	}
 }

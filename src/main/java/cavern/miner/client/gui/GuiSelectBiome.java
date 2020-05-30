@@ -227,7 +227,14 @@ public class GuiSelectBiome extends GuiScreen
 		}
 		else if (biomeList.isMouseYWithinSlotBounds(mouseY) && isCtrlKeyDown())
 		{
-			Biome biome = biomeList.contents.get(biomeList.getSlotIndexFromScreenCoords(mouseX, mouseY));
+			int index = biomeList.getSlotIndexFromScreenCoords(mouseX, mouseY);
+
+			if (index < 0)
+			{
+				return;
+			}
+
+			Biome biome = biomeList.contents.get(index);
 			List<String> info = Lists.newArrayList();
 
 			info.add(biome.getBiomeName() + TextFormatting.DARK_GRAY + "   " + biome.getRegistryName().toString());

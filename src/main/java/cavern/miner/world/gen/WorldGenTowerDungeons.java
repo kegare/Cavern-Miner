@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 
-import cavern.miner.util.CaveLog;
+import cavern.miner.core.CavernMod;
 import cavern.miner.util.CaveUtils;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.BlockLadder;
@@ -272,7 +272,7 @@ public class WorldGenTowerDungeons extends WorldGenerator
 			}
 			else
 			{
-				CaveLog.warning("Failed to fetch mob spawner entity at (" + blockPos.getX() + ", " + blockPos.getY() + ", " + blockPos.getZ() + ")");
+				CavernMod.LOG.warn("Failed to fetch mob spawner entity at (" + blockPos.getX() + ", " + blockPos.getY() + ", " + blockPos.getZ() + ")");
 			}
 		}
 	}

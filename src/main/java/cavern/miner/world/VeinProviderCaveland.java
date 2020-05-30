@@ -5,13 +5,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Level;
 
 import cavern.miner.config.CavelandConfig;
 import cavern.miner.config.manager.CaveVein;
 import cavern.miner.config.manager.CaveVeinManager;
+import cavern.miner.core.CavernMod;
 import cavern.miner.util.BlockMeta;
-import cavern.miner.util.CaveLog;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.state.IBlockState;
@@ -77,7 +76,7 @@ public class VeinProviderCaveland extends VeinProvider
 					}
 					catch (Exception e)
 					{
-						CaveLog.log(Level.WARN, e, "An error occurred while setup. Skip: {%s} %s", name, stack.toString());
+						CavernMod.LOG.warn("An error occurred while setup. Skip: {} | {}", name, stack.toString(), e);
 					}
 				}
 			}

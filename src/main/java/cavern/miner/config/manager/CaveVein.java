@@ -2,12 +2,11 @@ package cavern.miner.config.manager;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 import cavern.miner.util.BlockMeta;
 import net.minecraft.init.Blocks;
@@ -53,7 +52,7 @@ public class CaveVein
 
 	private String[] getBiomes(Object... objects)
 	{
-		Set<String> biomes = Sets.newTreeSet();
+		Stream.Builder<String> biomes = Stream.builder();
 
 		for (Object e : objects)
 		{
@@ -63,7 +62,7 @@ public class CaveVein
 			}
 			else if (e instanceof String)
 			{
-				Biome biome = Biome.REGISTRY.getObject(new ResourceLocation((String)e));
+				Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation((String)e));
 
 				if (biome != null)
 				{
@@ -85,7 +84,7 @@ public class CaveVein
 			}
 		}
 
-		return biomes.toArray(new String[biomes.size()]);
+		return biomes.build().sorted().toArray(String[]::new);
 	}
 
 	public BlockMeta getBlockMeta()
@@ -148,6 +147,7 @@ public class CaveVein
 		maxHeight = height;
 	}
 
+	@Nullable
 	public String[] getBiomes()
 	{
 		return biomes;

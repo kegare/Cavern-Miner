@@ -26,12 +26,7 @@ public final class CaveFilters
 			return false;
 		}
 
-		if (StringUtils.containsIgnoreCase(blockMeta.getName(), filter))
-		{
-			return true;
-		}
-
-		if (StringUtils.containsIgnoreCase(blockMeta.getMetaString(), filter))
+		if (StringUtils.containsIgnoreCase(blockMeta.toString(), filter))
 		{
 			return true;
 		}
@@ -64,7 +59,7 @@ public final class CaveFilters
 			}
 		}
 
-		if (StringUtils.containsIgnoreCase(block.getHarvestTool(blockMeta.getBlockState()), filter))
+		if (StringUtils.equalsIgnoreCase(block.getHarvestTool(blockMeta.getBlockState()), filter))
 		{
 			return true;
 		}
@@ -96,9 +91,12 @@ public final class CaveFilters
 			return true;
 		}
 
-		if (stack.getItem().getToolClasses(stack).contains(filter))
+		for (String name : stack.getItem().getToolClasses(stack))
 		{
-			return true;
+			if (StringUtils.equalsIgnoreCase(name, filter))
+			{
+				return true;
+			}
 		}
 
 		return false;

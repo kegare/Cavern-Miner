@@ -2,13 +2,11 @@ package cavern.miner.config;
 
 import java.util.List;
 
-import org.apache.logging.log4j.Level;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+import cavern.miner.core.CavernMod;
 import cavern.miner.util.BlockMeta;
-import cavern.miner.util.CaveLog;
 import cavern.miner.util.ItemMeta;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
@@ -81,7 +79,7 @@ public class EntryListHelper
 			}
 			catch (Exception e)
 			{
-				CaveLog.log(Level.ERROR, "An error occurred while setup. Skip: %s", block.toString());
+				CavernMod.LOG.warn("An error occurred while setup. Skip: {}", block.toString(), e);
 			}
 		}
 	}
@@ -115,17 +113,17 @@ public class EntryListHelper
 			}
 			catch (Exception e)
 			{
-				CaveLog.log(Level.ERROR, "An error occurred while setup. Skip: %s", item.toString());
+				CavernMod.LOG.warn("An error occurred while setup. Skip: {}", item.toString(), e);
 			}
 		}
 	}
 
-	public static ImmutableList<BlockMeta> getBlockEntiries()
+	public static ImmutableList<BlockMeta> getBlockEntries()
 	{
 		return ImmutableList.copyOf(BLOCKS);
 	}
 
-	public static ImmutableList<ItemMeta> getItemEntiries()
+	public static ImmutableList<ItemMeta> getItemEntries()
 	{
 		return ImmutableList.copyOf(ITEMS);
 	}

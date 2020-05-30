@@ -28,7 +28,6 @@ import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
-import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraft.world.gen.feature.WorldGenDeadBush;
 import net.minecraft.world.gen.feature.WorldGenLakes;
@@ -56,8 +55,8 @@ public class ChunkGeneratorCaveland implements IChunkGenerator
 
 	private Biome[] biomesForGeneration;
 
-	private final MapGenBase caveGenerator = new MapGenCavelandCaves();
-	private final MapGenBase ravineGenerator = new MapGenCavelandRavine();
+	private final MapGenCavelandCaves caveGenerator = new MapGenCavelandCaves();
+	private final MapGenCavelandRavine ravineGenerator = new MapGenCavelandRavine();
 
 	private final VeinGenerator veinGenerator;
 
@@ -159,11 +158,11 @@ public class ChunkGeneratorCaveland implements IChunkGenerator
 
 		setBlocksInChunk(primer);
 
-		caveGenerator.generate(world, chunkX, chunkZ, primer);
+		caveGenerator.generate(world, chunkX, chunkZ, primer, biomesForGeneration);
 
 		if (CavelandConfig.generateRiver)
 		{
-			ravineGenerator.generate(world, chunkX, chunkZ, primer);
+			ravineGenerator.generate(world, chunkX, chunkZ, primer, biomesForGeneration);
 		}
 
 		replaceBiomeBlocks(chunkX, chunkZ, primer);
