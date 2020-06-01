@@ -86,16 +86,16 @@ public class VeinProviderHugeCavern extends VeinProvider
 			return null;
 		}
 
-		list.add(new CaveVein(blockMeta, weight, size, min, max, biome));
+		list.add(new CaveVein(blockMeta, weight, size, min, max).setBiomes(biome));
 
 		if (rarity == Rarity.COMMON || rarity == Rarity.UNCOMMON || rarity == Rarity.RANDOMITE)
 		{
-			list.add(new CaveVein(blockMeta, weight, size / 2, max / 3, max, biome));
+			list.add(new CaveVein(blockMeta, weight, size / 2, max / 3, max).setBiomes(biome));
 		}
 
 		if (rarity == Rarity.COMMON)
 		{
-			list.add(new CaveVein(blockMeta, weight / 2, size, min, 40, biome));
+			list.add(new CaveVein(blockMeta, weight / 2, size, min, 40).setBiomes(biome));
 		}
 
 		return list;

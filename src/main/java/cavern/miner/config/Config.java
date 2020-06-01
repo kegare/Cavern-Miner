@@ -32,7 +32,7 @@ public class Config
 	public static Configuration loadConfig(String name)
 	{
 		File file = getConfigFile(name);
-		Configuration config = new CaveConfiguration(file, true);
+		Configuration config = new Configuration(file, true);
 
 		try
 		{
@@ -70,7 +70,7 @@ public class Config
 	public static Configuration loadConfig(String name, String category)
 	{
 		File file = getConfigFile(name, category);
-		Configuration config = new CaveConfiguration(file, true);
+		Configuration config = new Configuration(file, true);
 
 		try
 		{

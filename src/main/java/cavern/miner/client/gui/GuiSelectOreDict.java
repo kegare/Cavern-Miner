@@ -19,10 +19,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cavern.miner.client.config.CaveConfigGui;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.config.Config;
 import cavern.miner.util.CaveUtils;
-import cavern.miner.util.PanoramaPaths;
+import cavern.miner.util.PanoramaLocation;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -42,8 +42,8 @@ public class GuiSelectOreDict extends GuiScreen
 {
 	protected final GuiScreen parent;
 
-	protected ISelectorCallback<OreDictEntry> selectorCallback;
-	protected SelectSwitchEntry switchEntry;
+	protected Selector<OreDictEntry> selectorCallback;
+	protected SelectSwitch selectSwitch;
 
 	protected ArrayEntry arrayEntry;
 
@@ -72,21 +72,21 @@ public class GuiSelectOreDict extends GuiScreen
 		this.arrayEntry = arrayEntry;
 	}
 
-	public GuiSelectOreDict(GuiScreen parent, @Nullable ISelectorCallback<OreDictEntry> callback)
+	public GuiSelectOreDict(GuiScreen parent, @Nullable Selector<OreDictEntry> callback)
 	{
 		this(parent);
 		this.selectorCallback = callback;
 	}
 
-	public GuiSelectOreDict(GuiScreen parent, @Nullable ArrayEntry arrayEntry, @Nullable ISelectorCallback<OreDictEntry> callback)
+	public GuiSelectOreDict(GuiScreen parent, @Nullable ArrayEntry arrayEntry, @Nullable Selector<OreDictEntry> callback)
 	{
 		this(parent, arrayEntry);
 		this.selectorCallback = callback;
 	}
 
-	public void setSwitchEntry(@Nullable SelectSwitchEntry entry)
+	public void setSwitchEntry(@Nullable SelectSwitch entry)
 	{
-		switchEntry = entry;
+		selectSwitch = entry;
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class GuiSelectOreDict extends GuiScreen
 
 		oreDictList.setDimensions(width, height, 32, height - 28);
 
-		boolean hasSwitch = switchEntry != null;
+		boolean hasSwitch = selectSwitch != null;
 		int buttonWidth = hasSwitch ? 70 : 145;
 
 		if (doneButton == null)
@@ -112,7 +112,7 @@ public class GuiSelectOreDict extends GuiScreen
 
 		if (switchButton == null)
 		{
-			switchButton = new GuiButtonExt(3, 0, 0, buttonWidth, 20, hasSwitch ? switchEntry.getTranslatedName() : "");
+			switchButton = new GuiButtonExt(3, 0, 0, buttonWidth, 20, hasSwitch ? selectSwitch.getTranslatedName() : "");
 			switchButton.visible = hasSwitch;
 		}
 
@@ -129,7 +129,7 @@ public class GuiSelectOreDict extends GuiScreen
 			detailInfo = new GuiCheckBox(1, 0, 5, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		if (instantFilter == null)
@@ -137,7 +137,7 @@ public class GuiSelectOreDict extends GuiScreen
 			instantFilter = new GuiCheckBox(2, 0, detailInfo.y + detailInfo.height + 2, I18n.format(Config.LANG_KEY + "instant"), true);
 		}
 
-		instantFilter.setIsChecked(CaveConfigGui.instantFilter);
+		instantFilter.setIsChecked(GuiCaveConfig.instantFilter);
 		instantFilter.x = detailInfo.x;
 
 		buttonList.clear();
@@ -159,9 +159,9 @@ public class GuiSelectOreDict extends GuiScreen
 		detailHoverChecker = new HoverChecker(detailInfo, 800);
 		instantHoverChecker = new HoverChecker(instantFilter, 800);
 
-		if (switchEntry != null && mc.currentScreen == this)
+		if (selectSwitch != null && mc.currentScreen == this)
 		{
-			switchEntry.getGuiScreen().setWorldAndResolution(mc, width, height);
+			selectSwitch.getGuiScreen().setWorldAndResolution(mc, width, height);
 		}
 	}
 
@@ -174,7 +174,7 @@ public class GuiSelectOreDict extends GuiScreen
 
 		if (arrayEntry != null)
 		{
-			if (switchEntry == null || mc.currentScreen == this)
+			if (selectSwitch == null || mc.currentScreen == this)
 			{
 				if (oreDictList.selected.isEmpty())
 				{
@@ -223,9 +223,9 @@ public class GuiSelectOreDict extends GuiScreen
 				case 0:
 					setResult();
 
-					if (switchEntry != null)
+					if (selectSwitch != null)
 					{
-						switchEntry.getGuiScreen().confirmClicked(true, 3);
+						selectSwitch.getGuiScreen().confirmClicked(true, 3);
 					}
 
 					mc.displayGuiScreen(parent);
@@ -234,15 +234,15 @@ public class GuiSelectOreDict extends GuiScreen
 					oreDictList.scrollToTop();
 					break;
 				case 1:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 				case 2:
-					CaveConfigGui.instantFilter = instantFilter.isChecked();
+					GuiCaveConfig.instantFilter = instantFilter.isChecked();
 					break;
 				case 3:
-					if (switchEntry != null)
+					if (selectSwitch != null)
 					{
-						mc.displayGuiScreen(switchEntry.getGuiScreen());
+						mc.displayGuiScreen(selectSwitch.getGuiScreen());
 					}
 
 					break;
@@ -427,15 +427,7 @@ public class GuiSelectOreDict extends GuiScreen
 
 			if (arrayEntry != null)
 			{
-				Arrays.stream(arrayEntry.getCurrentValues()).map(Object::toString).filter(value -> !Strings.isNullOrEmpty(value)).forEach(value ->
-				{
-					value = value.trim();
-
-					if (OreDictionary.doesOreNameExist(value))
-					{
-						select.add(value);
-					}
-				});
+				Arrays.stream(arrayEntry.getCurrentValues()).map(Object::toString).filter(StringUtils::isNotEmpty).map(String::trim).filter(OreDictionary::doesOreNameExist).forEach(select::add);
 			}
 
 			for (String name : OreDictionary.getOreNames())
@@ -467,7 +459,7 @@ public class GuiSelectOreDict extends GuiScreen
 		}
 
 		@Override
-		public PanoramaPaths getPanoramaPaths()
+		public PanoramaLocation getPanoramaPaths()
 		{
 			return null;
 		}

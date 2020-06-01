@@ -1,14 +1,9 @@
 package cavern.miner.client.config.dimension;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
-import cavern.miner.client.config.CaveConfigGui;
-import cavern.miner.client.gui.GuiVeinsEditor;
-import cavern.miner.config.CavernConfig;
+import cavern.miner.client.config.GuiCaveConfig;
+import cavern.miner.client.gui.GuiEditVeins;
 import cavern.miner.config.manager.CaveVeinManager;
+import cavern.miner.world.VeinProvider;
 import cavern.miner.world.WorldProviderCavern;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.config.GuiConfig;
@@ -26,27 +21,32 @@ public class CavernVeinsEntry extends CategoryEntry
 		super(owningScreen, owningEntryList, prop);
 	}
 
+	protected VeinProvider getVeinProvider()
+	{
+		return WorldProviderCavern.VEINS;
+	}
+
 	protected GuiConfigEntries.BooleanEntry getAutoVeins()
 	{
-		return CaveConfigGui.getConfigEntry(owningEntryList.listEntries, "autoVeins", GuiConfigEntries.BooleanEntry.class);
+		return GuiCaveConfig.getConfigEntry(owningEntryList.listEntries, "autoVeins", GuiConfigEntries.BooleanEntry.class);
 	}
 
 	protected GuiConfigEntries.ArrayEntry getAutoVeinsBlacklist()
 	{
-		return CaveConfigGui.getConfigEntry(owningEntryList.listEntries, "autoVeinBlacklist", GuiConfigEntries.ArrayEntry.class);
+		return GuiCaveConfig.getConfigEntry(owningEntryList.listEntries, "autoVeinBlacklist", GuiConfigEntries.ArrayEntry.class);
 	}
 
 	@Override
 	protected GuiScreen buildChildScreen()
 	{
-		return new GuiVeinsEditor(owningScreen, WorldProviderCavern.VEINS, () -> getAutoVeins(), () -> getAutoVeinsBlacklist());
+		return new GuiEditVeins(owningScreen, getVeinProvider(), this::getAutoVeins, this::getAutoVeinsBlacklist);
 	}
 
 	protected void refreshChildScreen()
 	{
-		if (childScreen != null && childScreen instanceof GuiVeinsEditor)
+		if (childScreen != null && childScreen instanceof GuiEditVeins)
 		{
-			((GuiVeinsEditor)childScreen).refreshVeins();
+			((GuiEditVeins)childScreen).refreshVeins();
 		}
 	}
 
@@ -69,29 +69,21 @@ public class CavernVeinsEntry extends CategoryEntry
 	@Override
 	public boolean isDefault()
 	{
-		return CavernConfig.VEINS.getCaveVeins().isEmpty();
+		CaveVeinManager manager = getVeinProvider().getVeinManager();
+
+		return manager == null || manager.getCaveVeins().isEmpty();
 	}
 
 	@Override
 	public void setToDefault()
 	{
-		CaveVeinManager manager = CavernConfig.VEINS;
+		CaveVeinManager manager = getVeinProvider().getVeinManager();
 
-		try
+		if (manager != null)
 		{
-			FileUtils.forceDelete(new File(manager.config.toString()));
+			manager.getCaveVeins().clear();
+			manager.saveToFile();
 		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-
-			return;
-		}
-
-		manager.getCaveVeins().clear();
-
-		manager.config = null;
-		CavernConfig.syncVeinsConfig();
 
 		refreshChildScreen();
 	}

@@ -428,7 +428,7 @@ public class VeinProvider
 			return null;
 		}
 
-		return new CaveVein(blockMeta, weight, size, min, max, biome);
+		return new CaveVein(blockMeta, weight, size, min, max).setBiomes(biome);
 	}
 
 	@Nullable

@@ -3,19 +3,14 @@ package cavern.miner.util;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
-import net.minecraftforge.common.BiomeManager.BiomeEntry;
-import net.minecraftforge.common.BiomeManager.BiomeType;
 
 public final class CaveFilters
 {
@@ -109,7 +104,7 @@ public final class CaveFilters
 			return false;
 		}
 
-		if (Biome.getIdForBiome(biome) == NumberUtils.toInt(filter, -1) || StringUtils.containsIgnoreCase(biome.getRegistryName().toString(), filter))
+		if (StringUtils.containsIgnoreCase(biome.getRegistryName().toString(), filter))
 		{
 			return true;
 		}
@@ -130,33 +125,6 @@ public final class CaveFilters
 		if (blockFilter(new BlockMeta(biome.fillerBlock), filter))
 		{
 			return true;
-		}
-
-		BiomeType type;
-
-		try
-		{
-			type = BiomeType.valueOf(filter.toUpperCase());
-		}
-		catch (IllegalArgumentException e)
-		{
-			type = null;
-		}
-
-		if (type != null)
-		{
-			ImmutableList<BiomeEntry> list = BiomeManager.getBiomes(type);
-
-			if (list != null)
-			{
-				for (BiomeEntry entry : list)
-				{
-					if (entry != null && entry.biome.getRegistryName().equals(biome.getRegistryName()))
-					{
-						return true;
-					}
-				}
-			}
 		}
 
 		return false;

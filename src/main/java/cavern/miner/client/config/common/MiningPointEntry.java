@@ -1,6 +1,6 @@
 package cavern.miner.client.config.common;
 
-import cavern.miner.client.gui.GuiMiningPointsEditor;
+import cavern.miner.client.gui.GuiEditMiningPoints;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.GuiConfig;
@@ -40,7 +40,7 @@ public class MiningPointEntry extends ArrayEntry
 		{
 			btnValue.playPressSound(mc.getSoundHandler());
 
-			mc.displayGuiScreen(new GuiMiningPointsEditor(owningScreen, this));
+			mc.displayGuiScreen(new GuiEditMiningPoints(owningScreen, this));
 		}
 	}
 }

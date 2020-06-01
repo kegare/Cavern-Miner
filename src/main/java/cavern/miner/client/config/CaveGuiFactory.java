@@ -29,6 +29,6 @@ public class CaveGuiFactory implements IModGuiFactory
 	@Override
 	public GuiScreen createConfigGui(GuiScreen parentScreen)
 	{
-		return new CaveConfigGui(parentScreen);
+		return new GuiCaveConfig(parentScreen);
 	}
 }

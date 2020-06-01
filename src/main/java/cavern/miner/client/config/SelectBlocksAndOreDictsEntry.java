@@ -7,8 +7,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import cavern.miner.client.gui.GuiSelectBlock;
 import cavern.miner.client.gui.GuiSelectOreDict;
 import cavern.miner.client.gui.GuiSelectOreDict.OreDictEntry;
-import cavern.miner.client.gui.ISelectorCallback;
-import cavern.miner.client.gui.SelectSwitchEntry;
+import cavern.miner.client.gui.Selector;
+import cavern.miner.client.gui.SelectSwitch;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemBlock;
@@ -67,8 +67,8 @@ public class SelectBlocksAndOreDictsEntry extends ArrayEntry
 		GuiSelectBlock selectBlock = createSelectBlockGuiScreen();
 		GuiSelectOreDict selectOreDict = createSelectOreDictGuiScreen();
 
-		selectBlock.setSwitchEntry(new SelectSwitchEntry(selectOreDict, "oreDict"));
-		selectOreDict.setSwitchEntry(new SelectSwitchEntry(selectBlock, "block"));
+		selectBlock.setSwitchEntry(new SelectSwitch(selectOreDict, "oreDict"));
+		selectOreDict.setSwitchEntry(new SelectSwitch(selectBlock, "block"));
 
 		return selectBlock;
 	}
@@ -80,7 +80,7 @@ public class SelectBlocksAndOreDictsEntry extends ArrayEntry
 
 	protected GuiSelectOreDict createSelectOreDictGuiScreen()
 	{
-		return new GuiSelectOreDict(owningScreen, this, new ISelectorCallback<OreDictEntry>()
+		return new GuiSelectOreDict(owningScreen, this, new Selector<OreDictEntry>()
 		{
 			@Override
 			public boolean isValidEntry(OreDictEntry entry)

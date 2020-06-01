@@ -7,12 +7,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class SelectSwitchEntry
+public class SelectSwitch
 {
 	private final GuiScreen guiScreen;
 	private final String name;
 
-	public SelectSwitchEntry(GuiScreen guiScreen, String name)
+	public SelectSwitch(GuiScreen guiScreen, String name)
 	{
 		this.guiScreen = guiScreen;
 		this.name = name;

@@ -1,11 +1,6 @@
 package cavern.miner.client.config.dimension;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
-import cavern.miner.client.gui.GuiBiomesEditor;
+import cavern.miner.client.gui.GuiEditBiomes;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.manager.CaveBiomeManager;
 import net.minecraft.client.gui.GuiScreen;
@@ -24,42 +19,34 @@ public class CavernBiomesEntry extends CategoryEntry
 		super(owningScreen, owningEntryList, configElement);
 	}
 
+	protected CaveBiomeManager getBiomeManager()
+	{
+		return CavernConfig.BIOMES;
+	}
+
 	@Override
 	protected GuiScreen buildChildScreen()
 	{
-		return new GuiBiomesEditor(owningScreen, CavernConfig.BIOMES);
+		return new GuiEditBiomes(owningScreen, getBiomeManager());
 	}
 
 	@Override
 	public boolean isDefault()
 	{
-		return CavernConfig.BIOMES.getCaveBiomes().isEmpty();
+		return getBiomeManager().getCaveBiomes().isEmpty();
 	}
 
 	@Override
 	public void setToDefault()
 	{
-		CaveBiomeManager manager = CavernConfig.BIOMES;
-
-		try
-		{
-			FileUtils.forceDelete(new File(manager.config.toString()));
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-
-			return;
-		}
+		CaveBiomeManager manager = getBiomeManager();
 
 		manager.getCaveBiomes().clear();
+		manager.saveToFile();
 
-		manager.config = null;
-		CavernConfig.syncBiomesConfig();
-
-		if (childScreen != null && childScreen instanceof GuiBiomesEditor)
+		if (childScreen != null && childScreen instanceof GuiEditBiomes)
 		{
-			((GuiBiomesEditor)childScreen).refreshBiomes();
+			((GuiEditBiomes)childScreen).refreshBiomes();
 		}
 	}
 }

@@ -213,7 +213,7 @@ public class Miner implements IMinerAccess
 		{
 			NBTTagCompound tag = new NBTTagCompound();
 
-			tag.setString("Name", record.getKey().getBlockName());
+			tag.setString("Name", record.getKey().getRegistryName().toString());
 			tag.setInteger("Meta", record.getKey().getMeta());
 			tag.setInteger("Count", record.getValue());
 

@@ -13,9 +13,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class CaveConfigGuiEntries extends GuiConfigEntries
+public class GuiCaveConfigEntries extends GuiConfigEntries
 {
-	public CaveConfigGuiEntries(GuiConfig parent, Minecraft mc)
+	public GuiCaveConfigEntries(GuiConfig parent, Minecraft mc)
 	{
 		super(parent, mc);
 		this.setHasListHeader(true, 8);

@@ -4,11 +4,11 @@ import com.google.common.base.Objects;
 
 import net.minecraft.util.ResourceLocation;
 
-public class PanoramaPaths
+public class PanoramaLocation
 {
-	public final ResourceLocation north, east, south, west, top, bottom;
+	private final ResourceLocation north, east, south, west, top, bottom;
 
-	public PanoramaPaths(ResourceLocation north, ResourceLocation east , ResourceLocation south, ResourceLocation west, ResourceLocation top, ResourceLocation bottom)
+	public PanoramaLocation(ResourceLocation north, ResourceLocation east , ResourceLocation south, ResourceLocation west, ResourceLocation top, ResourceLocation bottom)
 	{
 		this.north = north;
 		this.east = east;
@@ -18,7 +18,7 @@ public class PanoramaPaths
 		this.bottom = bottom;
 	}
 
-	public ResourceLocation getPath(int i)
+	public ResourceLocation getLocation(int i)
 	{
 		switch (i)
 		{
@@ -39,16 +39,16 @@ public class PanoramaPaths
 		}
 	}
 
-	public ResourceLocation[] getPaths()
+	public ResourceLocation[] getLocations()
 	{
-		ResourceLocation[] paths = new ResourceLocation[6];
+		ResourceLocation[] entries = new ResourceLocation[6];
 
-		for (int i = 0; i < paths.length; ++i)
+		for (int i = 0; i < entries.length; ++i)
 		{
-			paths[i] = getPath(i);
+			entries[i] = getLocation(i);
 		}
 
-		return paths;
+		return entries;
 	}
 
 	@Override
@@ -58,12 +58,12 @@ public class PanoramaPaths
 		{
 			return true;
 		}
-		else if (obj == null || !(obj instanceof PanoramaPaths))
+		else if (obj == null || !(obj instanceof PanoramaLocation))
 		{
 			return false;
 		}
 
-		PanoramaPaths paths = (PanoramaPaths)obj;
+		PanoramaLocation paths = (PanoramaLocation)obj;
 
 		return north.equals(paths.north) && east.equals(paths.east) && south.equals(paths.south) && west.equals(paths.west) && top.equals(paths.top) && bottom.equals(paths.bottom);
 	}

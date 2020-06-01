@@ -34,8 +34,8 @@ public class HugeCavernConfig
 	public static boolean autoVeins;
 	public static String[] autoVeinBlacklist;
 
-	public static final CaveBiomeManager BIOMES = new CaveBiomeManager();
-	public static final CaveVeinManager VEINS = new CaveVeinManager();
+	public static final CaveBiomeManager BIOMES = new CaveBiomeManager("huge_cavern");
+	public static final CaveVeinManager VEINS = new CaveVeinManager("huge_cavern");
 
 	public static void syncConfig()
 	{
@@ -46,7 +46,7 @@ public class HugeCavernConfig
 
 		if (config == null)
 		{
-			config = Config.loadConfig("hugecavern", category);
+			config = Config.loadConfig("huge_cavern");
 		}
 
 		prop = config.get(category, "dimension", -51);
@@ -166,43 +166,5 @@ public class HugeCavernConfig
 		config.setCategoryPropertyOrder(category, propOrder);
 
 		Config.saveConfig(config);
-	}
-
-	public static void syncBiomesConfig()
-	{
-		if (BIOMES.config == null)
-		{
-			BIOMES.config = Config.loadConfig("hugecavern", "biomes");
-		}
-		else
-		{
-			BIOMES.getCaveBiomes().clear();
-		}
-
-		if (!BIOMES.config.getCategoryNames().isEmpty())
-		{
-			CavernConfig.addBiomesFromConfig(BIOMES);
-		}
-
-		Config.saveConfig(BIOMES.config);
-	}
-
-	public static void syncVeinsConfig()
-	{
-		if (VEINS.config == null)
-		{
-			VEINS.config = Config.loadConfig("hugecavern", "veins");
-		}
-		else
-		{
-			VEINS.getCaveVeins().clear();
-		}
-
-		if (!VEINS.config.getCategoryNames().isEmpty())
-		{
-			CavernConfig.addVeinsFromConfig(VEINS);
-		}
-
-		Config.saveConfig(VEINS.config);
 	}
 }

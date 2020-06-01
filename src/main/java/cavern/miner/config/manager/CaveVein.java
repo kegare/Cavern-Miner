@@ -1,12 +1,9 @@
 package cavern.miner.config.manager;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.Comparator;
+import java.util.Set;
 
-import javax.annotation.Nullable;
-
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 import cavern.miner.util.BlockMeta;
 import net.minecraft.init.Blocks;
@@ -19,72 +16,34 @@ public class CaveVein
 {
 	private BlockMeta blockMeta;
 	private BlockMeta targetBlockMeta;
-	private int veinWeight;
-	private int veinSize;
+	private int weight;
+	private int size;
 	private int minHeight;
 	private int maxHeight;
-	private String[] biomes;
 
-	public CaveVein() {}
+	private final Set<Biome> biomes = Sets.newTreeSet(Comparator.comparing(Biome::getRegistryName));
+	private final Set<BiomeDictionary.Type> biomeTypes = Sets.newHashSet();
 
 	public CaveVein(BlockMeta block, BlockMeta target, int weight, int size, int min, int max)
 	{
 		this.blockMeta = block;
 		this.targetBlockMeta = target;
-		this.veinWeight = weight;
-		this.veinSize = size;
+		this.weight = weight;
+		this.size = size;
 		this.minHeight = min;
 		this.maxHeight = max;
-		this.biomes = new String[0];
 	}
 
-	public CaveVein(BlockMeta block, int weight, int size, int min, int max, Object... biomes)
+	public CaveVein(BlockMeta block, int weight, int size, int min, int max)
 	{
 		this(block, new BlockMeta(Blocks.STONE.getDefaultState()), weight, size, min, max);
-		this.biomes = biomes == null || biomes.length <= 0 ? null : getBiomes(biomes);
 	}
 
 	public CaveVein(CaveVein vein)
 	{
-		this(vein.blockMeta, vein.targetBlockMeta, vein.veinWeight, vein.veinSize, vein.minHeight, vein.maxHeight);
-		this.biomes = vein.biomes;
-	}
-
-	private String[] getBiomes(Object... objects)
-	{
-		Stream.Builder<String> biomes = Stream.builder();
-
-		for (Object e : objects)
-		{
-			if (e instanceof Biome)
-			{
-				biomes.add(((Biome)e).getRegistryName().toString());
-			}
-			else if (e instanceof String)
-			{
-				Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation((String)e));
-
-				if (biome != null)
-				{
-					biomes.add((String)e);
-				}
-			}
-			else if (e instanceof Integer)
-			{
-				Biome biome = Biome.getBiome((Integer)e);
-
-				if (biome != null)
-				{
-					biomes.add(biome.getRegistryName().toString());
-				}
-			}
-			else if (e instanceof BiomeDictionary.Type)
-			{
-				BiomeDictionary.getBiomes((BiomeDictionary.Type)e).stream().map(Biome::getRegistryName).map(ResourceLocation::toString).forEach(biomes::add);
-			}
-		}
-
-		return biomes.build().sorted().toArray(String[]::new);
+		this(vein.blockMeta, vein.targetBlockMeta, vein.weight, vein.size, vein.minHeight, vein.maxHeight);
+		this.biomes.addAll(vein.biomes);
+		this.biomeTypes.addAll(vein.biomeTypes);
 	}
 
 	public BlockMeta getBlockMeta()
@@ -109,22 +68,22 @@ public class CaveVein
 
 	public int getWeight()
 	{
-		return veinWeight;
+		return weight;
 	}
 
-	public void setWeight(int weight)
+	public void setWeight(int value)
 	{
-		veinWeight = weight;
+		weight = value;
 	}
 
 	public int getSize()
 	{
-		return veinSize;
+		return size;
 	}
 
-	public void setSize(int size)
+	public void setSize(int value)
 	{
-		veinSize = size;
+		size = value;
 	}
 
 	public int getMinHeight()
@@ -132,9 +91,9 @@ public class CaveVein
 		return minHeight;
 	}
 
-	public void setMinHeight(int height)
+	public void setMinHeight(int y)
 	{
-		minHeight = height;
+		minHeight = y;
 	}
 
 	public int getMaxHeight()
@@ -147,54 +106,67 @@ public class CaveVein
 		maxHeight = height;
 	}
 
-	@Nullable
-	public String[] getBiomes()
+	public Set<Biome> getBiomes()
 	{
 		return biomes;
 	}
 
-	public void setBiomes(String[] target)
+	public Set<BiomeDictionary.Type> getBiomeTypes()
 	{
-		biomes = target;
+		return biomeTypes;
 	}
 
-	public boolean containsBiome(@Nullable Biome biome)
+	public CaveVein setBiomes(Object obj)
 	{
-		if (biomes == null || biomes.length <= 0 || biome == null)
+		if (obj == null)
 		{
-			return false;
+			return this;
 		}
 
-		for (String key : biomes)
+		if (obj instanceof Object[])
 		{
-			if (key.equals(biome.getRegistryName().toString()))
+			for (Object o : (Object[])obj)
 			{
-				return true;
+				setBiomes(o);
+			}
+		}
+		else if (obj instanceof BiomeDictionary.Type)
+		{
+			biomeTypes.add((BiomeDictionary.Type)obj);
+		}
+		else if (obj instanceof Biome)
+		{
+			biomes.add((Biome)obj);
+		}
+		else
+		{
+			ResourceLocation key = null;
+
+			if (obj instanceof ResourceLocation)
+			{
+				key = (ResourceLocation)obj;
+			}
+			else if (obj instanceof String)
+			{
+				key = new ResourceLocation((String)obj);
+			}
+
+			if (key != null)
+			{
+				Biome biome = ForgeRegistries.BIOMES.getValue(key);
+
+				if (biome != null)
+				{
+					biomes.add(biome);
+				}
 			}
 		}
 
-		return false;
+		return this;
 	}
 
-	public List<Biome> getBiomeList()
+	public boolean containsBiome(Biome biome)
 	{
-		if (biomes == null || biomes.length <= 0)
-		{
-			return Collections.emptyList();
-		}
-
-		List<Biome> list = Lists.newArrayList();
-
-		for (String key : biomes)
-		{
-			Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(key));
-
-			if (biome != null)
-			{
-				list.add(biome);
-			}
-		}
-
-		return list;
+		return biomes.contains(biome) || biomeTypes.stream().anyMatch(type -> BiomeDictionary.hasType(biome, type));
 	}
 }

@@ -1,7 +1,5 @@
 package cavern.miner.util;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.google.common.base.Objects;
@@ -10,6 +8,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class BlockMeta implements Comparable<BlockMeta>
@@ -19,10 +19,31 @@ public class BlockMeta implements Comparable<BlockMeta>
 
 	private IBlockState stateCache;
 
+	public BlockMeta(ResourceLocation name, int meta)
+	{
+		this(name, Blocks.AIR, meta);
+	}
+
+	public BlockMeta(String name, int meta)
+	{
+		this(new ResourceLocation(name), meta);
+	}
+
 	public BlockMeta(Block block, int meta)
 	{
 		this.block = block;
 		this.meta = meta;
+	}
+
+	public BlockMeta(ResourceLocation name, Block defaultValue, int meta)
+	{
+		this.block = ObjectUtils.defaultIfNull(ForgeRegistries.BLOCKS.getValue(name), defaultValue);
+		this.meta = meta;
+	}
+
+	public BlockMeta(String name, Block defaultValue, int meta)
+	{
+		this(new ResourceLocation(name), defaultValue, meta);
 	}
 
 	public BlockMeta(IBlockState state)
@@ -31,20 +52,14 @@ public class BlockMeta implements Comparable<BlockMeta>
 		this.stateCache = state;
 	}
 
-	public BlockMeta(String name, int meta)
-	{
-		this(name, Blocks.AIR, meta);
-	}
-
-	public BlockMeta(String name, Block defaultValue, int meta)
-	{
-		this(ObjectUtils.defaultIfNull(Block.getBlockFromName(name), defaultValue), meta);
-	}
-
-	@Nonnull
 	public Block getBlock()
 	{
 		return block;
+	}
+
+	public ResourceLocation getRegistryName()
+	{
+		return block.getRegistryName();
 	}
 
 	public int getMeta()
@@ -63,22 +78,15 @@ public class BlockMeta implements Comparable<BlockMeta>
 		return stateCache;
 	}
 
-	public String getBlockName()
-	{
-		return block.getRegistryName().toString();
-	}
-
 	@Override
 	public String toString()
 	{
-		String name = getBlockName();
-
 		if (meta < 0 || meta == OreDictionary.WILDCARD_VALUE || !Item.getItemFromBlock(block).getHasSubtypes())
 		{
-			return name;
+			return getRegistryName().toString();
 		}
 
-		return name + ":" + meta;
+		return getRegistryName().toString() + ":" + meta;
 	}
 
 	@Override
@@ -129,7 +137,12 @@ public class BlockMeta implements Comparable<BlockMeta>
 
 		if (i == 0 && blockMeta != null)
 		{
-			i = toString().compareTo(blockMeta.toString());
+			i = getRegistryName().compareTo(blockMeta.getRegistryName());
+
+			if (i == 0)
+			{
+				i = Integer.compare(meta, blockMeta.meta);
+			}
 		}
 
 		return i;

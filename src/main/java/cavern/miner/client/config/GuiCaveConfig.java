@@ -21,12 +21,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class CaveConfigGui extends GuiConfig
+public class GuiCaveConfig extends GuiConfig
 {
 	public static boolean detailInfo = true;
 	public static boolean instantFilter = true;
 
-	public CaveConfigGui(GuiScreen parent)
+	public GuiCaveConfig(GuiScreen parent)
 	{
 		super(parent, getConfigElements(), CavernMod.MODID, false, false, I18n.format(Config.LANG_KEY + "title"));
 	}
@@ -47,7 +47,7 @@ public class CaveConfigGui extends GuiConfig
 	{
 		if (entryList == null || needsRefresh)
 		{
-			entryList = new CaveConfigGuiEntries(this, mc);
+			entryList = new GuiCaveConfigEntries(this, mc);
 			needsRefresh = false;
 		}
 

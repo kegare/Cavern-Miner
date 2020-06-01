@@ -19,6 +19,8 @@ import cavern.miner.config.GeneralConfig;
 import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.config.MiningConfig;
 import cavern.miner.config.MiningPointHelper;
+import cavern.miner.config.manager.CaveBiomeManager;
+import cavern.miner.config.manager.CaveVeinManager;
 import cavern.miner.enchantment.CaveEnchantments;
 import cavern.miner.entity.CaveEntityRegistry;
 import cavern.miner.handler.CaveEventHooks;
@@ -177,16 +179,22 @@ public final class CavernMod
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
+		CaveBiomeManager.createExample();
+		CaveVeinManager.createExample();
+
 		CavernConfig.syncConfig();
-		CavernConfig.syncBiomesConfig();
-		CavernConfig.syncVeinsConfig();
+
+		CavernConfig.BIOMES.loadFromFile();
+		CavernConfig.VEINS.loadFromFile();
 
 		HugeCavernConfig.syncConfig();
-		HugeCavernConfig.syncBiomesConfig();
-		HugeCavernConfig.syncVeinsConfig();
+
+		HugeCavernConfig.BIOMES.loadFromFile();
+		HugeCavernConfig.VEINS.loadFromFile();
 
 		CavelandConfig.syncConfig();
-		CavelandConfig.syncVeinsConfig();
+
+		CavelandConfig.VEINS.loadFromFile();
 
 		CaveNetworkRegistry.registerMessages();
 

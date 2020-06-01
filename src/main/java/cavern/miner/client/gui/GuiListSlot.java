@@ -1,7 +1,5 @@
 package cavern.miner.client.gui;
 
-import java.util.Random;
-
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -13,7 +11,7 @@ import com.google.common.base.Strings;
 import cavern.miner.client.CaveRenderingRegistry;
 import cavern.miner.util.BlockMeta;
 import cavern.miner.util.CaveUtils;
-import cavern.miner.util.PanoramaPaths;
+import cavern.miner.util.PanoramaLocation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -40,26 +38,24 @@ import net.minecraftforge.oredict.OreDictionary;
 @SideOnly(Side.CLIENT)
 public abstract class GuiListSlot extends GuiSlot
 {
-	public static final NonNullList<PanoramaPaths> PANORAMA_PATHS = NonNullList.create();
-
-	private static final Random RANDOM = new Random();
-
-	private static int panoramaTimer;
+	private static final NonNullList<PanoramaLocation> PANORAMA_LOCATIONS = NonNullList.create();
 
 	static
 	{
 		for (int i = 0; i <= 2; ++i)
 		{
-			ResourceLocation[] paths = new ResourceLocation[6];
+			ResourceLocation[] entries = new ResourceLocation[6];
 
-			for (int j = 0; j < paths.length; ++j)
+			for (int j = 0; j < entries.length; ++j)
 			{
-				paths[j] = CaveUtils.getKey(String.format("textures/gui/panorama/%d/%d.png", i, j));
+				entries[j] = CaveUtils.getKey(String.format("textures/gui/panorama/%d/%d.png", i, j));
 			}
 
-			PANORAMA_PATHS.add(new PanoramaPaths(paths[0], paths[1], paths[2], paths[3], paths[4], paths[5]));
+			PANORAMA_LOCATIONS.add(new PanoramaLocation(entries[0], entries[1], entries[2], entries[3], entries[4], entries[5]));
 		}
 	}
+
+	private static int panoramaTimer;
 
 	protected final Minecraft mc;
 
@@ -67,7 +63,7 @@ public abstract class GuiListSlot extends GuiSlot
 	private final ResourceLocation panoramaBackground;
 	private float panoramaTicks;
 
-	public PanoramaPaths currentPanoramaPaths;
+	protected PanoramaLocation panoramaLocation;
 
 	public GuiListSlot(Minecraft mc, int width, int height, int top, int bottom, int slotHeight)
 	{
@@ -78,18 +74,14 @@ public abstract class GuiListSlot extends GuiSlot
 	}
 
 	@Nullable
-	public PanoramaPaths getPanoramaPaths()
+	protected PanoramaLocation getPanoramaPaths()
 	{
-		if (PANORAMA_PATHS.isEmpty())
+		if (panoramaLocation == null)
 		{
-			currentPanoramaPaths = null;
-		}
-		else if (currentPanoramaPaths == null)
-		{
-			currentPanoramaPaths = PANORAMA_PATHS.get(RANDOM.nextInt(PANORAMA_PATHS.size()));
+			panoramaLocation = CaveUtils.getRandomObject(PANORAMA_LOCATIONS);
 		}
 
-		return currentPanoramaPaths;
+		return panoramaLocation;
 	}
 
 	private void drawPanorama(float ticks)
@@ -125,7 +117,7 @@ public abstract class GuiListSlot extends GuiSlot
 
 			for (int l = 0; l < 6; ++l)
 			{
-				PanoramaPaths paths = getPanoramaPaths();
+				PanoramaLocation paths = getPanoramaPaths();
 
 				if (paths == null)
 				{
@@ -153,7 +145,7 @@ public abstract class GuiListSlot extends GuiSlot
 						break;
 				}
 
-				mc.getTextureManager().bindTexture(paths.getPath(l));
+				mc.getTextureManager().bindTexture(paths.getLocation(l));
 				buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
 				int i = 255 / (k + 1);
 				buffer.pos(-1.0D, -1.0D, 1.0D).tex(0.0D, 0.0D).color(255, 255, 255, i).endVertex();
@@ -319,7 +311,7 @@ public abstract class GuiListSlot extends GuiSlot
 			return;
 		}
 
-		if (stack.getMetadata() == OreDictionary.WILDCARD_VALUE)
+		if (stack.getItemDamage() == OreDictionary.WILDCARD_VALUE)
 		{
 			NBTTagCompound nbt = stack.getTagCompound();
 

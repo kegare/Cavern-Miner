@@ -152,13 +152,6 @@ public class VeinProviderCaveland extends VeinProvider
 			return null;
 		}
 
-		int max = world.provider.getAverageGroundLevel() - 4;
-
-		if (biome == null)
-		{
-			return new CaveVein(blockMeta, weight, size, 1, max);
-		}
-
-		return new CaveVein(blockMeta, weight, size, 1, max, biome);
+		return new CaveVein(blockMeta, weight, size, 1, world.provider.getAverageGroundLevel() - 4).setBiomes(biome);
 	}
 }

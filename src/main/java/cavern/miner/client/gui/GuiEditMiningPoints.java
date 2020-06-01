@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cavern.miner.client.CaveRenderingRegistry;
-import cavern.miner.client.config.CaveConfigGui;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.client.gui.GuiSelectOreDict.OreDictEntry;
 import cavern.miner.config.Config;
 import cavern.miner.config.MiningPointHelper;
@@ -49,7 +49,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.oredict.OreDictionary;
 
 @SideOnly(Side.CLIENT)
-public class GuiMiningPointsEditor extends GuiScreen
+public class GuiEditMiningPoints extends GuiScreen
 {
 	protected final GuiScreen parent;
 	protected final ArrayEntry arrayEntry;
@@ -83,7 +83,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 	private final List<String> editLabelList = Lists.newArrayList();
 	private final List<GuiTextField> editFieldList = Lists.newArrayList();
 
-	public GuiMiningPointsEditor(GuiScreen parent, ArrayEntry entry)
+	public GuiEditMiningPoints(GuiScreen parent, ArrayEntry entry)
 	{
 		this.parent = parent;
 		this.arrayEntry = entry;
@@ -159,7 +159,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 			detailInfo = new GuiCheckBox(6, 0, 5, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		if (instantFilter == null)
@@ -167,7 +167,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 			instantFilter = new GuiCheckBox(7, 0, detailInfo.y + detailInfo.height + 2, I18n.format(Config.LANG_KEY + "instant"), true);
 		}
 
-		instantFilter.setIsChecked(CaveConfigGui.instantFilter);
+		instantFilter.setIsChecked(GuiCaveConfig.instantFilter);
 		instantFilter.x = detailInfo.x;
 
 		buttonList.clear();
@@ -347,10 +347,10 @@ public class GuiMiningPointsEditor extends GuiScreen
 					actionPerformed(removeButton);
 					break;
 				case 6:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 				case 7:
-					CaveConfigGui.instantFilter = instantFilter.isChecked();
+					GuiCaveConfig.instantFilter = instantFilter.isChecked();
 					break;
 				default:
 					pointList.actionPerformed(button);
@@ -363,8 +363,8 @@ public class GuiMiningPointsEditor extends GuiScreen
 		GuiSelectBlock selectBlock = createSelectBlockGuiScreen();
 		GuiSelectOreDict selectOreDict = createSelectOreDictGuiScreen();
 
-		selectBlock.setSwitchEntry(new SelectSwitchEntry(selectOreDict, "oreDict"));
-		selectOreDict.setSwitchEntry(new SelectSwitchEntry(selectBlock, "block"));
+		selectBlock.setSwitchEntry(new SelectSwitch(selectOreDict, "oreDict"));
+		selectOreDict.setSwitchEntry(new SelectSwitch(selectBlock, "block"));
 
 		return selectBlock;
 	}
@@ -373,7 +373,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 	{
 		Set<BlockMeta> invisibleBlocks = pointList.points.stream().filter(PointEntry::isBlockMeta).map(PointEntry::getBlockMeta).collect(Collectors.toSet());
 
-		return new GuiSelectBlock(this, new ISelectorCallback<BlockMeta>()
+		return new GuiSelectBlock(this, new Selector<BlockMeta>()
 		{
 			@Override
 			public boolean isValidEntry(BlockMeta entry)
@@ -411,8 +411,8 @@ public class GuiMiningPointsEditor extends GuiScreen
 		GuiSelectOreDict selectOreDict = createSelectOreDictGuiScreen();
 		GuiSelectBlock selectBlock = createSelectBlockGuiScreen();
 
-		selectOreDict.setSwitchEntry(new SelectSwitchEntry(selectBlock, "block"));
-		selectBlock.setSwitchEntry(new SelectSwitchEntry(selectOreDict, "oreDict"));
+		selectOreDict.setSwitchEntry(new SelectSwitch(selectBlock, "block"));
+		selectBlock.setSwitchEntry(new SelectSwitch(selectOreDict, "oreDict"));
 
 		return selectOreDict;
 	}
@@ -421,7 +421,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 	{
 		Set<OreDictEntry> invisibleDicts = pointList.points.stream().filter(PointEntry::isOreDict).map(PointEntry::getOreDict).collect(Collectors.toSet());
 
-		return new GuiSelectOreDict(this, new ISelectorCallback<OreDictEntry>()
+		return new GuiSelectOreDict(this, new Selector<OreDictEntry>()
 		{
 			@Override
 			public boolean isValidEntry(OreDictEntry entry)
@@ -548,7 +548,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 			}
 			else
 			{
-				info.add(prefix + I18n.format(Config.LANG_KEY + "points.block") + ": " + entry.getBlockMeta().getBlockName() + ":" + entry.getBlockMeta().getMeta());
+				info.add(prefix + I18n.format(Config.LANG_KEY + "points.block") + ": " + entry.getBlockMeta().toString());
 			}
 
 			info.add(prefix + I18n.format(Config.LANG_KEY + "points.point") + ": " + entry.getPoint());
@@ -721,7 +721,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 	@Override
 	public void onGuiClosed()
 	{
-		pointList.currentPanoramaPaths = null;
+		pointList.panoramaLocation = null;
 	}
 
 	private class PointList extends GuiListSlot implements Comparator<PointEntry>
@@ -739,7 +739,7 @@ public class GuiMiningPointsEditor extends GuiScreen
 
 		private PointList()
 		{
-			super(GuiMiningPointsEditor.this.mc, 0, 0, 0, 0, 22);
+			super(GuiEditMiningPoints.this.mc, 0, 0, 0, 0, 22);
 
 			Arrays.stream(arrayEntry.getCurrentValues()).map(Object::toString).map(String::trim)
 				.filter(value -> value.contains(",") && value.length() > 3).forEach(value ->

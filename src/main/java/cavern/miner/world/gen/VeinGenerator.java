@@ -136,7 +136,7 @@ public class VeinGenerator
 
 					if (state.getBlock() == vein.getTarget().getBlock() && state.getBlock().getMetaFromState(state) == vein.getTarget().getMeta())
 					{
-						if (vein.getBiomes() == null || vein.getBiomes().length <= 0 || vein.containsBiome(biomes[x * 16 + z]))
+						if (vein.getBiomes().isEmpty() && vein.getBiomeTypes().isEmpty() || vein.containsBiome(biomes[x * 16 + z]))
 						{
 							primer.setBlockState(x, y, z, vein.getBlockMeta().getBlockState());
 						}

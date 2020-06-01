@@ -1,14 +1,11 @@
 package cavern.miner.client.gui;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.lwjgl.input.Keyboard;
 
@@ -17,19 +14,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cavern.miner.client.config.CaveConfigGui;
-import cavern.miner.config.CavernConfig;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.config.Config;
 import cavern.miner.config.manager.CaveBiome;
 import cavern.miner.config.manager.CaveBiomeManager;
 import cavern.miner.util.BlockMeta;
 import cavern.miner.util.CaveFilters;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.biome.Biome;
@@ -40,7 +36,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiBiomesEditor extends GuiScreen
+public class GuiEditBiomes extends GuiScreen
 {
 	protected final GuiScreen parent;
 	protected final CaveBiomeManager manager;
@@ -61,22 +57,22 @@ public class GuiBiomesEditor extends GuiScreen
 
 	protected boolean editMode;
 
-	protected GuiTextField terrainBlockField;
-	protected GuiTextField terrainBlockMetaField;
 	protected GuiTextField topBlockField;
-	protected GuiTextField topBlockMetaField;
+	protected GuiTextField topMetaField;
+	protected GuiTextField fillerBlockField;
+	protected GuiTextField fillerMetaField;
 
 	protected HoverChecker detailHoverChecker;
 	protected HoverChecker instantHoverChecker;
-	protected HoverChecker terrainBlockHoverChecker;
 	protected HoverChecker topBlockHoverChecker;
+	protected HoverChecker fillerBlockHoverChecker;
 
 	protected int maxLabelWidth;
 
 	protected final List<String> editLabelList = Lists.newArrayList();
 	protected final List<GuiTextField> editFieldList = Lists.newArrayList();
 
-	public GuiBiomesEditor(GuiScreen parent, CaveBiomeManager manager)
+	public GuiEditBiomes(GuiScreen parent, CaveBiomeManager manager)
 	{
 		this.parent = parent;
 		this.manager = manager;
@@ -154,7 +150,7 @@ public class GuiBiomesEditor extends GuiScreen
 			detailInfo = new GuiCheckBox(6, 0, 5, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		if (instantFilter == null)
@@ -162,7 +158,7 @@ public class GuiBiomesEditor extends GuiScreen
 			instantFilter = new GuiCheckBox(7, 0, detailInfo.y + detailInfo.height + 2, I18n.format(Config.LANG_KEY + "instant"), true);
 		}
 
-		instantFilter.setIsChecked(CaveConfigGui.instantFilter);
+		instantFilter.setIsChecked(GuiCaveConfig.instantFilter);
 		instantFilter.x = detailInfo.x;
 
 		buttonList.clear();
@@ -196,9 +192,9 @@ public class GuiBiomesEditor extends GuiScreen
 		instantHoverChecker = new HoverChecker(instantFilter, 800);
 
 		editLabelList.clear();
-		editLabelList.add(I18n.format(Config.LANG_KEY + "biomes.terrainBlock"));
-		editLabelList.add("");
 		editLabelList.add(I18n.format(Config.LANG_KEY + "biomes.topBlock"));
+		editLabelList.add("");
+		editLabelList.add(I18n.format(Config.LANG_KEY + "biomes.fillerBlock"));
 		editLabelList.add("");
 
 		for (String key : editLabelList)
@@ -206,60 +202,60 @@ public class GuiBiomesEditor extends GuiScreen
 			maxLabelWidth = Math.max(maxLabelWidth, fontRenderer.getStringWidth(key));
 		}
 
-		if (terrainBlockField == null)
-		{
-			terrainBlockField = new GuiTextField(1, fontRenderer, 0, 0, 0, 15);
-			terrainBlockField.setMaxStringLength(100);
-		}
-
-		int i = maxLabelWidth + 8 + width / 2;
-		terrainBlockField.x = width / 2 - i / 2 + maxLabelWidth + 10;
-		terrainBlockField.y = biomeList.bottom + 7;
-		int fieldWidth = width / 2 + i / 2 - 45 - terrainBlockField.x + 40;
-		terrainBlockField.width = fieldWidth / 4 + fieldWidth / 2 - 1;
-
-		if (terrainBlockMetaField == null)
-		{
-			terrainBlockMetaField = new GuiTextField(2, fontRenderer, 0, 0, 0, terrainBlockField.height);
-			terrainBlockMetaField.setMaxStringLength(100);
-		}
-
-		terrainBlockMetaField.x = terrainBlockField.x + terrainBlockField.width + 3;
-		terrainBlockMetaField.y = terrainBlockField.y;
-		terrainBlockMetaField.width = fieldWidth / 4 - 1;
-
 		if (topBlockField == null)
 		{
-			topBlockField = new GuiTextField(3, fontRenderer, 0, 0, 0, terrainBlockField.height);
+			topBlockField = new GuiTextField(1, fontRenderer, 0, 0, 0, 15);
 			topBlockField.setMaxStringLength(100);
 		}
 
-		topBlockField.x = terrainBlockField.x;
-		topBlockField.y = terrainBlockField.y + terrainBlockField.height + 5;
-		topBlockField.width = terrainBlockField.width;
+		int i = maxLabelWidth + 8 + width / 2;
+		topBlockField.x = width / 2 - i / 2 + maxLabelWidth + 10;
+		topBlockField.y = biomeList.bottom + 7;
+		int fieldWidth = width / 2 + i / 2 - 45 - topBlockField.x + 40;
+		topBlockField.width = fieldWidth / 4 + fieldWidth / 2 - 1;
 
-		if (topBlockMetaField == null)
+		if (topMetaField == null)
 		{
-			topBlockMetaField = new GuiTextField(5, fontRenderer, 0, 0, 0, topBlockField.height);
-			topBlockMetaField.setMaxStringLength(100);
+			topMetaField = new GuiTextField(2, fontRenderer, 0, 0, 0, topBlockField.height);
+			topMetaField.setMaxStringLength(100);
 		}
 
-		topBlockMetaField.x = terrainBlockMetaField.x;
-		topBlockMetaField.y = topBlockField.y;
-		topBlockMetaField.width = terrainBlockMetaField.width;
+		topMetaField.x = topBlockField.x + topBlockField.width + 3;
+		topMetaField.y = topBlockField.y;
+		topMetaField.width = fieldWidth / 4 - 1;
+
+		if (fillerBlockField == null)
+		{
+			fillerBlockField = new GuiTextField(3, fontRenderer, 0, 0, 0, topBlockField.height);
+			fillerBlockField.setMaxStringLength(100);
+		}
+
+		fillerBlockField.x = topBlockField.x;
+		fillerBlockField.y = topBlockField.y + topBlockField.height + 5;
+		fillerBlockField.width = topBlockField.width;
+
+		if (fillerMetaField == null)
+		{
+			fillerMetaField = new GuiTextField(5, fontRenderer, 0, 0, 0, fillerBlockField.height);
+			fillerMetaField.setMaxStringLength(100);
+		}
+
+		fillerMetaField.x = topMetaField.x;
+		fillerMetaField.y = fillerBlockField.y;
+		fillerMetaField.width = topMetaField.width;
 
 		editFieldList.clear();
 
 		if (editMode)
 		{
-			editFieldList.add(terrainBlockField);
-			editFieldList.add(terrainBlockMetaField);
 			editFieldList.add(topBlockField);
-			editFieldList.add(topBlockMetaField);
+			editFieldList.add(topMetaField);
+			editFieldList.add(fillerBlockField);
+			editFieldList.add(fillerMetaField);
 		}
 
-		terrainBlockHoverChecker = new HoverChecker(terrainBlockField.y - 1, terrainBlockField.y + terrainBlockField.height, terrainBlockField.x - maxLabelWidth - 12, terrainBlockField.x - 10, 800);
 		topBlockHoverChecker = new HoverChecker(topBlockField.y - 1, topBlockField.y + topBlockField.height, topBlockField.x - maxLabelWidth - 12, topBlockField.x - 10, 800);
+		fillerBlockHoverChecker = new HoverChecker(fillerBlockField.y - 1, fillerBlockField.y + fillerBlockField.height, fillerBlockField.x - maxLabelWidth - 12, fillerBlockField.x - 10, 800);
 	}
 
 	@Override
@@ -274,43 +270,17 @@ public class GuiBiomesEditor extends GuiScreen
 					{
 						for (CaveBiome caveBiome : biomeList.selected)
 						{
-							if (!Strings.isNullOrEmpty(terrainBlockField.getText()))
-							{
-								Block block = Block.getBlockFromName(terrainBlockField.getText());
-
-								if (block != null && block != Blocks.AIR)
-								{
-									int meta;
-
-									try
-									{
-										meta = Integer.parseInt(terrainBlockMetaField.getText());
-
-										if (meta < 0)
-										{
-											meta = 0;
-										}
-									}
-									catch (NumberFormatException e)
-									{
-										meta = 0;
-									}
-
-									caveBiome.setTerrainBlock(new BlockMeta(block, meta));
-								}
-							}
-
 							if (!Strings.isNullOrEmpty(topBlockField.getText()))
 							{
 								Block block = Block.getBlockFromName(topBlockField.getText());
 
-								if (block != null && block != Blocks.AIR)
+								if (block != null && !(block instanceof BlockAir))
 								{
 									int meta;
 
 									try
 									{
-										meta = Integer.parseInt(topBlockMetaField.getText());
+										meta = Integer.parseInt(topMetaField.getText());
 
 										if (meta < 0)
 										{
@@ -325,6 +295,32 @@ public class GuiBiomesEditor extends GuiScreen
 									caveBiome.setTopBlock(new BlockMeta(block, meta));
 								}
 							}
+
+							if (!Strings.isNullOrEmpty(fillerBlockField.getText()))
+							{
+								Block block = Block.getBlockFromName(fillerBlockField.getText());
+
+								if (block != null && !(block instanceof BlockAir))
+								{
+									int meta;
+
+									try
+									{
+										meta = Integer.parseInt(fillerMetaField.getText());
+
+										if (meta < 0)
+										{
+											meta = 0;
+										}
+									}
+									catch (NumberFormatException e)
+									{
+										meta = 0;
+									}
+
+									caveBiome.setFillerBlock(new BlockMeta(block, meta));
+								}
+							}
 						}
 
 						actionPerformed(cancelButton);
@@ -334,24 +330,8 @@ public class GuiBiomesEditor extends GuiScreen
 					}
 					else
 					{
-						manager.getCaveBiomes().clear();
-
-						try
-						{
-							FileUtils.forceDelete(new File(manager.config.toString()));
-
-							manager.config.load();
-						}
-						catch (Exception e)
-						{
-							e.printStackTrace();
-						}
-
-						Collections.sort(biomeList.biomes);
-
-						CavernConfig.generateBiomesConfig(manager, biomeList.biomes);
-
-						Config.saveConfig(manager.config);
+						manager.setCaveBiomes(biomeList.biomes);
+						manager.saveToFile();
 
 						actionPerformed(cancelButton);
 
@@ -375,19 +355,19 @@ public class GuiBiomesEditor extends GuiScreen
 
 						if (biomeList.selected.size() > 1)
 						{
-							terrainBlockField.setText("");
-							terrainBlockMetaField.setText("");
 							topBlockField.setText("");
-							topBlockMetaField.setText("");
+							topMetaField.setText("");
+							fillerBlockField.setText("");
+							fillerMetaField.setText("");
 						}
 						else for (CaveBiome biome : biomeList.selected)
 						{
 							if (biome != null)
 							{
-								terrainBlockField.setText(biome.getTerrainBlock().getBlockName());
-								terrainBlockMetaField.setText(Integer.toString(biome.getTerrainBlock().getMeta()));
-								topBlockField.setText(biome.getTopBlock().getBlockName());
-								topBlockMetaField.setText(Integer.toString(biome.getTopBlock().getMeta()));
+								topBlockField.setText(biome.getTopBlock().getRegistryName().toString());
+								topMetaField.setText(Integer.toString(biome.getTopBlock().getMeta()));
+								fillerBlockField.setText(biome.getFillerBlock().getRegistryName().toString());
+								fillerMetaField.setText(Integer.toString(biome.getFillerBlock().getMeta()));
 							}
 						}
 					}
@@ -408,7 +388,7 @@ public class GuiBiomesEditor extends GuiScreen
 				case 3:
 					Set<Biome> invisibleBiomes = biomeList.biomes.stream().map(CaveBiome::getBiome).collect(Collectors.toSet());
 
-					mc.displayGuiScreen(new GuiSelectBiome(this, new ISelectorCallback<Biome>()
+					mc.displayGuiScreen(new GuiSelectBiome(this, new Selector<Biome>()
 					{
 						@Override
 						public boolean isValidEntry(Biome entry)
@@ -456,10 +436,10 @@ public class GuiBiomesEditor extends GuiScreen
 					actionPerformed(removeButton);
 					break;
 				case 6:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 				case 7:
-					CaveConfigGui.instantFilter = instantFilter.isChecked();
+					GuiCaveConfig.instantFilter = instantFilter.isChecked();
 					break;
 				default:
 					biomeList.actionPerformed(button);
@@ -507,20 +487,20 @@ public class GuiBiomesEditor extends GuiScreen
 				drawString(fontRenderer, editLabelList.get(i), textField.x - maxLabelWidth - 10, textField.y + 3, 0xBBBBBB);
 			}
 
-			if (terrainBlockHoverChecker.checkHover(mouseX, mouseY))
+			if (topBlockHoverChecker.checkHover(mouseX, mouseY))
 			{
 				List<String> hover = Lists.newArrayList();
-				String key = Config.LANG_KEY + "biomes.terrainBlock";
+				String key = Config.LANG_KEY + "biomes.topBlock";
 
 				hover.add(TextFormatting.GRAY + I18n.format(key));
 				hover.addAll(fontRenderer.listFormattedStringToWidth(I18n.format(key + ".tooltip"), 300));
 
 				drawHoveringText(hover, mouseX, mouseY);
 			}
-			else if (topBlockHoverChecker.checkHover(mouseX, mouseY))
+			else if (fillerBlockHoverChecker.checkHover(mouseX, mouseY))
 			{
 				List<String> hover = Lists.newArrayList();
-				String key = Config.LANG_KEY + "biomes.topBlock";
+				String key = Config.LANG_KEY + "biomes.fillerBlock";
 
 				hover.add(TextFormatting.GRAY + I18n.format(key));
 				hover.addAll(fontRenderer.listFormattedStringToWidth(I18n.format(key + ".tooltip"), 300));
@@ -547,8 +527,8 @@ public class GuiBiomesEditor extends GuiScreen
 			List<String> info = Lists.newArrayList();
 			String prefix = TextFormatting.GRAY.toString();
 
-			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.terrainBlock") + ": " + caveBiome.getTerrainBlock().toString());
 			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.topBlock") + ": " + caveBiome.getTopBlock().toString());
+			info.add(prefix + I18n.format(Config.LANG_KEY + "biomes.fillerBlock") + ": " + caveBiome.getFillerBlock().toString());
 
 			drawHoveringText(info, mouseX, mouseY);
 		}
@@ -585,17 +565,17 @@ public class GuiBiomesEditor extends GuiScreen
 
 			if (!isShiftKeyDown())
 			{
-				if (terrainBlockField.isFocused())
-				{
-					terrainBlockField.setFocused(false);
-
-					mc.displayGuiScreen(new GuiSelectBlock(this, terrainBlockField, terrainBlockMetaField));
-				}
-				else if (topBlockField.isFocused())
+				if (topBlockField.isFocused())
 				{
 					topBlockField.setFocused(false);
 
-					mc.displayGuiScreen(new GuiSelectBlock(this, topBlockField, topBlockMetaField));
+					mc.displayGuiScreen(new GuiSelectBlock(this, topBlockField, topMetaField));
+				}
+				else if (fillerBlockField.isFocused())
+				{
+					fillerBlockField.setFocused(false);
+
+					mc.displayGuiScreen(new GuiSelectBlock(this, fillerBlockField, fillerMetaField));
 				}
 			}
 		}
@@ -629,7 +609,7 @@ public class GuiBiomesEditor extends GuiScreen
 				}
 				else if (textField.isFocused())
 				{
-					if (textField != terrainBlockField && textField != terrainBlockMetaField && textField != topBlockField && textField != topBlockMetaField)
+					if (textField != topBlockField && textField != topMetaField && textField != fillerBlockField && textField != fillerMetaField)
 					{
 						if (!CharUtils.isAsciiControl(c) && !CharUtils.isAsciiNumeric(c))
 						{
@@ -736,7 +716,7 @@ public class GuiBiomesEditor extends GuiScreen
 	@Override
 	public void onGuiClosed()
 	{
-		biomeList.currentPanoramaPaths = null;
+		biomeList.panoramaLocation = null;
 	}
 
 	public void refreshBiomes()
@@ -769,7 +749,7 @@ public class GuiBiomesEditor extends GuiScreen
 
 		protected BiomeList()
 		{
-			super(GuiBiomesEditor.this.mc, 0, 0, 0, 0, 22);
+			super(GuiEditBiomes.this.mc, 0, 0, 0, 0, 22);
 		}
 
 		@Override
@@ -830,8 +810,8 @@ public class GuiBiomesEditor extends GuiScreen
 
 			if (detailInfo.isChecked() || Keyboard.isKeyDown(Keyboard.KEY_TAB))
 			{
-				drawItemStack(itemRender, caveBiome.getTerrainBlock(), width / 2 - 100, par3 + 1);
-				drawItemStack(itemRender, caveBiome.getTopBlock(), width / 2 + 90, par3 + 1);
+				drawItemStack(itemRender, caveBiome.getTopBlock(), width / 2 - 100, par3 + 1);
+				drawItemStack(itemRender, caveBiome.getFillerBlock(), width / 2 + 90, par3 + 1);
 			}
 		}
 
@@ -893,18 +873,18 @@ public class GuiBiomesEditor extends GuiScreen
 
 		protected boolean filterMatch(CaveBiome entry, String filter)
 		{
-			if (filter.startsWith("terrain:"))
-			{
-				filter = filter.substring(filter.indexOf(":") + 1);
-
-				return CaveFilters.blockFilter(entry.getTerrainBlock(), filter);
-			}
-
 			if (filter.startsWith("top:"))
 			{
 				filter = filter.substring(filter.indexOf(":") + 1);
 
 				return CaveFilters.blockFilter(entry.getTopBlock(), filter);
+			}
+
+			if (filter.startsWith("filler:"))
+			{
+				filter = filter.substring(filter.indexOf(":") + 1);
+
+				return CaveFilters.blockFilter(entry.getFillerBlock(), filter);
 			}
 
 			return CaveFilters.biomeFilter(entry.getBiome(), filter);

@@ -107,7 +107,7 @@ public class ChunkGeneratorCavern implements IChunkGenerator
 				Biome biome = biomesForGeneration[x * 16 + z];
 				CaveBiome caveBiome = CavernConfig.BIOMES.getCaveBiome(biome);
 				IBlockState top = caveBiome == null ? STONE : caveBiome.getTopBlock().getBlockState();
-				IBlockState filter = caveBiome == null ? top : caveBiome.getTerrainBlock().getBlockState();
+				IBlockState filter = caveBiome == null ? top : caveBiome.getFillerBlock().getBlockState();
 
 				primer.setBlockState(x, 0, z, BEDROCK);
 				primer.setBlockState(x, max, z, BEDROCK);

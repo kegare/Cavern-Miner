@@ -1,23 +1,15 @@
 package cavern.miner.client.config.dimension;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-
-import cavern.miner.client.gui.GuiBiomesEditor;
 import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.config.manager.CaveBiomeManager;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;
-import net.minecraftforge.fml.client.config.GuiConfigEntries.CategoryEntry;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class HugeCavernBiomesEntry extends CategoryEntry
+public class HugeCavernBiomesEntry extends CavernBiomesEntry
 {
 	public HugeCavernBiomesEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement)
 	{
@@ -25,41 +17,8 @@ public class HugeCavernBiomesEntry extends CategoryEntry
 	}
 
 	@Override
-	protected GuiScreen buildChildScreen()
+	protected CaveBiomeManager getBiomeManager()
 	{
-		return new GuiBiomesEditor(owningScreen, HugeCavernConfig.BIOMES);
-	}
-
-	@Override
-	public boolean isDefault()
-	{
-		return HugeCavernConfig.BIOMES.getCaveBiomes().isEmpty();
-	}
-
-	@Override
-	public void setToDefault()
-	{
-		CaveBiomeManager manager = HugeCavernConfig.BIOMES;
-
-		try
-		{
-			FileUtils.forceDelete(new File(manager.config.toString()));
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-
-			return;
-		}
-
-		manager.getCaveBiomes().clear();
-
-		manager.config = null;
-		HugeCavernConfig.syncBiomesConfig();
-
-		if (childScreen != null && childScreen instanceof GuiBiomesEditor)
-		{
-			((GuiBiomesEditor)childScreen).refreshBiomes();
-		}
+		return HugeCavernConfig.BIOMES;
 	}
 }

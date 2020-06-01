@@ -137,14 +137,10 @@ cavern.config.dimension.autoVeinBlacklist.tooltip=Banned blocks for automatic ve
 
 cavern.config.biomes=Biome Settings
 cavern.config.biomes.tooltip=Change the biome settings of this dimension.
-cavern.config.biomes.terrainBlock=Terrain Block
-cavern.config.biomes.terrainBlock.tooltip=The terrain block's registry name.
-cavern.config.biomes.terrainBlockMeta=Terrain Block Metadata
-cavern.config.biomes.terrainBlockMeta.tooltip=The terrain block's metadata.
 cavern.config.biomes.topBlock=Top Block
-cavern.config.biomes.topBlock.tooltip=The top block's registry name.
-cavern.config.biomes.topBlockMeta=Top Block Metadata
-cavern.config.biomes.topBlockMeta.tooltip=The top block's metadata.
+cavern.config.biomes.topBlock.tooltip=The top block's registry data.
+cavern.config.biomes.fillerBlock=Filler Block
+cavern.config.biomes.fillerBlock.tooltip=The filler block's registry data.
 
 cavern.config.veins=Vein Settings
 cavern.config.veins.tooltip=Change the ore vein settings of this dimension.

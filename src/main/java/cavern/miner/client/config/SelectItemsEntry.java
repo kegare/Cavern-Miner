@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 import cavern.miner.client.gui.GuiSelectItem;
-import cavern.miner.client.gui.ISelectorCallback;
+import cavern.miner.client.gui.Selector;
 import cavern.miner.util.ItemMeta;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -18,7 +18,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class SelectItemsEntry extends ArrayEntry implements ISelectorCallback<ItemMeta>
+public class SelectItemsEntry extends ArrayEntry implements Selector<ItemMeta>
 {
 	public SelectItemsEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement)
 	{

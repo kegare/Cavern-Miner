@@ -1,6 +1,5 @@
 package cavern.miner.client.gui;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +10,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -26,9 +24,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cavern.miner.client.config.CaveConfigGui;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.client.gui.GuiSelectOreDict.OreDictEntry;
-import cavern.miner.config.CavernConfig;
 import cavern.miner.config.Config;
 import cavern.miner.config.manager.CaveVein;
 import cavern.miner.config.manager.CaveVeinManager;
@@ -56,7 +53,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GuiVeinsEditor extends GuiScreen
+public class GuiEditVeins extends GuiScreen
 {
 	protected final GuiScreen parent;
 
@@ -109,7 +106,7 @@ public class GuiVeinsEditor extends GuiScreen
 	protected final List<String> editLabelList = Lists.newArrayList();
 	protected final List<GuiTextField> editFieldList = Lists.newArrayList();
 
-	public GuiVeinsEditor(GuiScreen parent, VeinProvider provider, Supplier<GuiConfigEntries.BooleanEntry> autoVeins, Supplier<GuiConfigEntries.ArrayEntry> blacklist)
+	public GuiEditVeins(GuiScreen parent, VeinProvider provider, Supplier<GuiConfigEntries.BooleanEntry> autoVeins, Supplier<GuiConfigEntries.ArrayEntry> blacklist)
 	{
 		this.parent = parent;
 		this.provider = provider;
@@ -187,7 +184,7 @@ public class GuiVeinsEditor extends GuiScreen
 			detailInfo = new GuiCheckBox(6, 0, 5, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		if (instantFilter == null)
@@ -195,7 +192,7 @@ public class GuiVeinsEditor extends GuiScreen
 			instantFilter = new GuiCheckBox(7, 0, detailInfo.y + detailInfo.height + 2, I18n.format(Config.LANG_KEY + "instant"), true);
 		}
 
-		instantFilter.setIsChecked(CaveConfigGui.instantFilter);
+		instantFilter.setIsChecked(GuiCaveConfig.instantFilter);
 		instantFilter.x = detailInfo.x;
 
 		buttonList.clear();
@@ -476,7 +473,7 @@ public class GuiVeinsEditor extends GuiScreen
 
 								if (!biomes.isEmpty())
 								{
-									vein.setBiomes(biomes.toArray(new String[biomes.size()]));
+									vein.setBiomes(biomes.toArray());
 								}
 							}
 						}
@@ -492,22 +489,8 @@ public class GuiVeinsEditor extends GuiScreen
 
 						if (!autoVeins && manager != null)
 						{
-							manager.getCaveVeins().clear();
-
-							try
-							{
-								FileUtils.forceDelete(new File(manager.config.toString()));
-
-								manager.config.load();
-							}
-							catch (Exception e)
-							{
-								e.printStackTrace();
-							}
-
-							CavernConfig.generateVeinsConfig(manager, veinList.veins);
-
-							Config.saveConfig(manager.config);
+							manager.setCaveVeins(veinList.veins);
+							manager.saveToFile();
 						}
 
 						actionPerformed(cancelButton);
@@ -546,24 +529,22 @@ public class GuiVeinsEditor extends GuiScreen
 						{
 							if (vein != null)
 							{
-								blockField.setText(vein.getBlockMeta().getBlockName());
+								blockField.setText(vein.getBlockMeta().getRegistryName().toString());
 								blockMetaField.setText(Integer.toString(vein.getBlockMeta().getMeta()));
-								targetField.setText(vein.getTarget().getBlockName());
+								targetField.setText(vein.getTarget().getRegistryName().toString());
 								targetMetaField.setText(Integer.toString(vein.getTarget().getMeta()));
 								weightField.setText(Integer.toString(vein.getWeight()));
 								sizeField.setText(Integer.toString(vein.getSize()));
 								minHeightField.setText(Integer.toString(vein.getMinHeight()));
 								maxHeightField.setText(Integer.toString(vein.getMaxHeight()));
 
-								String[] biomes = vein.getBiomes();
-
-								if (biomes == null || biomes.length <= 0)
+								if (vein.getBiomes().isEmpty())
 								{
 									biomesField.setText("");
 								}
 								else
 								{
-									biomesField.setText(Joiner.on(", ").join(biomes));
+									biomesField.setText(Joiner.on(", ").join(vein.getBiomes().stream().map(biome -> biome.getRegistryName().toString()).iterator()));
 								}
 							}
 						}
@@ -592,7 +573,7 @@ public class GuiVeinsEditor extends GuiScreen
 							break;
 						}
 
-						mc.displayGuiScreen(new GuiSelectOreDict(this, new ISelectorCallback<OreDictEntry>()
+						mc.displayGuiScreen(new GuiSelectOreDict(this, new Selector<OreDictEntry>()
 						{
 							@Override
 							public boolean isValidEntry(OreDictEntry entry)
@@ -691,10 +672,10 @@ public class GuiVeinsEditor extends GuiScreen
 					actionPerformed(removeButton);
 					break;
 				case 6:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 				case 7:
-					CaveConfigGui.instantFilter = instantFilter.isChecked();
+					GuiCaveConfig.instantFilter = instantFilter.isChecked();
 					break;
 				default:
 					veinList.actionPerformed(button);
@@ -841,11 +822,10 @@ public class GuiVeinsEditor extends GuiScreen
 			info.add(prefix + I18n.format(Config.LANG_KEY + "veins.size") + ": " + vein.getSize());
 			info.add(prefix + I18n.format(Config.LANG_KEY + "veins.height") + ": " + vein.getMinHeight() + ", " + vein.getMaxHeight());
 
-			String[] biomes = vein.getBiomes();
-
-			if (biomes != null && biomes.length > 0)
+			if (!vein.getBiomes().isEmpty())
 			{
-				List<String> list = fontRenderer.listFormattedStringToWidth(I18n.format(Config.LANG_KEY + "veins.biomes") + ": " + Joiner.on(", ").join(biomes), 300);
+				String biomes = Joiner.on(", ").join(vein.getBiomes().stream().map(biome -> biome.getRegistryName().toString()).iterator());
+				List<String> list = fontRenderer.listFormattedStringToWidth(I18n.format(Config.LANG_KEY + "veins.biomes") + ": " + biomes, 300);
 
 				for (String text : list)
 				{
@@ -1179,7 +1159,7 @@ public class GuiVeinsEditor extends GuiScreen
 	@Override
 	public void onGuiClosed()
 	{
-		veinList.currentPanoramaPaths = null;
+		veinList.panoramaLocation = null;
 	}
 
 	public void refreshVeins()
@@ -1261,7 +1241,7 @@ public class GuiVeinsEditor extends GuiScreen
 
 		public VeinList()
 		{
-			super(GuiVeinsEditor.this.mc, 0, 0, 0, 0, 22);
+			super(GuiEditVeins.this.mc, 0, 0, 0, 0, 22);
 		}
 
 		@Override
@@ -1345,7 +1325,7 @@ public class GuiVeinsEditor extends GuiScreen
 
 			if (detailInfo.isChecked())
 			{
-				if (GuiVeinsEditor.this.autoVeins)
+				if (GuiEditVeins.this.autoVeins)
 				{
 					drawItemStack(itemRender, blockMeta, width / 2 - 100, par3 + 1);
 				}
@@ -1439,7 +1419,7 @@ public class GuiVeinsEditor extends GuiScreen
 			{
 				filter = filter.substring(filter.indexOf(":") + 1);
 
-				for (Biome biome : vein.getBiomeList())
+				for (Biome biome : vein.getBiomes())
 				{
 					if (CaveFilters.biomeFilter(biome, filter))
 					{

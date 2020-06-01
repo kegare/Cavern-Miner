@@ -19,11 +19,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cavern.miner.client.config.CaveConfigGui;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.config.Config;
 import cavern.miner.util.CaveFilters;
 import cavern.miner.util.CaveUtils;
-import cavern.miner.util.PanoramaPaths;
+import cavern.miner.util.PanoramaLocation;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.GuiButton;
@@ -50,7 +50,7 @@ public class GuiSelectBiome extends GuiScreen
 {
 	protected final GuiScreen parent;
 
-	protected ISelectorCallback<Biome> selectorCallback;
+	protected Selector<Biome> selectorCallback;
 
 	protected GuiTextField biomeField;
 
@@ -72,7 +72,7 @@ public class GuiSelectBiome extends GuiScreen
 		this.parent = parent;
 	}
 
-	public GuiSelectBiome(GuiScreen parent, @Nullable ISelectorCallback<Biome> callback)
+	public GuiSelectBiome(GuiScreen parent, @Nullable Selector<Biome> callback)
 	{
 		this(parent);
 		this.selectorCallback = callback;
@@ -107,7 +107,7 @@ public class GuiSelectBiome extends GuiScreen
 			detailInfo = new GuiCheckBox(1, 0, 5, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		if (instantFilter == null)
@@ -115,7 +115,7 @@ public class GuiSelectBiome extends GuiScreen
 			instantFilter = new GuiCheckBox(2, 0, detailInfo.y + detailInfo.height + 2, I18n.format(Config.LANG_KEY + "instant"), true);
 		}
 
-		instantFilter.setIsChecked(CaveConfigGui.instantFilter);
+		instantFilter.setIsChecked(GuiCaveConfig.instantFilter);
 		instantFilter.x = detailInfo.x;
 
 		buttonList.clear();
@@ -187,10 +187,10 @@ public class GuiSelectBiome extends GuiScreen
 					biomeList.scrollToTop();
 					break;
 				case 1:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 				case 2:
-					CaveConfigGui.instantFilter = instantFilter.isChecked();
+					GuiCaveConfig.instantFilter = instantFilter.isChecked();
 					break;
 				default:
 					biomeList.actionPerformed(button);
@@ -473,7 +473,7 @@ public class GuiSelectBiome extends GuiScreen
 		}
 
 		@Override
-		public PanoramaPaths getPanoramaPaths()
+		public PanoramaLocation getPanoramaPaths()
 		{
 			return null;
 		}
@@ -529,8 +529,6 @@ public class GuiSelectBiome extends GuiScreen
 
 			if (detailInfo.isChecked() && isTabDown)
 			{
-				drawString(fontRenderer, Integer.toString(Biome.getIdForBiome(biome)), width / 2 - 100, par3 + 1, 0xFFFFFF);
-
 				drawItemStack(itemRender, biome.topBlock, width / 2 + 70, par3 - 1);
 				drawItemStack(itemRender, biome.fillerBlock, width / 2 + 90, par3 - 1);
 			}

@@ -10,13 +10,13 @@ import org.lwjgl.input.Keyboard;
 import com.google.common.base.Strings;
 
 import cavern.miner.client.CaveKeyBindings;
-import cavern.miner.client.config.CaveConfigGui;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.config.Config;
 import cavern.miner.config.MiningConfig;
 import cavern.miner.data.Miner;
 import cavern.miner.data.MinerRank;
 import cavern.miner.util.BlockMeta;
-import cavern.miner.util.PanoramaPaths;
+import cavern.miner.util.PanoramaLocation;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -64,7 +64,7 @@ public class GuiMiningRecords extends GuiScreen
 			detailInfo = new GuiCheckBox(1, 0, 12, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		buttonList.clear();
@@ -86,7 +86,7 @@ public class GuiMiningRecords extends GuiScreen
 					mc.displayGuiScreen(null);
 					break;
 				case 1:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 			}
 		}
@@ -198,7 +198,7 @@ public class GuiMiningRecords extends GuiScreen
 		}
 
 		@Override
-		public PanoramaPaths getPanoramaPaths()
+		public PanoramaLocation getPanoramaPaths()
 		{
 			return null;
 		}

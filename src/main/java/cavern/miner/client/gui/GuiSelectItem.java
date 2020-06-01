@@ -18,12 +18,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import cavern.miner.client.config.CaveConfigGui;
+import cavern.miner.client.config.GuiCaveConfig;
 import cavern.miner.config.Config;
 import cavern.miner.config.EntryListHelper;
 import cavern.miner.util.CaveFilters;
 import cavern.miner.util.ItemMeta;
-import cavern.miner.util.PanoramaPaths;
+import cavern.miner.util.PanoramaLocation;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
@@ -42,7 +42,7 @@ public class GuiSelectItem extends GuiScreen
 {
 	protected final GuiScreen parent;
 
-	protected ISelectorCallback<ItemMeta> selectorCallback;
+	protected Selector<ItemMeta> selectorCallback;
 
 	protected GuiTextField nameField, metaField;
 
@@ -66,7 +66,7 @@ public class GuiSelectItem extends GuiScreen
 		this.parent = parent;
 	}
 
-	public GuiSelectItem(GuiScreen parent, @Nullable ISelectorCallback<ItemMeta> callback)
+	public GuiSelectItem(GuiScreen parent, @Nullable Selector<ItemMeta> callback)
 	{
 		this(parent);
 		this.selectorCallback = callback;
@@ -79,7 +79,7 @@ public class GuiSelectItem extends GuiScreen
 		this.metaField = metaField;
 	}
 
-	public GuiSelectItem(GuiScreen parent, @Nullable GuiTextField nameField, @Nullable GuiTextField metaField, @Nullable ISelectorCallback<ItemMeta> callback)
+	public GuiSelectItem(GuiScreen parent, @Nullable GuiTextField nameField, @Nullable GuiTextField metaField, @Nullable Selector<ItemMeta> callback)
 	{
 		this(parent, nameField, metaField);
 		this.selectorCallback = callback;
@@ -91,7 +91,7 @@ public class GuiSelectItem extends GuiScreen
 		this.arrayEntry = arrayEntry;
 	}
 
-	public GuiSelectItem(GuiScreen parent, @Nullable ArrayEntry arrayEntry, @Nullable ISelectorCallback<ItemMeta> callback)
+	public GuiSelectItem(GuiScreen parent, @Nullable ArrayEntry arrayEntry, @Nullable Selector<ItemMeta> callback)
 	{
 		this(parent, arrayEntry);
 		this.selectorCallback = callback;
@@ -120,7 +120,7 @@ public class GuiSelectItem extends GuiScreen
 			detailInfo = new GuiCheckBox(1, 0, 5, I18n.format(Config.LANG_KEY + "detail"), true);
 		}
 
-		detailInfo.setIsChecked(CaveConfigGui.detailInfo);
+		detailInfo.setIsChecked(GuiCaveConfig.detailInfo);
 		detailInfo.x = width / 2 + 95;
 
 		if (instantFilter == null)
@@ -128,7 +128,7 @@ public class GuiSelectItem extends GuiScreen
 			instantFilter = new GuiCheckBox(2, 0, detailInfo.y + detailInfo.height + 2, I18n.format(Config.LANG_KEY + "instant"), true);
 		}
 
-		instantFilter.setIsChecked(CaveConfigGui.instantFilter);
+		instantFilter.setIsChecked(GuiCaveConfig.instantFilter);
 		instantFilter.x = detailInfo.x;
 
 		buttonList.clear();
@@ -219,10 +219,10 @@ public class GuiSelectItem extends GuiScreen
 					itemList.scrollToTop();
 					break;
 				case 1:
-					CaveConfigGui.detailInfo = detailInfo.isChecked();
+					GuiCaveConfig.detailInfo = detailInfo.isChecked();
 					break;
 				case 2:
-					CaveConfigGui.instantFilter = instantFilter.isChecked();
+					GuiCaveConfig.instantFilter = instantFilter.isChecked();
 					break;
 				default:
 					itemList.actionPerformed(button);
@@ -486,7 +486,7 @@ public class GuiSelectItem extends GuiScreen
 		}
 
 		@Override
-		public PanoramaPaths getPanoramaPaths()
+		public PanoramaLocation getPanoramaPaths()
 		{
 			return null;
 		}

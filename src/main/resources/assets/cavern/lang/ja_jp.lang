@@ -137,14 +137,10 @@ cavern.config.dimension.autoVeinBlacklist.tooltip=自動鉱脈生成の対象に
 
 cavern.config.biomes=バイオームの設定
 cavern.config.biomes.tooltip=ディメンションのバイオームの生成設定を変更できます。
-cavern.config.biomes.terrainBlock=地形ブロック
-cavern.config.biomes.terrainBlock.tooltip=バイオームの地形を主に構成するブロックのブロック名を指定します。
-cavern.config.biomes.terrainBlockMeta=地形ブロックのメタデータ
-cavern.config.biomes.terrainBlockMeta.tooltip=バイオームの地形を主に構成するブロックのメタデータを指定します。
 cavern.config.biomes.topBlock=地表ブロック
-cavern.config.biomes.topBlock.tooltip=バイオームの地表を構成するブロックのブロック名を指定します。
-cavern.config.biomes.topBlockMeta=地表ブロックのメタデータ
-cavern.config.biomes.topBlockMeta.tooltip=バイオームの地表を構成するブロックのメタデータを指定します。
+cavern.config.biomes.topBlock.tooltip=バイオームの地表を構成するブロックのデータを指定します。
+cavern.config.biomes.fillerBlock=地形ブロック
+cavern.config.biomes.fillerBlock.tooltip=バイオームの地形を主に構成するブロックのデータを指定します。
 
 cavern.config.veins=鉱脈の設定
 cavern.config.veins.tooltip=ディメンションの鉱脈の生成設定を変更できます。

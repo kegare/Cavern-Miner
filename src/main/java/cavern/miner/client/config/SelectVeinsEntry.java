@@ -6,7 +6,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import cavern.miner.client.gui.GuiSelectOreDict;
 import cavern.miner.client.gui.GuiSelectOreDict.OreDictEntry;
-import cavern.miner.client.gui.ISelectorCallback;
+import cavern.miner.client.gui.Selector;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemBlock;
@@ -62,7 +62,7 @@ public class SelectVeinsEntry extends ArrayEntry
 
 	protected GuiSelectOreDict createSelectOreDictGuiScreen()
 	{
-		return new GuiSelectOreDict(owningScreen, this, new ISelectorCallback<OreDictEntry>()
+		return new GuiSelectOreDict(owningScreen, this, new Selector<OreDictEntry>()
 		{
 			@Override
 			public boolean isValidEntry(OreDictEntry entry)

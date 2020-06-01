@@ -34,7 +34,7 @@ public class CavelandConfig
 	public static boolean autoVeins;
 	public static String[] autoVeinBlacklist;
 
-	public static final CaveVeinManager VEINS = new CaveVeinManager();
+	public static final CaveVeinManager VEINS = new CaveVeinManager("caveland");
 
 	public static void syncConfig()
 	{
@@ -45,7 +45,7 @@ public class CavelandConfig
 
 		if (config == null)
 		{
-			config = Config.loadConfig("caveland", category);
+			config = Config.loadConfig("caveland");
 		}
 
 		prop = config.get(category, "dimension", -52);
@@ -176,24 +176,5 @@ public class CavelandConfig
 		config.setCategoryPropertyOrder(category, propOrder);
 
 		Config.saveConfig(config);
-	}
-
-	public static void syncVeinsConfig()
-	{
-		if (VEINS.config == null)
-		{
-			VEINS.config = Config.loadConfig("caveland", "veins");
-		}
-		else
-		{
-			VEINS.getCaveVeins().clear();
-		}
-
-		if (!VEINS.config.getCategoryNames().isEmpty())
-		{
-			CavernConfig.addVeinsFromConfig(VEINS);
-		}
-
-		Config.saveConfig(VEINS.config);
 	}
 }

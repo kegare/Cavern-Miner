@@ -3,26 +3,29 @@ package cavern.miner.config.manager;
 import javax.annotation.Nonnull;
 
 import cavern.miner.util.BlockMeta;
+import cavern.miner.util.CaveUtils;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.Biome;
 
 public class CaveBiome implements Comparable<CaveBiome>
 {
+	private static final BlockMeta STONE = new BlockMeta(Blocks.STONE, 0);
+
 	private final Biome biome;
 
-	private BlockMeta terrainBlock;
 	private BlockMeta topBlock;
+	private BlockMeta fillerBlock;
 
-	public CaveBiome(Biome biome, BlockMeta terrain, BlockMeta top)
+	public CaveBiome(Biome biome, BlockMeta top, BlockMeta filler)
 	{
 		this.biome = biome;
-		this.terrainBlock = terrain;
 		this.topBlock = top;
+		this.fillerBlock = filler;
 	}
 
 	public CaveBiome(Biome biome)
 	{
-		this(biome, null, null);
+		this(biome, STONE, STONE);
 	}
 
 	@Override
@@ -49,7 +52,24 @@ public class CaveBiome implements Comparable<CaveBiome>
 	@Override
 	public int compareTo(CaveBiome o)
 	{
-		return o == null ? -1 : Integer.compare(Biome.getIdForBiome(biome), Biome.getIdForBiome(o.biome));
+		int i = CaveUtils.compareWithNull(this, o);
+
+		if (i == 0)
+		{
+			i = biome.getRegistryName().compareTo(o.biome.getRegistryName());
+
+			if (i == 0)
+			{
+				i = topBlock.compareTo(o.topBlock);
+
+				if (i == 0)
+				{
+					i = fillerBlock.compareTo(o.fillerBlock);
+				}
+			}
+		}
+
+		return i;
 	}
 
 	public Biome getBiome()
@@ -58,32 +78,32 @@ public class CaveBiome implements Comparable<CaveBiome>
 	}
 
 	@Nonnull
-	public BlockMeta getTerrainBlock()
+	public BlockMeta getTopBlock()
 	{
-		if (terrainBlock == null)
-		{
-			setTerrainBlock(new BlockMeta(Blocks.STONE.getDefaultState()));
-		}
-
-		return terrainBlock;
+		return topBlock == null ? getFillerBlock() : topBlock;
 	}
 
-	public CaveBiome setTerrainBlock(BlockMeta terrain)
+	public CaveBiome setTopBlock(BlockMeta block)
 	{
-		terrainBlock = terrain;
+		topBlock = block;
 
 		return this;
 	}
 
 	@Nonnull
-	public BlockMeta getTopBlock()
+	public BlockMeta getFillerBlock()
 	{
-		return topBlock == null ? getTerrainBlock() : topBlock;
+		if (fillerBlock == null)
+		{
+			fillerBlock = new BlockMeta(Blocks.STONE.getDefaultState());
+		}
+
+		return fillerBlock;
 	}
 
-	public CaveBiome setTopBlock(BlockMeta top)
+	public CaveBiome setFillerBlock(BlockMeta block)
 	{
-		topBlock = top;
+		fillerBlock = block;
 
 		return this;
 	}

@@ -31,7 +31,7 @@ public class ConfigCaveborn
 		HUGE_CAVERN(2, CaveBlocks.HUGE_CAVERN_PORTAL),
 		CAVELAND(3, CaveBlocks.CAVELAND_PORTAL);
 
-		public static final Type[] VALUES = new Type[values().length];
+		private static final Type[] VALUES = new Type[values().length];
 
 		private final int type;
 		private final BlockCavernPortal portalBlock;
