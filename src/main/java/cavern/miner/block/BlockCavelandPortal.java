@@ -1,6 +1,7 @@
 package cavern.miner.block;
 
 import cavern.miner.config.CavelandConfig;
+import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.world.CaveDimensions;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -29,5 +30,11 @@ public class BlockCavelandPortal extends BlockCavernPortal
 		}
 
 		return !stack.isEmpty() && stack.getItem() == Items.GOLDEN_APPLE;
+	}
+
+	@Override
+	public ConfigBlocks getPortalFrameBlocks()
+	{
+		return CavelandConfig.portalFrameBlocks;
 	}
 }

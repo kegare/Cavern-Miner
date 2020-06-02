@@ -1,11 +1,8 @@
 package cavern.miner.handler;
 
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
-
-import com.google.common.collect.Sets;
 
 import cavern.miner.api.CavernAPI;
 import cavern.miner.api.item.IAquaTool;
@@ -24,14 +21,10 @@ import cavern.miner.util.PlayerUtils;
 import cavern.miner.world.CustomSeed;
 import cavern.miner.world.CustomSeedProvider;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockStoneBrick;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumActionResult;
@@ -115,45 +108,35 @@ public final class CaveEventHooks
 			return;
 		}
 
-		World world = event.getWorld();
-		BlockPos pos = event.getPos();
-		IBlockState state = world.getBlockState(pos);
+		BlockCavernPortal portalBlock = null;
 
-		if (state.getBlock() != Blocks.MOSSY_COBBLESTONE && (state.getBlock() != Blocks.STONEBRICK || state.getBlock().getMetaFromState(state) != BlockStoneBrick.MOSSY_META))
-		{
-			return;
-		}
-
-		EntityPlayer player = event.getEntityPlayer();
-		Set<BlockCavernPortal> portals = Sets.newHashSet();
-
-		portals.add(CaveBlocks.CAVERN_PORTAL);
-		portals.add(CaveBlocks.HUGE_CAVERN_PORTAL);
-		portals.add(CaveBlocks.CAVELAND_PORTAL);
-
-		Item portalItem = Items.AIR;
-
-		for (BlockCavernPortal portal : portals)
+		for (BlockCavernPortal portal : CaveBlocks.CAVE_PORTALS)
 		{
 			if (portal.isTriggerItem(stack))
 			{
-				portalItem = Item.getItemFromBlock(portal);
+				portalBlock = portal;
 
 				break;
 			}
 		}
 
-		if (portalItem != Items.AIR)
-		{
-			EnumFacing facing = ObjectUtils.defaultIfNull(event.getFace(), EnumFacing.UP);
-			Vec3d hit = event.getHitVec();
-			EnumActionResult result = portalItem.onItemUse(player, world, pos, event.getHand(), facing, (float)hit.x, (float)hit.y, (float)hit.z);
+		World world = event.getWorld();
+		BlockPos pos = event.getPos();
 
-			if (result == EnumActionResult.SUCCESS)
-			{
-				event.setCancellationResult(result);
-				event.setCanceled(true);
-			}
+		if (portalBlock == null || !portalBlock.isPortalFrameBlock(world.getBlockState(pos)))
+		{
+			return;
+		}
+
+		EntityPlayer player = event.getEntityPlayer();
+		EnumFacing facing = ObjectUtils.defaultIfNull(event.getFace(), EnumFacing.UP);
+		Vec3d hit = event.getHitVec();
+		EnumActionResult result = Item.getItemFromBlock(portalBlock).onItemUse(player, world, pos, event.getHand(), facing, (float)hit.x, (float)hit.y, (float)hit.z);
+
+		if (result == EnumActionResult.SUCCESS)
+		{
+			event.setCancellationResult(result);
+			event.setCanceled(true);
 		}
 	}
 

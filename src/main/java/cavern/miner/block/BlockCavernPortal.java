@@ -11,6 +11,7 @@ import cavern.miner.client.gui.GuiMiningRecords;
 import cavern.miner.client.gui.GuiRegeneration;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.GeneralConfig;
+import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.core.CavernMod;
 import cavern.miner.data.PortalCache;
 import cavern.miner.data.WorldData;
@@ -200,6 +201,31 @@ public class BlockCavernPortal extends BlockPortal
 		return false;
 	}
 
+	public ConfigBlocks getPortalFrameBlocks()
+	{
+		return CavernConfig.portalFrameBlocks;
+	}
+
+	public boolean isPortalFrameBlock(IBlockState state)
+	{
+		if (!getPortalFrameBlocks().isEmpty())
+		{
+			return getPortalFrameBlocks().hasBlockState(state);
+		}
+
+		if (state.getBlock() == Blocks.MOSSY_COBBLESTONE)
+		{
+			return true;
+		}
+
+		if (state.getBlock() == Blocks.STONEBRICK && state.getBlock().getMetaFromState(state) == BlockStoneBrick.MOSSY_META)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
 	@Override
 	public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity)
 	{
@@ -230,7 +256,16 @@ public class BlockCavernPortal extends BlockPortal
 		DimensionType dimOld = world.provider.getDimensionType();
 		DimensionType dimNew = dimOld == getDimension() ? cache.getLastDim(key) : getDimension();
 		WorldServer worldNew = server.getWorld(dimNew.getId());
-		ITeleporter teleporter = new TeleporterCavern(worldNew, this);
+
+		BlockPos blockpos = pos;
+
+		while (world.getBlockState(blockpos).getBlock() == this)
+		{
+			blockpos = blockpos.down();
+		}
+
+		IBlockState frame = world.getBlockState(blockpos);
+		ITeleporter teleporter = new TeleporterCavern(worldNew, this, frame);
 		BlockPos prevPos = entity.getPosition();
 
 		entity.timeUntilPortal = cd;
@@ -474,16 +509,9 @@ public class BlockCavernPortal extends BlockPortal
 
 		protected boolean isFrameBlock(IBlockState state)
 		{
-			if (portalFrame == null)
+			if (portalFrame == null && isPortalFrameBlock(state))
 			{
-				if (state.getBlock() == Blocks.MOSSY_COBBLESTONE)
-				{
-					portalFrame = Blocks.MOSSY_COBBLESTONE.getDefaultState();
-				}
-				else if (state.getBlock() == Blocks.STONEBRICK && state.getBlock().getMetaFromState(state) == BlockStoneBrick.MOSSY_META)
-				{
-					portalFrame = Blocks.STONEBRICK.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.MOSSY);
-				}
+				portalFrame = state;
 			}
 
 			return CaveUtils.isBlockEqual(portalFrame, state);

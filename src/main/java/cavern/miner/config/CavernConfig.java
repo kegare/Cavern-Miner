@@ -9,6 +9,7 @@ import com.google.common.collect.Sets;
 import cavern.miner.client.config.CaveConfigEntries;
 import cavern.miner.config.manager.CaveBiomeManager;
 import cavern.miner.config.manager.CaveVeinManager;
+import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.config.property.ConfigEntities;
 import cavern.miner.config.property.ConfigItems;
 import cavern.miner.core.CavernMod;
@@ -24,7 +25,6 @@ import net.minecraft.entity.monster.EntitySilverfish;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
@@ -36,6 +36,7 @@ public class CavernConfig
 	public static boolean halfHeight;
 
 	public static ConfigItems triggerItems = new ConfigItems();
+	public static ConfigBlocks portalFrameBlocks = new ConfigBlocks();
 
 	public static boolean generateCaves;
 	public static boolean generateRavine;
@@ -99,6 +100,16 @@ public class CavernConfig
 		prop.setComment(comment);
 		propOrder.add(prop.getName());
 		triggerItems.setValues(prop.getStringList());
+
+		prop = config.get(category, "portalFrameBlocks", new String[0]);
+		prop.setConfigEntryClass(CaveConfigEntries.selectBlocks);
+		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
+		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
+		comment += Configuration.NEW_LINE;
+		comment += "Note: If multiplayer, server-side only.";
+		prop.setComment(comment);
+		propOrder.add(prop.getName());
+		portalFrameBlocks.setValues(prop.getStringList());
 
 		prop = config.get(category, "generateCaves", true);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
@@ -190,7 +201,7 @@ public class CavernConfig
 		mobs.add(EntityEnderman.class);
 		mobs.add(EntitySilverfish.class);
 
-		prop = config.get(category, "dungeonMobs", mobs.stream().map(EntityList::getKey).map(ResourceLocation::toString).sorted().toArray(String[]::new));
+		prop = config.get(category, "dungeonMobs", mobs.stream().map(mob -> EntityList.getKey(mob).toString()).sorted().toArray(String[]::new));
 		prop.setConfigEntryClass(CaveConfigEntries.selectMobs);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
 		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
@@ -210,7 +221,7 @@ public class CavernConfig
 		mobs.add(EntityCavenicZombie.class);
 		mobs.add(EntityCavenicSpider.class);
 
-		prop = config.get(category, "towerDungeonMobs", mobs.stream().map(EntityList::getKey).map(ResourceLocation::toString).sorted().toArray(String[]::new));
+		prop = config.get(category, "towerDungeonMobs", mobs.stream().map(mob -> EntityList.getKey(mob).toString()).sorted().toArray(String[]::new));
 		prop.setConfigEntryClass(CaveConfigEntries.selectMobs);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
 		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");

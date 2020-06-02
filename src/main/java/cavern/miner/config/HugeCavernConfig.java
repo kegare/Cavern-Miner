@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import cavern.miner.client.config.CaveConfigEntries;
 import cavern.miner.config.manager.CaveBiomeManager;
 import cavern.miner.config.manager.CaveVeinManager;
+import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.config.property.ConfigItems;
 import cavern.miner.core.CavernMod;
 import net.minecraftforge.common.config.Configuration;
@@ -20,6 +21,7 @@ public class HugeCavernConfig
 	public static boolean halfHeight;
 
 	public static ConfigItems triggerItems = new ConfigItems();
+	public static ConfigBlocks portalFrameBlocks = new ConfigBlocks();
 
 	public static boolean generateCaves;
 	public static boolean generateLakes;
@@ -77,6 +79,16 @@ public class HugeCavernConfig
 		prop.setComment(comment);
 		propOrder.add(prop.getName());
 		triggerItems.setValues(prop.getStringList());
+
+		prop = config.get(category, "portalFrameBlocks", new String[0]);
+		prop.setConfigEntryClass(CaveConfigEntries.selectBlocks);
+		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
+		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
+		comment += Configuration.NEW_LINE;
+		comment += "Note: If multiplayer, server-side only.";
+		prop.setComment(comment);
+		propOrder.add(prop.getName());
+		portalFrameBlocks.setValues(prop.getStringList());
 
 		prop = config.get(category, "generateCaves", true);
 		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());

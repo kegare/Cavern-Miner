@@ -48,19 +48,12 @@ public final class CaveDimensions
 			return null;
 		}
 
-		if (type == CaveDimensions.CAVERN)
+		for (BlockCavernPortal portal : CaveBlocks.CAVE_PORTALS)
 		{
-			return CaveBlocks.CAVERN_PORTAL;
-		}
-
-		if (type == CaveDimensions.HUGE_CAVERN)
-		{
-			return CaveBlocks.HUGE_CAVERN_PORTAL;
-		}
-
-		if (type == CaveDimensions.CAVELAND)
-		{
-			return CaveBlocks.CAVELAND_PORTAL;
+			if (portal.getDimension() == type)
+			{
+				return portal;
+			}
 		}
 
 		return null;

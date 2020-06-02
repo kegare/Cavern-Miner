@@ -1,6 +1,7 @@
 package cavern.miner.block;
 
 import cavern.miner.config.HugeCavernConfig;
+import cavern.miner.config.property.ConfigBlocks;
 import cavern.miner.util.CaveUtils;
 import cavern.miner.world.CaveDimensions;
 import net.minecraft.init.Items;
@@ -44,5 +45,11 @@ public class BlockHugeCavernPortal extends BlockCavernPortal
 		}
 
 		return false;
+	}
+
+	@Override
+	public ConfigBlocks getPortalFrameBlocks()
+	{
+		return HugeCavernConfig.portalFrameBlocks;
 	}
 }

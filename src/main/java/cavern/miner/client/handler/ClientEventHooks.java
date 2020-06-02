@@ -92,6 +92,7 @@ public final class ClientEventHooks
 					if (event.isWorldRunning())
 					{
 						CavernConfig.triggerItems.refreshItems();
+						CavernConfig.portalFrameBlocks.refreshBlocks();
 						CavernConfig.dungeonMobs.refreshEntities();
 						CavernConfig.towerDungeonMobs.refreshEntities();
 					}
@@ -104,6 +105,7 @@ public final class ClientEventHooks
 					if (event.isWorldRunning())
 					{
 						HugeCavernConfig.triggerItems.refreshItems();
+						HugeCavernConfig.portalFrameBlocks.refreshBlocks();
 					}
 
 					WorldProviderHugeCavern.VEINS.clearCaches();
@@ -114,6 +116,7 @@ public final class ClientEventHooks
 					if (event.isWorldRunning())
 					{
 						CavelandConfig.triggerItems.refreshItems();
+						CavelandConfig.portalFrameBlocks.refreshBlocks();
 					}
 
 					WorldProviderCaveland.VEINS.clearCaches();

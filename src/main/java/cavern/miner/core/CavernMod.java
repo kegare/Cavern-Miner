@@ -261,12 +261,15 @@ public final class CavernMod
 		MiningConfig.areaTargetBlocks.refreshBlocks();
 
 		CavernConfig.triggerItems.refreshItems();
+		CavernConfig.portalFrameBlocks.refreshBlocks();
 		CavernConfig.dungeonMobs.refreshEntities();
 		CavernConfig.towerDungeonMobs.refreshEntities();
 
 		HugeCavernConfig.triggerItems.refreshItems();
+		HugeCavernConfig.portalFrameBlocks.refreshBlocks();
 
 		CavelandConfig.triggerItems.refreshItems();
+		CavelandConfig.portalFrameBlocks.refreshBlocks();
 
 		RandomiteHelper.refreshItems();
 	}
