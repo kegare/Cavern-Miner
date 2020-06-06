@@ -6,10 +6,8 @@ import cavern.miner.CavernMod;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.miner.Miner;
 import io.netty.buffer.ByteBufUtil;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -61,25 +59,19 @@ public class MinerUpdateMessage
 
 	public static void handle(final MinerUpdateMessage msg, final Supplier<NetworkEvent.Context> ctx)
 	{
-		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> handleClient(msg, ctx.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public static void handleClient(final MinerUpdateMessage msg, final NetworkEvent.Context ctx)
-	{
 		if (!msg.failed)
 		{
-			ctx.enqueueWork(() ->
+			ctx.get().enqueueWork(() ->
 			{
-				Minecraft mc = Minecraft.getInstance();
+				PlayerEntity player = DistExecutor.safeRunForDist(() -> CavernMod.PROXY::getClientPlayer, () -> ctx.get()::getSender);
 
-				if (mc.player != null)
+				if (player != null)
 				{
-					mc.player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.setPoint(msg.point).setRank(msg.rank));
+					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.setPoint(msg.point).setRank(msg.rank));
 				}
 			});
 		}
 
-		ctx.setPacketHandled(true);
+		ctx.get().setPacketHandled(true);
 	}
 }

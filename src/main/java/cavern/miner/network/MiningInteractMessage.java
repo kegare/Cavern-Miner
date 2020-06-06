@@ -7,10 +7,8 @@ import cavern.miner.init.CaveCapabilities;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -57,25 +55,19 @@ public class MiningInteractMessage
 
 	public static void handle(final MiningInteractMessage msg, final Supplier<NetworkEvent.Context> ctx)
 	{
-		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> handleClient(msg, ctx.get()));
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public static void handleClient(final MiningInteractMessage msg, final NetworkEvent.Context ctx)
-	{
 		if (!msg.failed)
 		{
-			ctx.enqueueWork(() ->
+			ctx.get().enqueueWork(() ->
 			{
-				Minecraft mc = Minecraft.getInstance();
+				PlayerEntity player = DistExecutor.safeRunForDist(() -> CavernMod.PROXY::getClientPlayer, () -> ctx.get()::getSender);
 
-				if (mc.player != null)
+				if (player != null)
 				{
-					mc.player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getMiningCache().put(msg.state, msg.point));
+					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getMiningCache().put(msg.state, msg.point));
 				}
 			});
 		}
 
-		ctx.setPacketHandled(true);
+		ctx.get().setPacketHandled(true);
 	}
 }

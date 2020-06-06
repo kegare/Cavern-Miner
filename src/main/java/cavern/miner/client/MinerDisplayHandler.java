@@ -235,6 +235,7 @@ public class MinerDisplayHandler
 		MatrixStack matrix = new MatrixStack();
 		IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
 
+		matrix.push();
 		matrix.translate(0.0D, 0.0D, itemRenderer.zLevel + 200.0F);
 
 		int x2 = corner.isLeft() ? x + 5 : x + 17 - fontRenderer.getStringWidth(pointText);
@@ -250,6 +251,9 @@ public class MinerDisplayHandler
 			matrix = new MatrixStack();
 			buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
 
+			matrix.push();
+			matrix.translate(0.0D, 0.0D, itemRenderer.zLevel + 200.0F);
+
 			x2 = corner.isLeft() ? posX + 5 : posX + 17 - fontRenderer.getStringWidth(rankText);
 			z2 = corner.isTop() ? y + 21 : y - 12;
 
@@ -263,6 +267,9 @@ public class MinerDisplayHandler
 		{
 			matrix = new MatrixStack();
 			buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+
+			matrix.push();
+			matrix.translate(0.0D, 0.0D, itemRenderer.zLevel + 200.0F);
 
 			x2 = corner.isLeft() ? posX + 5 : posX + 17 - fontRenderer.getStringWidth(comboText);
 			z2 = corner.isTop() ? y + 33 : y - 24;
