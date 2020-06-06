@@ -1,6 +1,6 @@
 {
     "parent": "item/handheld",
     "textures": {
-        "layer0": "cavern:items/magnite_sword"
+        "layer0": "cavern:item/magnite_sword"
     }
 }

@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+showAsResourcePack=false
+
+[[mods]]
+modId="cavern"
+version="4.0.0-alpha"
+displayName="Cavern: Miner"
+displayURL="https://twitter.com/_kegare"
+logoFile="logo.png"
+credits=""
+authors="kegare"
+description='''
+New Cavern Project
+'''
+
+[[dependencies.cavern]]
+    modId="forge"
+    mandatory=true
+    versionRange="[31,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.cavern]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.15.2]"
+    ordering="NONE"
+    side="BOTH"

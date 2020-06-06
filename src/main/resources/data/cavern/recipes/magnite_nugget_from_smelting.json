@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": [
+    {
+      "item": "cavern:magnite_sword"
+    },
+    {
+      "item": "cavern:magnite_pickaxe"
+    },
+    {
+      "item": "cavern:magnite_axe"
+    },
+    {
+      "item": "cavern:magnite_shovel"
+    }
+  ],
+  "result": "cavern:magnite_nugget",
+  "experience": 0.1,
+  "cookingtime": 300
+}

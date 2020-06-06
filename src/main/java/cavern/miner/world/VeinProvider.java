@@ -1,480 +1,313 @@
 package cavern.miner.world;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import cavern.miner.block.BlockCave;
-import cavern.miner.block.CaveBlocks;
-import cavern.miner.config.manager.CaveVein;
-import cavern.miner.config.manager.CaveVeinManager;
-import cavern.miner.core.CavernMod;
-import cavern.miner.handler.CaveEventHooks;
-import cavern.miner.util.BlockMeta;
-import cavern.miner.util.CaveUtils;
+import cavern.miner.config.VeinBlacklistConfig;
+import cavern.miner.config.VeinConfig;
+import cavern.miner.util.BlockStateTagList;
+import cavern.miner.vein.OreRegistry;
+import cavern.miner.vein.Vein;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockAir;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.ToolType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class VeinProvider
 {
-	private static final Map<BlockMeta, Rarity> RARITY_MAP = Maps.newHashMap();
+	private static final Map<Block, VeinProvider.Rarity> RARITY_CACHE = Maps.newHashMap();
 
-	static
-	{
-		setRarity(Blocks.COAL_ORE.getDefaultState(), Rarity.COMMON);
-		setRarity(Blocks.IRON_ORE.getDefaultState(), Rarity.COMMON);
-		setRarity(Blocks.GOLD_ORE.getDefaultState(), Rarity.RARE);
-		setRarity(Blocks.REDSTONE_ORE.getDefaultState(), Rarity.UNCOMMON);
-		setRarity(Blocks.LAPIS_ORE.getDefaultState(), Rarity.RARE);
-		setRarity(Blocks.EMERALD_ORE.getDefaultState(), Rarity.EMERALD);
-		setRarity(Blocks.DIAMOND_ORE.getDefaultState(), Rarity.DIAMOND);
-		setRarity(CaveBlocks.CAVE_BLOCK.getStateFromMeta(BlockCave.EnumType.AQUAMARINE_ORE.getMetadata()), Rarity.AQUA);
-		setRarity(CaveBlocks.CAVE_BLOCK.getStateFromMeta(BlockCave.EnumType.MAGNITE_ORE.getMetadata()), Rarity.COMMON);
-		setRarity(CaveBlocks.CAVE_BLOCK.getStateFromMeta(BlockCave.EnumType.RANDOMITE_ORE.getMetadata()), Rarity.RANDOMITE);
-		setRarity(CaveBlocks.CAVE_BLOCK.getStateFromMeta(BlockCave.EnumType.HEXCITE_ORE.getMetadata()), Rarity.EPIC);
-		setRarity(CaveBlocks.CAVE_BLOCK.getStateFromMeta(BlockCave.EnumType.FISSURED_STONE.getMetadata()), Rarity.RANDOMITE);
-	}
+	protected NonNullList<BlockState> oreBlocks;
+	protected NonNullList<BlockState> variousBlocks;
 
-	public static void setRarity(IBlockState state, Rarity rarity)
-	{
-		RARITY_MAP.put(new BlockMeta(state), rarity);
-	}
-
-	protected final Random rand = CaveEventHooks.RANDOM;
-
-	protected NonNullList<Pair<String, BlockMeta>> oreBlocks;
-	protected NonNullList<Pair<String, BlockMeta>> stoneBlocks;
-
-	protected Pair<ChunkPos, List<CaveVein>> cachedVeins;
+	protected Pair<ChunkPos, NonNullList<Vein>> cachedVeins;
 
 	@Nullable
-	public CaveVeinManager getVeinManager()
+	public VeinConfig getConfig()
 	{
 		return null;
 	}
 
 	@Nullable
-	public String[] getBlacklist()
+	public VeinBlacklistConfig getBlacklistConfig()
 	{
 		return null;
 	}
 
-	@SuppressWarnings("deprecation")
-	public NonNullList<Pair<String, BlockMeta>> getOreBlocks()
+	public NonNullList<BlockState> getOreBlocks()
 	{
 		if (oreBlocks != null)
 		{
 			return oreBlocks;
 		}
 
-		NonNullList<Pair<String, BlockMeta>> list = NonNullList.create();
+		NonNullList<BlockState> blocks = NonNullList.create();
 
-		Arrays.stream(OreDictionary.getOreNames())
-			.filter(name -> getBlacklist() != null && !ArrayUtils.contains(getBlacklist(), name))
-			.filter(name -> name.startsWith("ore") && name.length() > 3 && Character.isUpperCase(name.charAt(3)))
-			.forEach(name ->
-			{
-				for (ItemStack stack : OreDictionary.getOres(name, false))
-				{
-					try
-					{
-						if (stack.isEmpty() || stack.getItem() == Items.AIR || !(stack.getItem() instanceof ItemBlock))
-						{
-							continue;
-						}
-
-						Block block = ((ItemBlock)stack.getItem()).getBlock();
-
-						if (block == null || block instanceof BlockAir)
-						{
-							continue;
-						}
-
-						IBlockState state = block.getStateFromMeta(stack.getItemDamage());
-						BlockMeta blockMeta = new BlockMeta(state);
-						Rarity rarity = RARITY_MAP.get(blockMeta);
-
-						if (rarity == null)
-						{
-							for (Rarity type : Rarity.values())
-							{
-								if (type.hasOreDict() && name.equals(type.getOreDictName()))
-								{
-									rarity = type;
-
-									break;
-								}
-							}
-						}
-
-						if (rarity == null)
-						{
-							String variant = name.substring(3).toLowerCase();
-
-							int harvestLevel = block.getHarvestLevel(state);
-
-							if (harvestLevel < 0 || !block.getHarvestTool(state).equals("pickaxe"))
-							{
-								continue;
-							}
-
-							int level = harvestLevel;
-
-							Item pickaxe = ForgeRegistries.ITEMS.getValue(new ResourceLocation(block.getRegistryName().getResourceDomain(), variant + "_pickaxe"));
-							double toolRarity = 1.0D;
-
-							if (pickaxe != null)
-							{
-								ItemStack dummy = new ItemStack(pickaxe);
-								int max = pickaxe.getMaxDamage(dummy);
-								float destroy = pickaxe.getDestroySpeed(dummy, Blocks.COAL_ORE.getDefaultState());
-								int enchant = pickaxe.getItemEnchantability(dummy);
-								int harvest = pickaxe.getHarvestLevel(dummy, "pickaxe", null, null);
-
-								toolRarity = max * 0.01D + destroy * 0.01D + enchant * 0.01D + harvest * 1.0D;
-							}
-							else if (harvestLevel > 0)
-							{
-								++level;
-							}
-
-							if (toolRarity >= 12.0D)
-							{
-								level += MathHelper.ceil(toolRarity * 0.3D) - 3;
-							}
-
-							if (level > 3)
-							{
-								rarity = Rarity.EPIC;
-							}
-							else if (level > 2)
-							{
-								rarity = Rarity.RARE;
-							}
-							else if (level > 1)
-							{
-								rarity = Rarity.UNCOMMON;
-							}
-
-							rarity = Rarity.COMMON;
-
-							RARITY_MAP.put(blockMeta, rarity);
-						}
-
-						list.add(Pair.of(name, blockMeta));
-					}
-					catch (Exception e)
-					{
-						CavernMod.LOG.warn("An error occurred while setup. Skip: {} | {}", name, stack.toString(), e);
-					}
-				}
-			}
-		);
-
-		oreBlocks = list;
-
-		return list;
-	}
-
-	@SuppressWarnings("deprecation")
-	public NonNullList<Pair<String, BlockMeta>> getStoneBlocks()
-	{
-		if (stoneBlocks != null)
+		for (Block block : Tags.Blocks.ORES.getAllElements())
 		{
-			return stoneBlocks;
-		}
-
-		NonNullList<Pair<String, BlockMeta>> list = NonNullList.create();
-		String[] others = {"dirt", "gravel"};
-
-		Arrays.stream(OreDictionary.getOreNames())
-			.filter(name -> getBlacklist() != null && !ArrayUtils.contains(getBlacklist(), name))
-			.filter(name -> name.startsWith("stone") && name.length() > 5 && Character.isUpperCase(name.charAt(5)) || ArrayUtils.contains(others, name))
-			.forEach(name ->
-			{
-				for (ItemStack stack : OreDictionary.getOres(name, false))
-				{
-					try
-					{
-						if (stack.isEmpty() || stack.getItem() == Items.AIR || !(stack.getItem() instanceof ItemBlock))
-						{
-							continue;
-						}
-
-						Block block = ((ItemBlock)stack.getItem()).getBlock();
-
-						if (block == null || block instanceof BlockAir)
-						{
-							continue;
-						}
-
-						IBlockState state = block.getStateFromMeta(stack.getItemDamage());
-
-						list.add(Pair.of(name, new BlockMeta(state)));
-					}
-					catch (Exception e)
-					{
-						CavernMod.LOG.warn("An error occurred while setup. Skip: {} | {}", name, stack.toString(), e);
-					}
-				}
-			}
-		);
-
-		stoneBlocks = list;
-
-		return list;
-	}
-
-	@Nullable
-	public String getEntryName(BlockMeta blockMeta)
-	{
-		for (Pair<String, BlockMeta> ore : getOreBlocks())
-		{
-			if (ore.getRight().equals(blockMeta))
-			{
-				return ore.getLeft();
-			}
-		}
-
-		for (Pair<String, BlockMeta> stone : getStoneBlocks())
-		{
-			if (stone.getRight().equals(blockMeta))
-			{
-				return stone.getLeft();
-			}
-		}
-
-		return null;
-	}
-
-	public NonNullList<CaveVein> getDummyVeins(@Nullable String[] blacklist)
-	{
-		NonNullList<CaveVein> veins = NonNullList.create();
-
-		for (Pair<String, BlockMeta> ore : getOreBlocks())
-		{
-			Rarity rarity = RARITY_MAP.get(ore.getRight());
-
-			if (rarity == null)
+			if (getBlacklistConfig() != null && getBlacklistConfig().getBlacklist().contains(block))
 			{
 				continue;
 			}
 
-			if (blacklist == null || !ArrayUtils.contains(blacklist, ore.getLeft()))
-			{
-				veins.add(new CaveVein(ore.getRight(), 1, 1, 1, 255));
-			}
-		}
+			blocks.add(block.getDefaultState());
 
-		for (Pair<String, BlockMeta> stone : getStoneBlocks())
-		{
-			if (blacklist == null || !ArrayUtils.contains(blacklist, stone.getLeft()))
-			{
-				veins.add(new CaveVein(stone.getRight(), 1, 1, 1, 255));
-			}
-		}
+			VeinProvider.Rarity rarity = OreRegistry.getEntry(block).getRarity();
 
-		return veins;
-	}
-
-	public List<CaveVein> getVeins(World world, int chunkX, int chunkZ)
-	{
-		CaveVeinManager manager = getVeinManager();
-
-		if (manager != null)
-		{
-			return manager.getCaveVeins();
-		}
-
-		List<CaveVein> list;
-		ChunkPos chunkPos = new ChunkPos(chunkX, chunkZ);
-
-		if (cachedVeins == null || CaveUtils.getChunkDistance(cachedVeins.getLeft(), chunkPos) > 3.0D)
-		{
-			list = Lists.newArrayList();
-		}
-		else
-		{
-			return cachedVeins.getRight();
-		}
-
-		NonNullList<Pair<String, BlockMeta>> ores = getOreBlocks();
-
-		for (Pair<String, BlockMeta> ore : ores)
-		{
-			Rarity rarity = RARITY_MAP.get(ore.getRight());
-
-			if (rarity == null)
+			if (rarity != null)
 			{
 				continue;
 			}
 
-			List<CaveVein> veins = createVeins(world, ore.getRight(), rarity);
+			int harvestLevel = block.getHarvestLevel(block.getDefaultState());
 
-			if (veins == null || veins.isEmpty())
+			if (harvestLevel < 0)
 			{
-				CaveVein vein = createVein(world, ore.getRight(), rarity);
+				RARITY_CACHE.put(block, VeinProvider.Rarity.UNKNOWN);
 
-				if (vein != null)
+				continue;
+			}
+
+			int level = harvestLevel;
+
+			String name = block.getRegistryName().getPath();
+
+			if (name.contains("_"))
+			{
+				name = name.substring(0, name.lastIndexOf('_'));
+			}
+
+			Item pickaxe = ForgeRegistries.ITEMS.getValue(new ResourceLocation(block.getRegistryName().getNamespace(), name + "_pickaxe"));
+			double toolRarity = 1.0D;
+
+			if (pickaxe != null)
+			{
+				ItemStack dummy = new ItemStack(pickaxe);
+				int max = pickaxe.getMaxDamage(dummy);
+				float destroy = pickaxe.getDestroySpeed(dummy, Blocks.COAL_ORE.getDefaultState());
+				int enchant = pickaxe.getItemEnchantability(dummy);
+				int harvest = pickaxe.getHarvestLevel(dummy, ToolType.PICKAXE, null, null);
+
+				toolRarity = max * 0.01D + destroy * 0.01D + enchant * 0.01D + harvest * 1.0D;
+			}
+			else if (harvestLevel > 0)
+			{
+				++level;
+			}
+
+			if (toolRarity >= 12.0D)
+			{
+				level += MathHelper.ceil(toolRarity * 0.3D) - 3;
+			}
+
+			if (level > 3)
+			{
+				rarity = VeinProvider.Rarity.EPIC;
+			}
+			else if (level > 2)
+			{
+				rarity = VeinProvider.Rarity.RARE;
+			}
+			else if (level > 1)
+			{
+				rarity = VeinProvider.Rarity.UNCOMMON;
+			}
+			else
+			{
+				rarity = VeinProvider.Rarity.COMMON;
+			}
+
+			RARITY_CACHE.put(block, rarity);
+		}
+
+		oreBlocks = blocks;
+
+		return blocks;
+	}
+
+	protected BlockStateTagList getVariousEntries()
+	{
+		return BlockStateTagList.create().add(Blocks.DIRT).add(Tags.Blocks.STONE).add(Tags.Blocks.GRAVEL);
+	}
+
+	public NonNullList<BlockState> getVariousBlocks()
+	{
+		if (variousBlocks != null)
+		{
+			return variousBlocks;
+		}
+
+		NonNullList<BlockState> blocks = NonNullList.create();
+
+		for (BlockState state : getVariousEntries())
+		{
+			if (getBlacklistConfig() == null || !getBlacklistConfig().getBlacklist().contains(state))
+			{
+				blocks.add(state);
+			}
+		}
+
+		variousBlocks = blocks;
+
+		return blocks;
+	}
+
+	public NonNullList<Vein> getVeins(IWorld world, IChunk chunk, Random rand)
+	{
+		VeinConfig config = getConfig();
+
+		if (config != null && !config.getVeins().isEmpty())
+		{
+			return config.getVeins();
+		}
+
+		NonNullList<Vein> list;
+		ChunkPos chunkPos = chunk.getPos();
+
+		if (cachedVeins == null || chunkPos.getChessboardDistance(cachedVeins.getLeft()) > 3)
+		{
+			list = NonNullList.create();
+		}
+		else return cachedVeins.getRight();
+
+		for (BlockState state : getOreBlocks())
+		{
+			VeinProvider.Rarity rarity = OreRegistry.getEntry(state).getRarity();
+
+			if (rarity == null)
+			{
+				rarity = RARITY_CACHE.getOrDefault(state.getBlock(), VeinProvider.Rarity.RARE);
+			}
+
+			if (rarity == VeinProvider.Rarity.UNKNOWN)
+			{
+				continue;
+			}
+
+			List<Vein> veins = createVeins(state, rarity, world, rand);
+
+			if (veins.isEmpty())
+			{
+				Vein vein = createVein(state, rarity, world, rand);
+
+				if (vein.getCount() > 0 && vein.getSize() > 0)
 				{
 					list.add(vein);
 				}
 			}
-			else
+			else for (Vein vein : veins)
 			{
-				list.addAll(veins);
+				if (vein.getCount() > 0 && vein.getSize() > 0)
+				{
+					list.add(vein);
+				}
 			}
 		}
 
-		getSubVeins(world, chunkX, chunkZ, list);
+		getSubVeins(world, chunk, rand, list);
 
 		cachedVeins = Pair.of(chunkPos, list);
 
 		return list;
 	}
 
-	protected void getSubVeins(World world, int chunkX, int chunkZ, List<CaveVein> list)
+	protected void getSubVeins(IWorld world, IChunk chunk, Random rand, NonNullList<Vein> veins)
 	{
-		NonNullList<Pair<String, BlockMeta>> stones = getStoneBlocks();
-		int max = world.getActualHeight() - 1;
+		int max = world.getMaxHeight() - 1;
 
-		for (Pair<String, BlockMeta> stone : stones)
+		for (BlockState state : getVariousBlocks())
 		{
-			int weight = MathHelper.getInt(rand, 25, 40);
-			int size = MathHelper.getInt(rand, 10, 30);
+			Vein.Properties properties = new Vein.Properties().max(max);
 
-			list.add(new CaveVein(stone.getRight(), weight, size, 1, max));
+			properties.count(MathHelper.nextInt(rand, 25, 40));
+			properties.size(MathHelper.nextInt(rand, 10, 30));
+
+			veins.add(new Vein(state, properties));
 		}
 	}
 
-	@Nullable
-	protected CaveVein createVein(World world, BlockMeta blockMeta, Rarity rarity)
+	protected Vein createVein(BlockState state, VeinProvider.Rarity rarity, IWorld world, Random rand)
 	{
-		int weight = 20;
-		int size = 5;
-		int min = 1;
-		int max = world.getActualHeight() - 1;
-		Object[] biome = null;
+		Vein.Properties properties = new Vein.Properties().max(world.getMaxHeight() - 1);
 
 		switch (rarity)
 		{
 			case COMMON:
-				weight = MathHelper.getInt(rand, 15, 20);
-				size = MathHelper.getInt(rand, 10, 20);
+				properties.count(MathHelper.nextInt(rand, 15, 20));
+				properties.size(MathHelper.nextInt(rand, 10, 20));
 				break;
 			case UNCOMMON:
-				weight = MathHelper.getInt(rand, 12, 15);
-				size = MathHelper.getInt(rand, 7, 10);
+				properties.count(MathHelper.nextInt(rand, 12, 15));
+				properties.size(MathHelper.nextInt(rand, 7, 10));
 				break;
 			case RARE:
-				weight = MathHelper.getInt(rand, 10, 12);
-				size = MathHelper.getInt(rand, 4, 7);
+				properties.count(MathHelper.nextInt(rand, 10, 12));
+				properties.size(MathHelper.nextInt(rand, 4, 7));
 				break;
 			case EPIC:
-				weight = MathHelper.getInt(rand, 1, 3);
-				size = MathHelper.getInt(rand, 2, 7);
-				max = 30;
+				properties.count(MathHelper.nextInt(rand, 1, 3));
+				properties.size(MathHelper.nextInt(rand, 2, 7));
+				properties.max(30);
 				break;
 			case EMERALD:
-				weight = MathHelper.getInt(rand, 1, 5);
-				size = MathHelper.getInt(rand, 1, 5);
-				min = 50;
-				biome = ArrayUtils.toArray(BiomeDictionary.Type.MOUNTAIN, BiomeDictionary.Type.HILLS);
+				properties.count(MathHelper.nextInt(rand, 1, 5));
+				properties.size(MathHelper.nextInt(rand, 1, 5));
+				properties.max(50);
 				break;
 			case DIAMOND:
-				weight = MathHelper.getInt(rand, 1, 2);
-				size = MathHelper.getInt(rand, 2, 6);
-				max = 20;
+				properties.count(MathHelper.nextInt(rand, 1, 2));
+				properties.size(MathHelper.nextInt(rand, 2, 6));
+				properties.max(20);
 				break;
 			case AQUA:
-				weight = MathHelper.getInt(rand, 5, 7);
-				size = MathHelper.getInt(rand, 2, 7);
-				max = 70;
-				biome = ArrayUtils.toArray(BiomeDictionary.Type.COLD, BiomeDictionary.Type.WET, BiomeDictionary.Type.OCEAN, BiomeDictionary.Type.RIVER);
+				properties.count(MathHelper.nextInt(rand, 5, 7));
+				properties.size(MathHelper.nextInt(rand, 2, 7));
+				properties.max(70);
 				break;
 			case RANDOMITE:
-				weight = MathHelper.getInt(rand, 5, 10);
-				size = MathHelper.getInt(rand, 1, 4);
-				min = 20;
+				properties.count(MathHelper.nextInt(rand, 5, 10));
+				properties.size(MathHelper.nextInt(rand, 1, 4));
+				properties.min(20);
 				break;
+			default:
 		}
 
-		if (weight <= 0 || size <= 0)
-		{
-			return null;
-		}
-
-		return new CaveVein(blockMeta, weight, size, min, max).setBiomes(biome);
+		return new Vein(state, properties);
 	}
 
-	@Nullable
-	protected List<CaveVein> createVeins(World world, BlockMeta blockMeta, Rarity rarity)
+	protected List<Vein> createVeins(BlockState state, VeinProvider.Rarity rarity, IWorld world, Random rand)
 	{
-		return null;
-	}
-
-	public void clearCaches()
-	{
-		oreBlocks = null;
-		stoneBlocks = null;
-		cachedVeins = null;
+		return Collections.emptyList();
 	}
 
 	public enum Rarity
 	{
+		UNKNOWN,
 		COMMON,
 		UNCOMMON,
 		RARE,
 		EPIC,
-		EMERALD("oreEmerald"),
-		DIAMOND("oreDiamond"),
-		AQUA("oreAquamarine"),
-		RANDOMITE("oreRandomite");
-
-		private final String oreName;
-
-		private Rarity()
-		{
-			this.oreName = null;
-		}
-
-		private Rarity(String oredict)
-		{
-			this.oreName = oredict;
-		}
-
-		public boolean hasOreDict()
-		{
-			return !Strings.isNullOrEmpty(oreName);
-		}
-
-		public String getOreDictName()
-		{
-			return oreName;
-		}
+		EMERALD,
+		DIAMOND,
+		AQUA,
+		RANDOMITE;
 	}
 }

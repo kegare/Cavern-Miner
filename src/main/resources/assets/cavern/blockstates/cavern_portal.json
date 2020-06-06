@@ -1,6 +1,6 @@
 {
     "variants": {
-        "axis=z": { "model": "cavern:cavern_portal_ew" },
-        "axis=x": { "model": "cavern:cavern_portal_ns" }
+        "axis=z": { "model": "cavern:block/cavern_portal_ew" },
+        "axis=x": { "model": "cavern:block/cavern_portal_ns" }
     }
 }

@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "cavern:randomite_ore" }
+        "": { "model": "cavern:block/randomite_ore" }
     }
 }

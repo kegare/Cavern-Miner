@@ -1,0 +1,9 @@
+{
+    "replace": false,
+    "values": [
+      "#forge:ores/magnite",
+      "#forge:ores/aquamarine",
+      "#forge:ores/randomite",
+      "cavern:cracked_stone"
+    ]
+}

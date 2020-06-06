@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "cavern:aquamarine_block" }
+        "": { "model": "cavern:block/aquamarine_block" }
     }
 }

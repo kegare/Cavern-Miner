@@ -1,7 +1,0 @@
-{
-    "criteria": {
-        "mining_assist": {
-            "trigger": "minecraft:impossible"
-        }
-    }
-}

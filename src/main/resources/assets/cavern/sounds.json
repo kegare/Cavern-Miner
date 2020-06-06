@@ -1,36 +1,6 @@
 {
-  "music.caves": {
-    "category": "music",
-    "sounds": [
-      {
-        "name": "cavern:music/cave",
-        "volume": 0.5,
-        "stream": true
-      },
-      {
-        "name": "cavern:music/unrest",
-        "volume": 0.5,
-        "stream": true
-      }
-    ]
-  },
-  "music.caveland": {
-    "category": "music",
-    "sounds": [
-      {
-        "name": "cavern:music/hope",
-        "volume": 0.5,
-        "stream": true
-      },
-      {
-        "name": "cavern:music/cave",
-        "volume": 0.5,
-        "stream": true
-      }
-    ]
-  },
-  "miner.rankup": {
-    "category": "player",
+  "miner_rankup": {
+    "category": "ambient",
     "sounds": [
       {
         "name": "cavern:rankup",

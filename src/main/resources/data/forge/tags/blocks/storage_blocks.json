@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#forge:storage_blocks/magnite",
+    "#forge:storage_blocks/aquamarine"
+  ]
+}

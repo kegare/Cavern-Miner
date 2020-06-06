@@ -1,0 +1,6 @@
+{
+    "parent": "cavern:block/cube_ore",
+    "textures": {
+        "ore": "cavern:block/cracked_stone"
+    }
+}

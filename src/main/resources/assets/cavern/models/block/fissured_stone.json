@@ -1,7 +1,0 @@
-{
-    "parent": "cavern:block/cube_ore",
-    "textures": {
-        "base": "blocks/stone",
-        "ore": "cavern:blocks/stone_fissured"
-    }
-}

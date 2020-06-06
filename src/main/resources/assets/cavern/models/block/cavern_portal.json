@@ -1,8 +1,7 @@
 {
-    "parent": "block/thin_block",
     "textures": {
-        "particle": "cavern:items/cavern_portal",
-        "portal": "cavern:items/cavern_portal"
+        "particle": "cavern:item/cavern_portal",
+        "portal": "cavern:item/cavern_portal"
     },
     "elements": [
         {   "from": [ 0, 0, 6 ],

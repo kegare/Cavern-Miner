@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "cavern:magnite_ingot"
+    }
+  ],
+  "result": {
+    "item": "cavern:magnite_nugget",
+    "count": 9
+  }
+}

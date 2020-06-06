@@ -1,7 +1,6 @@
 {
     "parent": "cavern:block/cube_ore",
     "textures": {
-        "base": "blocks/stone",
-        "ore": "cavern:blocks/aquamarine_ore"
+        "ore": "cavern:block/aquamarine_ore"
     }
 }
