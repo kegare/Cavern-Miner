@@ -68,7 +68,9 @@ public class VeinProvider
 				continue;
 			}
 
-			blocks.add(block.getDefaultState());
+			BlockState state = block.getDefaultState();
+
+			blocks.add(state);
 
 			VeinProvider.Rarity rarity = OreRegistry.getEntry(block).getRarity();
 
@@ -77,9 +79,9 @@ public class VeinProvider
 				continue;
 			}
 
-			int harvestLevel = block.getHarvestLevel(block.getDefaultState());
+			int harvestLevel = block.getHarvestLevel(state);
 
-			if (harvestLevel < 0)
+			if (harvestLevel < 0 || block.getHarvestTool(state) != ToolType.PICKAXE)
 			{
 				RARITY_CACHE.put(block, VeinProvider.Rarity.UNKNOWN);
 

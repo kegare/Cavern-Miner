@@ -21,8 +21,6 @@ public final class OreRegistry
 	private static final Map<BlockState, BlockStateEntry> BLOCK_STATE_ENTRIES = Maps.newHashMap();
 	private static final Map<ResourceLocation, TagEntry> TAG_ENTRIES = Maps.newHashMap();
 
-	private static final OreEntry EMPTY = new EmptyEntry();
-
 	private OreRegistry() {}
 
 	public static void registerBlock(BlockEntry entry)
@@ -77,7 +75,7 @@ public final class OreRegistry
 
 			if (strict)
 			{
-				return EMPTY;
+				return OreEntry.EMPTY;
 			}
 
 			for (BlockStateEntry blockStateEntry : BLOCK_STATE_ENTRIES.values())
@@ -109,7 +107,7 @@ public final class OreRegistry
 
 			if (strict)
 			{
-				return EMPTY;
+				return OreEntry.EMPTY;
 			}
 
 			for (BlockStateEntry blockStateEntry : BLOCK_STATE_ENTRIES.values())
@@ -149,7 +147,7 @@ public final class OreRegistry
 
 			if (strict)
 			{
-				return EMPTY;
+				return OreEntry.EMPTY;
 			}
 
 			for (BlockEntry blockEntry : BLOCK_ENTRIES.values())
@@ -169,19 +167,21 @@ public final class OreRegistry
 			}
 		}
 
-		return EMPTY;
+		return OreEntry.EMPTY;
 	}
 
 	public interface OreEntry
 	{
-		@Nullable
-		public Object getParent();
+		static final OreEntry EMPTY = new EmptyEntry();
 
 		@Nullable
-		public VeinProvider.Rarity getRarity();
+		Object getParent();
 
 		@Nullable
-		public Integer getPoint();
+		VeinProvider.Rarity getRarity();
+
+		@Nullable
+		Integer getPoint();
 	}
 
 	private static class EmptyEntry implements OreEntry

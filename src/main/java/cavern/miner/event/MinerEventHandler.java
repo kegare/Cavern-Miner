@@ -5,6 +5,7 @@ import cavern.miner.miner.Miner;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MiningInteractMessage;
 import cavern.miner.util.BlockStateHelper;
+import cavern.miner.vein.OrePointHelper;
 import cavern.miner.vein.OreRegistry;
 import cavern.miner.world.CavernDimension;
 import net.minecraft.block.BlockState;
@@ -97,9 +98,9 @@ public class MinerEventHandler
 			return;
 		}
 
-		Integer point = OreRegistry.getEntry(state).getPoint();
+		int point = OrePointHelper.getPoint(OreRegistry.getEntry(state));
 
-		if (point == null || point.intValue() == 0)
+		if (point == 0)
 		{
 			return;
 		}
@@ -129,9 +130,9 @@ public class MinerEventHandler
 		}
 
 		BlockState state = event.getPlacedBlock();
-		Integer point = OreRegistry.getEntry(state).getPoint();
+		int point = OrePointHelper.getPoint(OreRegistry.getEntry(state));
 
-		if (point == null || point.intValue() == 0)
+		if (point == 0)
 		{
 			return;
 		}
