@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import cavern.miner.config.DisplayCorner;
-import cavern.miner.config.MiningConfig;
+import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.miner.Miner;
 import cavern.miner.miner.MinerRank;
@@ -53,7 +53,7 @@ public class MinerDisplayHandler
 			}
 		}
 
-		return mc.player.isCreative() || MiningConfig.INSTANCE.alwaysShow.get();
+		return mc.player.isCreative() || GeneralConfig.INSTANCE.alwaysShow.get();
 	}
 
 	private static void setDisplayPosition(DisplayCorner corner, int width, int height)
@@ -153,7 +153,7 @@ public class MinerDisplayHandler
 		MinerRank rank = miner.getRank();
 
 		MainWindow window = event.getWindow();
-		DisplayCorner corner = MiningConfig.INSTANCE.displayConer.get();
+		DisplayCorner corner = GeneralConfig.INSTANCE.displayConer.get();
 
 		setDisplayPosition(corner, window.getScaledWidth(), window.getScaledHeight());
 
@@ -247,7 +247,7 @@ public class MinerDisplayHandler
 		matrix.pop();
 		buffer.finish();
 
-		if (MiningConfig.INSTANCE.showRank.get())
+		if (GeneralConfig.INSTANCE.showRank.get())
 		{
 			matrix = new MatrixStack();
 			buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());

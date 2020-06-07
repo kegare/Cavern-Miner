@@ -22,6 +22,6 @@ public class CavernModConfig
 			dir.mkdirs();
 		}
 
-		context.registerConfig(ModConfig.Type.COMMON, MiningConfig.SPEC, "cavern_miner/mining.toml");
+		context.registerConfig(ModConfig.Type.COMMON, GeneralConfig.SPEC, "cavern_miner/general.toml");
 	}
 }

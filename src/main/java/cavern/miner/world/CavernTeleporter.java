@@ -9,15 +9,18 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.ObjectUtils;
 
 import cavern.miner.block.CavernPortalBlock;
+import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.common.util.LazyOptional;
@@ -39,9 +42,17 @@ public class CavernTeleporter implements ITeleporter
 	{
 		Entity newEntity = repositionEntity.apply(false);
 		BlockPos pos = newEntity.getPosition();
-		int range = 32;
+		int range = GeneralConfig.INSTANCE.findRange.get();
 
-		destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> placeInStoredPortal(destWorld, newEntity, yaw, range, pos, o));
+		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, range, o)).orElse(false))
+		{
+			return newEntity;
+		}
+
+		if (destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, range, pos, o)).orElse(false))
+		{
+			return newEntity;
+		}
 
 		if (!placeInPortal(destWorld, newEntity, yaw, range, pos))
 		{
@@ -49,6 +60,20 @@ public class CavernTeleporter implements ITeleporter
 		}
 
 		return newEntity;
+	}
+
+	public boolean placeInCachedPortal(ServerWorld world, Entity entity, float yaw, int checkRange, TeleporterCache cache)
+	{
+		ResourceLocation key = portalBlock.getRegistryName();
+		DimensionType dim = world.getDimension().getType();
+		BlockPos pos = cache.getLastPos(key, dim, null);
+
+		if (pos == null)
+		{
+			return false;
+		}
+
+		return placeInPortal(world, entity, yaw, checkRange, pos);
 	}
 
 	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int checkRange, BlockPos checkPos, CavePortalList list)
