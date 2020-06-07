@@ -32,7 +32,7 @@ public class PortalTriggerConfig
 
 	public PortalTriggerConfig(File dir, String name)
 	{
-		this.file = new File(dir, name + "_portal_trigger.json");
+		this.file = new File(dir, name + "_portal_triggers.json");
 	}
 
 	public boolean setEntries(ItemStackTagList entries)

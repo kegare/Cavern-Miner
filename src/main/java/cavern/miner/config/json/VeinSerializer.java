@@ -49,17 +49,40 @@ public class VeinSerializer implements JsonSerializer<Vein>, JsonDeserializer<Ve
 		BlockState state = JsonHelper.deserializeBlockState(object.get("block").getAsJsonObject());
 		Vein.Properties properties = new Vein.Properties();
 
-		JsonArray array = object.get("target_blocks").getAsJsonArray();
-		Stream.Builder<BlockState> states = Stream.builder();
-		array.forEach(o -> states.add(JsonHelper.deserializeBlockState((JsonObject)o)));
-		properties.target(states.build().toArray(BlockState[]::new));
+		if (object.has("target_blocks"))
+		{
+			JsonArray array = object.get("target_blocks").getAsJsonArray();
+			Stream.Builder<BlockState> states = Stream.builder();
 
-		properties.count(object.get("count").getAsInt());
-		properties.size(object.get("size").getAsInt());
+			array.forEach(o -> states.add(JsonHelper.deserializeBlockState((JsonObject)o)));
 
-		JsonObject sub = object.get("height").getAsJsonObject();
-		properties.min(sub.get("min").getAsInt());
-		properties.max(sub.get("max").getAsInt());
+			properties.target(states.build().toArray(BlockState[]::new));
+		}
+
+		if (object.has("count"))
+		{
+			properties.count(object.get("count").getAsInt());
+		}
+
+		if (object.has("size"))
+		{
+			properties.size(object.get("size").getAsInt());
+		}
+
+		if (object.has("height"))
+		{
+			JsonObject sub = object.get("height").getAsJsonObject();
+
+			if (sub.has("min"))
+			{
+				properties.min(sub.get("min").getAsInt());
+			}
+
+			if (sub.has("max"))
+			{
+				properties.max(sub.get("max").getAsInt());
+			}
+		}
 
 		return new Vein(state, properties);
 	}

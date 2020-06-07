@@ -32,7 +32,7 @@ public class PortalFrameConfig
 
 	public PortalFrameConfig(File dir, String name)
 	{
-		this.file = new File(dir, name + "_portal_frame.json");
+		this.file = new File(dir, name + "_portal_frames.json");
 	}
 
 	public boolean setEntries(BlockStateTagList entries)

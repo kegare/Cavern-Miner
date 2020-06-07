@@ -44,7 +44,10 @@ public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDes
 			propsObject.addProperty(value.getLeft(), value.getRight());
 		}
 
-		object.add("properties", propsObject);
+		if (propsObject.size() > 0)
+		{
+			object.add("properties", propsObject);
+		}
 
 		return object;
 	}
@@ -62,21 +65,24 @@ public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDes
 			return Blocks.AIR.getDefaultState();
 		}
 
-		JsonObject propsObject = object.get("properties").getAsJsonObject();
-
 		BlockState state = block.getDefaultState();
-		StateContainer<Block, BlockState> stateContainer = block.getStateContainer();
 
-		for (Map.Entry<String, JsonElement> entry : propsObject.entrySet())
+		if (object.has("properties"))
 		{
-			String key = entry.getKey();
-			IProperty<?> prop = stateContainer.getProperty(key);
+			StateContainer<Block, BlockState> stateContainer = block.getStateContainer();
+			JsonObject propsObject = object.get("properties").getAsJsonObject();
 
-			if (prop != null)
+			for (Map.Entry<String, JsonElement> entry : propsObject.entrySet())
 			{
-				String value = entry.getValue().getAsString();
+				String key = entry.getKey();
+				IProperty<?> prop = stateContainer.getProperty(key);
 
-				state = IStateHolder.withString(state, prop, key, value, value);
+				if (prop != null)
+				{
+					String value = entry.getValue().getAsString();
+
+					state = IStateHolder.withString(state, prop, key, value, value);
+				}
 			}
 		}
 

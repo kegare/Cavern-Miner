@@ -31,7 +31,13 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeser
 		JsonObject object = new JsonObject();
 
 		object.addProperty("name", src.getItem().getRegistryName().toString());
-		object.addProperty("count", src.getCount());
+
+		int count = src.getCount();
+
+		if (count > 1)
+		{
+			object.addProperty("count", count);
+		}
 
 		CompoundNBT nbt = src.getTag();
 
@@ -83,7 +89,10 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeser
 			}
 		}
 
-		stack.setCount(MathHelper.clamp(object.get("count").getAsInt(), 1, stack.getMaxStackSize()));
+		if (object.has("count"))
+		{
+			stack.setCount(MathHelper.clamp(object.get("count").getAsInt(), 1, stack.getMaxStackSize()));
+		}
 
 		return stack;
 	}
