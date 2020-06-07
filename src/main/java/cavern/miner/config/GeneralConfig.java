@@ -14,6 +14,7 @@ public class GeneralConfig
 
 	public final ForgeConfigSpec.IntValue sleepWait;
 
+	public final ForgeConfigSpec.BooleanValue disableMiner;
 	public final ForgeConfigSpec.BooleanValue alwaysShow;
 	public final ForgeConfigSpec.BooleanValue showRank;
 	public final ForgeConfigSpec.EnumValue<DisplayCorner> displayConer;
@@ -30,8 +31,9 @@ public class GeneralConfig
 		builder.pop();
 
 		builder.push("miner");
-		alwaysShow = builder.comment("Whether to always show the mining status.").define("always_show", false);
-		showRank = builder.comment("Whether to show the miner rank along with mining points.").define("show_rank", true);
+		disableMiner = builder.comment("If disable the miner status for all players.").define("disable_miner", false);
+		alwaysShow = builder.comment("When enabled, the miner status will always be shown.").define("always_show", false);
+		showRank = builder.comment("When enabled, the miner rank will be shown along with the miner points.").define("show_rank", true);
 		displayConer = builder.comment("The display corner of miner status.").defineEnum("display_corner", DisplayCorner.BOTTOM_RIGHT);
 		builder.pop();
 	}

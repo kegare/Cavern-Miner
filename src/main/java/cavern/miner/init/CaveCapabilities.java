@@ -1,6 +1,7 @@
 package cavern.miner.init;
 
 import cavern.miner.capability.NBTSerializableCapability;
+import cavern.miner.config.GeneralConfig;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
 import cavern.miner.storage.Miner;
@@ -60,7 +61,11 @@ public final class CaveCapabilities
 			PlayerEntity player = (PlayerEntity)event.getObject();
 
 			event.addCapability(CAVER_ID, new NBTSerializableCapability<>(CAVER, Caver::new));
-			event.addCapability(MINER_ID, new NBTSerializableCapability<>(MINER, () -> new Miner(player)));
+
+			if (!GeneralConfig.INSTANCE.disableMiner.get())
+			{
+				event.addCapability(MINER_ID, new NBTSerializableCapability<>(MINER, () -> new Miner(player)));
+			}
 		}
 	}
 
