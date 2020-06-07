@@ -3,12 +3,13 @@ package cavern.miner.client;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import cavern.miner.config.DisplayCorner;
-import cavern.miner.config.GeneralConfig;
+import cavern.miner.config.client.ClientConfig;
+import cavern.miner.config.client.DisplayCorner;
+import cavern.miner.config.client.DisplayType;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.Miner;
-import cavern.miner.storage.MinerRank;
 import cavern.miner.storage.MinerCache;
+import cavern.miner.storage.MinerRank;
 import cavern.miner.world.CavernDimension;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MainWindow;
@@ -38,6 +39,13 @@ public class MinerDisplayHandler
 
 	private static boolean canDisplay()
 	{
+		DisplayType type = ClientConfig.INSTANCE.displayType.get();
+
+		if (type == DisplayType.HIDDEN)
+		{
+			return false;
+		}
+
 		Minecraft mc = Minecraft.getInstance();
 
 		if (!(mc.world.dimension instanceof CavernDimension))
@@ -53,7 +61,7 @@ public class MinerDisplayHandler
 			}
 		}
 
-		return mc.player.isCreative() || GeneralConfig.INSTANCE.alwaysShow.get();
+		return mc.player.isCreative() || type == DisplayType.ALWAYS;
 	}
 
 	private static void setDisplayPosition(DisplayCorner corner, int width, int height)
@@ -153,7 +161,7 @@ public class MinerDisplayHandler
 		MinerRank rank = miner.getRank();
 
 		MainWindow window = event.getWindow();
-		DisplayCorner corner = GeneralConfig.INSTANCE.displayConer.get();
+		DisplayCorner corner = ClientConfig.INSTANCE.displayConer.get();
 
 		setDisplayPosition(corner, window.getScaledWidth(), window.getScaledHeight());
 
@@ -168,6 +176,15 @@ public class MinerDisplayHandler
 		MinerCache cache = miner.getCache();
 		BlockState lastBlock = cache.getLastBlock();
 		long diffTime = System.currentTimeMillis() - cache.getLastTime();
+
+		if (ClientConfig.INSTANCE.displayType.get() == DisplayType.ACTION)
+		{
+			if (lastBlock == null || diffTime > 15000L)
+			{
+				return;
+			}
+		}
+
 		boolean showLastMine = false;
 
 		if (lastBlock != null && diffTime <= 3000L)
@@ -247,7 +264,7 @@ public class MinerDisplayHandler
 		matrix.pop();
 		buffer.finish();
 
-		if (GeneralConfig.INSTANCE.showRank.get())
+		if (ClientConfig.INSTANCE.showRank.get())
 		{
 			matrix = new MatrixStack();
 			buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());

@@ -1,4 +1,4 @@
-package cavern.miner.config;
+package cavern.miner.config.client;
 
 public enum DisplayCorner
 {

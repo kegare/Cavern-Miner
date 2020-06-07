@@ -2,6 +2,7 @@ package cavern.miner.config;
 
 import java.io.File;
 
+import cavern.miner.config.client.ClientConfig;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -23,5 +24,6 @@ public class CavernModConfig
 		}
 
 		context.registerConfig(ModConfig.Type.COMMON, GeneralConfig.SPEC, "cavern_miner/general.toml");
+		context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "cavern_miner/client.toml");
 	}
 }
