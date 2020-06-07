@@ -115,7 +115,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 
 		if (entry instanceof OreRegistry.TagEntry)
 		{
-			return JsonHelper.serializeBlockTag(((OreRegistry.TagEntry)entry).getTag());
+			return JsonHelper.serializeTag(((OreRegistry.TagEntry)entry).getTag());
 		}
 
 		return null;

@@ -4,9 +4,13 @@ import javax.annotation.Nullable;
 
 import com.google.common.cache.LoadingCache;
 
+import cavern.miner.config.CavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.storage.TeleporterCache;
+import cavern.miner.util.BlockStateHelper;
+import cavern.miner.util.BlockStateTagList;
+import cavern.miner.util.ItemStackTagList;
 import cavern.miner.world.CavernTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -42,6 +46,21 @@ public class CavernPortalBlock extends Block
 	{
 		super(properties);
 		this.setDefaultState(stateContainer.getBaseState().with(AXIS, Direction.Axis.X));
+	}
+
+	public DimensionType getDimension()
+	{
+		return CaveDimensions.CAVERN_TYPE;
+	}
+
+	public ItemStackTagList getTriggerItems()
+	{
+		return CavernConfig.PORTAL_TRIGGER.getEntries();
+	}
+
+	public BlockStateTagList getFrameBlocks()
+	{
+		return CavernConfig.PORTAL_FRAME.getEntries();
 	}
 
 	@Override
@@ -140,11 +159,6 @@ public class CavernPortalBlock extends Block
 		}
 	}
 
-	public DimensionType getDimension()
-	{
-		return CaveDimensions.CAVERN_TYPE;
-	}
-
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity)
 	{
@@ -209,13 +223,13 @@ public class CavernPortalBlock extends Block
 
 		if (!frame.isNormalCube(world, blockpos))
 		{
-			frame = Blocks.MOSSY_COBBLESTONE.getDefaultState();
+			frame = getFrameBlocks().getCachedList().get(0);
 		}
 
 		entity.changeDimension(dimNew, new CavernTeleporter(this, frame));
 	}
 
-	public static BlockPattern.PatternHelper createPatternHelper(Block portal, IWorld world, BlockPos pos)
+	public static BlockPattern.PatternHelper createPatternHelper(CavernPortalBlock portal, IWorld world, BlockPos pos)
 	{
 		Direction.Axis axis = Direction.Axis.Z;
 		Size size = new Size(portal, world, pos, Direction.Axis.X);
@@ -271,7 +285,7 @@ public class CavernPortalBlock extends Block
 
 	public static class Size
 	{
-		private final Block portalBlock;
+		private final CavernPortalBlock portalBlock;
 		private final IWorld world;
 		private final Direction.Axis axis;
 		private final Direction rightDir;
@@ -281,9 +295,9 @@ public class CavernPortalBlock extends Block
 		private BlockPos bottomLeft;
 		private int height;
 		private int width;
-		private Block portalFrame;
+		private BlockState portalFrame;
 
-		public Size(Block portal, IWorld world, BlockPos pos, Direction.Axis axis)
+		public Size(CavernPortalBlock portal, IWorld world, BlockPos pos, Direction.Axis axis)
 		{
 			this.portalBlock = portal;
 			this.world = world;
@@ -424,17 +438,13 @@ public class CavernPortalBlock extends Block
 
 			if (portalFrame == null)
 			{
-				if (state.getBlock() == Blocks.MOSSY_COBBLESTONE)
+				if (portalBlock.getFrameBlocks().contains(state))
 				{
-					portalFrame = state.getBlock();
-				}
-				else if (state.getBlock() == Blocks.MOSSY_STONE_BRICKS)
-				{
-					portalFrame = state.getBlock();
+					portalFrame = state;
 				}
 			}
 
-			return portalFrame != null && portalFrame == state.getBlock();
+			return BlockStateHelper.equals(portalFrame, state);
 		}
 
 		public boolean isValid()

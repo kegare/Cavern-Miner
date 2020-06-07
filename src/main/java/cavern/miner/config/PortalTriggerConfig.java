@@ -18,32 +18,31 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 import cavern.miner.CavernMod;
-import cavern.miner.config.json.BlockStateTagListSerializer;
-import cavern.miner.util.BlockStateTagList;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import cavern.miner.config.json.ItemStackTagListSerializer;
+import cavern.miner.util.ItemStackTagList;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Tags;
 
-public class VeinBlacklistConfig
+public class PortalTriggerConfig
 {
-	private final BlockStateTagList list = BlockStateTagList.create();
+	private final ItemStackTagList list = ItemStackTagList.create();
 
 	private final File file;
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	public VeinBlacklistConfig(File dir, String name)
+	public PortalTriggerConfig(File dir, String name)
 	{
-		this.file = new File(dir, name + "_veins_blacklist.json");
+		this.file = new File(dir, name + "_portal_trigger.json");
 	}
 
-	public boolean setBlacklist(BlockStateTagList entries)
+	public boolean setEntries(ItemStackTagList entries)
 	{
 		list.clear();
 
 		return list.addEntries(entries.getEntryList()) && list.addTags(entries.getTagList());
 	}
 
-	public BlockStateTagList getBlacklist()
+	public ItemStackTagList getEntries()
 	{
 		return list;
 	}
@@ -80,7 +79,7 @@ public class VeinBlacklistConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to load veins blacklist", e);
+			CavernMod.LOG.error("Failed to load portal trigger", e);
 		}
 	}
 
@@ -111,7 +110,7 @@ public class VeinBlacklistConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to save veins blacklist", e);
+			CavernMod.LOG.error("Failed to save portal trigger", e);
 		}
 	}
 
@@ -123,21 +122,21 @@ public class VeinBlacklistConfig
 			return null;
 		}
 
-		return gson.toJson(BlockStateTagListSerializer.INSTANCE.serialize(list, BlockState.class, null));
+		return gson.toJson(ItemStackTagListSerializer.INSTANCE.serialize(list, ItemStack.class, null));
 	}
 
 	public boolean fromJson(Reader json)
 	{
 		try
 		{
-			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonElement.class), BlockState.class, null);
+			ItemStackTagList entries = ItemStackTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonElement.class), ItemStack.class, null);
 
 			if (entries == null || entries.isEmpty())
 			{
 				return false;
 			}
 
-			return setBlacklist(entries);
+			return setEntries(entries);
 		}
 		catch (Exception e)
 		{
@@ -150,7 +149,6 @@ public class VeinBlacklistConfig
 	public void setDefault()
 	{
 		list.clear();
-		list.add(Blocks.STONE).add(Blocks.POLISHED_ANDESITE).add(Blocks.POLISHED_DIORITE).add(Blocks.POLISHED_GRANITE);
-		list.add(Tags.Blocks.ORES_QUARTZ);
+		list.add(Tags.Items.GEMS_EMERALD);
 	}
 }

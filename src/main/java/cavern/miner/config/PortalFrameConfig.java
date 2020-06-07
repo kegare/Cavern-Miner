@@ -22,28 +22,27 @@ import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraftforge.common.Tags;
 
-public class VeinBlacklistConfig
+public class PortalFrameConfig
 {
 	private final BlockStateTagList list = BlockStateTagList.create();
 
 	private final File file;
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	public VeinBlacklistConfig(File dir, String name)
+	public PortalFrameConfig(File dir, String name)
 	{
-		this.file = new File(dir, name + "_veins_blacklist.json");
+		this.file = new File(dir, name + "_portal_frame.json");
 	}
 
-	public boolean setBlacklist(BlockStateTagList entries)
+	public boolean setEntries(BlockStateTagList entries)
 	{
 		list.clear();
 
 		return list.addEntries(entries.getEntryList()) && list.addTags(entries.getTagList());
 	}
 
-	public BlockStateTagList getBlacklist()
+	public BlockStateTagList getEntries()
 	{
 		return list;
 	}
@@ -80,7 +79,7 @@ public class VeinBlacklistConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to load veins blacklist", e);
+			CavernMod.LOG.error("Failed to load portal frame", e);
 		}
 	}
 
@@ -111,7 +110,7 @@ public class VeinBlacklistConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to save veins blacklist", e);
+			CavernMod.LOG.error("Failed to save portal frame", e);
 		}
 	}
 
@@ -137,7 +136,7 @@ public class VeinBlacklistConfig
 				return false;
 			}
 
-			return setBlacklist(entries);
+			return setEntries(entries);
 		}
 		catch (Exception e)
 		{
@@ -150,7 +149,6 @@ public class VeinBlacklistConfig
 	public void setDefault()
 	{
 		list.clear();
-		list.add(Blocks.STONE).add(Blocks.POLISHED_ANDESITE).add(Blocks.POLISHED_DIORITE).add(Blocks.POLISHED_GRANITE);
-		list.add(Tags.Blocks.ORES_QUARTZ);
+		list.add(Blocks.MOSSY_COBBLESTONE).add(Blocks.MOSSY_STONE_BRICKS);
 	}
 }

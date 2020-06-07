@@ -35,9 +35,9 @@ public class VeinConfig
 	private final File file;
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-	public VeinConfig(String name)
+	public VeinConfig(File dir, String name)
 	{
-		this.file = new File(CavernModConfig.getConfigDir(), name + "_veins.json");
+		this.file = new File(dir, name + "_veins.json");
 	}
 
 	public boolean setVeins(Collection<Vein> entries)
@@ -187,7 +187,7 @@ public class VeinConfig
 
 	public static void createExampleConfig()
 	{
-		VeinConfig config = new VeinConfig("example");
+		VeinConfig config = new VeinConfig(CavernModConfig.getConfigDir(), "example");
 
 		config.getVeins().add(new Vein(Blocks.COAL_ORE.getDefaultState(), new Vein.Properties().count(20).size(10)));
 		config.getVeins().add(new Vein(Blocks.SAND.getDefaultState(), new Vein.Properties().target(Blocks.DIRT.getDefaultState()).count(30).size(15).min(30)));

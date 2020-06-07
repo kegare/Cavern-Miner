@@ -1,0 +1,90 @@
+package cavern.miner.config.json;
+
+import java.lang.reflect.Type;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+
+import cavern.miner.CavernMod;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.registries.ForgeRegistries;
+
+public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack>
+{
+	public static final ItemStackSerializer INSTANCE = new ItemStackSerializer();
+
+	@Override
+	public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context)
+	{
+		JsonObject object = new JsonObject();
+
+		object.addProperty("name", src.getItem().getRegistryName().toString());
+		object.addProperty("count", src.getCount());
+
+		CompoundNBT nbt = src.getTag();
+
+		if (nbt != null)
+		{
+			JsonObject nbtObject = new JsonObject();
+
+			for (String key : nbt.keySet())
+			{
+				String value = nbt.get(key).toString();
+
+				nbtObject.addProperty(key, value);
+			}
+
+			object.add("nbt", nbtObject);
+		}
+
+		return object;
+	}
+
+	@Override
+	public ItemStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+	{
+		JsonObject object = json.getAsJsonObject();
+
+		Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("name").getAsString()));
+
+		if (item == null || item == Items.AIR)
+		{
+			return ItemStack.EMPTY;
+		}
+
+		ItemStack stack = new ItemStack(item);
+
+		if (object.has("nbt"))
+		{
+			try
+			{
+				CompoundNBT nbt = JsonToNBT.getTagFromJson(object.get("nbt").toString());
+
+				if (!nbt.isEmpty())
+				{
+					stack.setTag(nbt);
+				}
+			}
+			catch (CommandSyntaxException e)
+			{
+				CavernMod.LOG.error("Invalid nbt tag: " + e.getMessage());
+			}
+		}
+
+		stack.setCount(MathHelper.clamp(object.get("count").getAsInt(), 1, stack.getMaxStackSize()));
+
+		return stack;
+	}
+}

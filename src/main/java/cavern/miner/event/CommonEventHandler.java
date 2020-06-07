@@ -2,10 +2,10 @@ package cavern.miner.event;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.item.CaveItemTier;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
@@ -17,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -31,7 +30,7 @@ public class CommonEventHandler
 	{
 		ItemStack stack = event.getItemStack();
 
-		if (stack.isEmpty() || !stack.getItem().isIn(Tags.Items.GEMS_EMERALD))
+		if (stack.isEmpty())
 		{
 			return;
 		}
@@ -40,15 +39,24 @@ public class CommonEventHandler
 		BlockPos pos = event.getPos();
 		BlockState state = world.getBlockState(pos);
 
-		if (state.getBlock() == Blocks.MOSSY_COBBLESTONE || state.getBlock() == Blocks.MOSSY_STONE_BRICKS)
+		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
+			if (!portal.getTriggerItems().contains(stack))
+			{
+				continue;
+			}
+
+			if (!portal.getFrameBlocks().contains(state))
+			{
+				continue;
+			}
+
 			PlayerEntity player = event.getPlayer();
 			Direction face = ObjectUtils.defaultIfNull(event.getFace(), Direction.UP);
 			Hand hand = event.getHand();
 			ItemStack prevItem = stack.copy();
-			ItemStack portalItem = new ItemStack(CaveBlocks.CAVERN_PORTAL.get());
 			ItemUseContext context = new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos));
-			ActionResultType result = portalItem.getItem().onItemUse(context);
+			ActionResultType result = portal.asItem().onItemUse(context);
 
 			if (result == ActionResultType.SUCCESS)
 			{
@@ -59,6 +67,8 @@ public class CommonEventHandler
 
 				event.setCancellationResult(result);
 				event.setCanceled(true);
+
+				break;
 			}
 		}
 	}

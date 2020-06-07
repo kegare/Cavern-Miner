@@ -61,7 +61,7 @@ public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTag
 		{
 			if (e.isJsonObject())
 			{
-				BlockState state = JsonHelper.deserializeBlockState((JsonObject)e);
+				BlockState state = JsonHelper.deserializeBlockState(e.getAsJsonObject());
 
 				if (!(state.getBlock() instanceof AirBlock))
 				{
