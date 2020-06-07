@@ -20,9 +20,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDeserializer<BlockState>
 {
@@ -31,10 +29,7 @@ public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDes
 	@Override
 	public JsonElement serialize(BlockState src, Type typeOfSrc, JsonSerializationContext context)
 	{
-		JsonObject object = new JsonObject();
-
-		object.addProperty("name", src.getBlock().getRegistryName().toString());
-
+		JsonObject object = JsonHelper.serializeRegistryEntry(src.getBlock());
 		JsonObject propsObject = new JsonObject();
 
 		for (Map.Entry<IProperty<?>, Comparable<?>> entry : src.getValues().entrySet())
@@ -57,10 +52,9 @@ public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDes
 	{
 		JsonObject object = json.getAsJsonObject();
 
-		String name = object.get("name").getAsString();
-		Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));
+		Block block = JsonHelper.deserializeBlock(object);
 
-		if (block == null || block instanceof AirBlock)
+		if (block instanceof AirBlock)
 		{
 			return Blocks.AIR.getDefaultState();
 		}

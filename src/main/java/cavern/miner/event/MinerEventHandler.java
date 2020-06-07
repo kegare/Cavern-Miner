@@ -35,6 +35,7 @@ public class MinerEventHandler
 		PlayerEntity player = event.getPlayer();
 
 		player.getCapability(CaveCapabilities.MINER).ifPresent(Miner::sendToClient);
+
 	}
 
 	@SubscribeEvent
@@ -106,7 +107,7 @@ public class MinerEventHandler
 		}
 
 		miner.addPoint(point).sendToClient();
-		miner.getMiningCache().put(state, point);
+		miner.getCache().put(state, point);
 
 		CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new MiningInteractMessage(state, point));
 	}
@@ -147,7 +148,7 @@ public class MinerEventHandler
 
 		if (entity.ticksExisted % 10 == 0 && entity instanceof PlayerEntity)
 		{
-			entity.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getMiningCache().updateCombo());
+			entity.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getCache().updateCombo());
 		}
 	}
 }

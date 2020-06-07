@@ -15,9 +15,7 @@ import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.util.ResourceLocation;
 
 public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTagList>, JsonDeserializer<BlockStateTagList>
 {
@@ -74,7 +72,7 @@ public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTag
 
 		for (JsonElement e : array)
 		{
-			list.add(new BlockTags.Wrapper(new ResourceLocation(e.getAsString())));
+			list.add(JsonHelper.deserializeBlockTag(e.getAsJsonObject()));
 		}
 
 		return list;

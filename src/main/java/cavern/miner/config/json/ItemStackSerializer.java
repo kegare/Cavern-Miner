@@ -17,9 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack>
 {
@@ -28,10 +26,7 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeser
 	@Override
 	public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context)
 	{
-		JsonObject object = new JsonObject();
-
-		object.addProperty("name", src.getItem().getRegistryName().toString());
-
+		JsonObject object = JsonHelper.serializeRegistryEntry(src.getItem());
 		int count = src.getCount();
 
 		if (count > 1)
@@ -63,9 +58,9 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeser
 	{
 		JsonObject object = json.getAsJsonObject();
 
-		Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("name").getAsString()));
+		Item item = JsonHelper.deserializeItem(object);
 
-		if (item == null || item == Items.AIR)
+		if (item == Items.AIR)
 		{
 			return ItemStack.EMPTY;
 		}

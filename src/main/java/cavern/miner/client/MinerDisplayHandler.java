@@ -165,7 +165,7 @@ public class MinerDisplayHandler
 		ItemRenderer itemRenderer = mc.getItemRenderer();
 		FontRenderer fontRenderer = mc.fontRenderer;
 
-		MinerCache cache = miner.getMiningCache();
+		MinerCache cache = miner.getCache();
 		BlockState lastBlock = cache.getLastBlock();
 		long diffTime = System.currentTimeMillis() - cache.getLastTime();
 		boolean showLastMine = false;

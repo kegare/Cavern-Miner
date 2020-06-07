@@ -1,7 +1,5 @@
 package cavern.miner.config.json;
 
-import javax.annotation.Nullable;
-
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.google.gson.JsonObject;
@@ -15,17 +13,17 @@ import net.minecraft.item.Items;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
-import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 public class JsonHelper
 {
-	public static JsonObject serializeBlock(Block block)
+	public static JsonObject serializeRegistryEntry(IForgeRegistryEntry<?> entry)
 	{
 		JsonObject object = new JsonObject();
 
-		object.addProperty("name", block.getRegistryName().toString());
+		object.addProperty("name", entry.getRegistryName().toString());
 
 		return object;
 	}
@@ -54,19 +52,9 @@ public class JsonHelper
 		return BlockStateSerializer.INSTANCE.deserialize(object, BlockState.class, null);
 	}
 
-	@Nullable
 	public static Tag<Block> deserializeBlockTag(JsonObject object)
 	{
-		return BlockTags.getCollection().get(new ResourceLocation(object.get("tag").getAsString()));
-	}
-
-	public static JsonObject serializeItem(IItemProvider item)
-	{
-		JsonObject object = new JsonObject();
-
-		object.addProperty("name", item.asItem().getRegistryName().toString());
-
-		return object;
+		return new BlockTags.Wrapper(new ResourceLocation(object.get("tag").getAsString()));
 	}
 
 	public static JsonObject serializeItemStack(ItemStack stack)
@@ -84,9 +72,8 @@ public class JsonHelper
 		return ItemStackSerializer.INSTANCE.deserialize(object, ItemStack.class, null);
 	}
 
-	@Nullable
 	public static Tag<Item> deserializeItemTag(JsonObject object)
 	{
-		return ItemTags.getCollection().get(new ResourceLocation(object.get("tag").getAsString()));
+		return new ItemTags.Wrapper(new ResourceLocation(object.get("tag").getAsString()));
 	}
 }

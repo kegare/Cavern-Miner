@@ -20,7 +20,6 @@ import cavern.miner.world.VeinProvider;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.tags.Tag;
 
 public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>, JsonDeserializer<OreRegistry.OreEntry>
 {
@@ -105,7 +104,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 
 		if (entry instanceof OreRegistry.BlockEntry)
 		{
-			return JsonHelper.serializeBlock(((OreRegistry.BlockEntry)entry).getBlock());
+			return JsonHelper.serializeRegistryEntry(((OreRegistry.BlockEntry)entry).getBlock());
 		}
 
 		if (entry instanceof OreRegistry.BlockStateEntry)
@@ -150,12 +149,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 
 		if (object.has("tag"))
 		{
-			Tag<Block> tag = JsonHelper.deserializeBlockTag(object);
-
-			if (tag != null)
-			{
-				return new OreRegistry.TagEntry(tag, rarity, point);
-			}
+			return new OreRegistry.TagEntry(JsonHelper.deserializeBlockTag(object), rarity, point);
 		}
 
 		return null;

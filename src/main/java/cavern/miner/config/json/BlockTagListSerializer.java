@@ -12,8 +12,8 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import cavern.miner.util.EntryTagList;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -60,7 +60,7 @@ public class BlockTagListSerializer implements JsonSerializer<EntryTagList<Block
 		{
 			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(e.getAsString()));
 
-			if (block != null)
+			if (block != null && !(block instanceof AirBlock))
 			{
 				list.add(block);
 			}
@@ -70,7 +70,7 @@ public class BlockTagListSerializer implements JsonSerializer<EntryTagList<Block
 
 		for (JsonElement e : array)
 		{
-			list.add(new BlockTags.Wrapper(new ResourceLocation(e.getAsString())));
+			list.add(JsonHelper.deserializeBlockTag(e.getAsJsonObject()));
 		}
 
 		return list;

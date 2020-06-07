@@ -13,6 +13,7 @@ import com.google.gson.JsonSerializer;
 
 import cavern.miner.util.EntryTagList;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
@@ -60,7 +61,7 @@ public class ItemTagListSerializer implements JsonSerializer<EntryTagList<Item>>
 		{
 			Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(e.getAsString()));
 
-			if (item != null)
+			if (item != null && item != Items.AIR)
 			{
 				list.add(item);
 			}

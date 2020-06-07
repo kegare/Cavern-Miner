@@ -147,7 +147,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		setRank(nbt.getInt("Rank"));
 	}
 
-	public MinerCache getMiningCache()
+	public MinerCache getCache()
 	{
 		if (cache == null)
 		{
