@@ -1,9 +1,9 @@
 package cavern.miner.event;
 
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.miner.Miner;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MiningInteractMessage;
+import cavern.miner.storage.Miner;
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.vein.OrePointHelper;
 import cavern.miner.vein.OreRegistry;

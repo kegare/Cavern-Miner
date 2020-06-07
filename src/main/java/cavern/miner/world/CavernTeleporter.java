@@ -11,6 +11,8 @@ import org.apache.commons.lang3.ObjectUtils;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.storage.CavePortalList;
+import cavern.miner.storage.TeleporterCache;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;

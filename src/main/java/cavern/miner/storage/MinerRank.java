@@ -1,4 +1,4 @@
-package cavern.miner.miner;
+package cavern.miner.storage;
 
 import java.util.function.Supplier;
 

@@ -1,4 +1,4 @@
-package cavern.miner.miner;
+package cavern.miner.storage;
 
 import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
@@ -22,7 +22,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	private int point;
 	private MinerRank rank;
 
-	private MiningCache miningCache;
+	private MinerCache miningCache;
 
 	public Miner(PlayerEntity player)
 	{
@@ -147,11 +147,11 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		setRank(nbt.getInt("Rank"));
 	}
 
-	public MiningCache getMiningCache()
+	public MinerCache getMiningCache()
 	{
 		if (miningCache == null)
 		{
-			miningCache = new MiningCache();
+			miningCache = new MinerCache();
 		}
 
 		return miningCache;

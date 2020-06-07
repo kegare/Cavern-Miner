@@ -1,8 +1,8 @@
-package cavern.miner.miner;
+package cavern.miner.storage;
 
 import net.minecraft.block.BlockState;
 
-public class MiningCache
+public class MinerCache
 {
 	private BlockState lastBlock;
 	private int lastPoint;

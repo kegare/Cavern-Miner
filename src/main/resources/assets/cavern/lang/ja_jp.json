@@ -23,5 +23,6 @@
 	"cavern.miner.gold": "金掘り",
 	"cavern.miner.aqua": "アクアマリン掘り",
 	"cavern.miner.diamond": "ダイヤモンド掘り",
-	"cavern.miner.promoted": "%s の炭鉱夫ランクが %s に昇格しました。"
+	"cavern.miner.promoted": "%s の炭鉱夫ランクが %s に昇格しました。",
+	"cavern.caver.no_sleep": "まだ疲れていないので眠れません。"
 }

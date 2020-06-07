@@ -1,9 +1,10 @@
 package cavern.miner.init;
 
 import cavern.miner.capability.NBTSerializableCapability;
-import cavern.miner.miner.Miner;
-import cavern.miner.world.CavePortalList;
-import cavern.miner.world.TeleporterCache;
+import cavern.miner.storage.CavePortalList;
+import cavern.miner.storage.Caver;
+import cavern.miner.storage.Miner;
+import cavern.miner.storage.TeleporterCache;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
@@ -23,12 +24,15 @@ import net.minecraftforge.fml.common.Mod;
 public final class CaveCapabilities
 {
 	private static final ResourceLocation TELEPORTER_CACHE_ID = new ResourceLocation("cavern", "teleporter_cache");
+	private static final ResourceLocation CAVER_ID = new ResourceLocation("cavern", "caver");
 	private static final ResourceLocation MINER_ID = new ResourceLocation("cavern", "miner");
 
 	private static final ResourceLocation CAVE_PORTAL_LIST_ID = new ResourceLocation("cavern", "cave_portal_list");
 
 	@CapabilityInject(TeleporterCache.class)
 	public static final Capability<TeleporterCache> TELEPORTER_CACHE = null;
+	@CapabilityInject(Caver.class)
+	public static final Capability<Caver> CAVER = null;
 	@CapabilityInject(Miner.class)
 	public static final Capability<Miner> MINER = null;
 
@@ -40,6 +44,7 @@ public final class CaveCapabilities
 		CapabilityManager registry = CapabilityManager.INSTANCE;
 
 		registry.register(TeleporterCache.class, NBTSerializableCapability.createStorage(), TeleporterCache::new);
+		registry.register(Caver.class, NBTSerializableCapability.createStorage(), Caver::new);
 		registry.register(Miner.class, NBTSerializableCapability.createStorage(), () -> new Miner(null));
 
 		registry.register(CavePortalList.class, NBTSerializableCapability.createStorage(), CavePortalList::new);
@@ -54,6 +59,7 @@ public final class CaveCapabilities
 		{
 			PlayerEntity player = (PlayerEntity)event.getObject();
 
+			event.addCapability(CAVER_ID, new NBTSerializableCapability<>(CAVER, Caver::new));
 			event.addCapability(MINER_ID, new NBTSerializableCapability<>(MINER, () -> new Miner(player)));
 		}
 	}
@@ -71,10 +77,11 @@ public final class CaveCapabilities
 		PlayerEntity player = event.getPlayer();
 
 		cloneCapability(TELEPORTER_CACHE, original, player);
+		cloneCapability(CAVER, original, player);
 		cloneCapability(MINER, original, player);
 	}
 
-	public static <T extends INBTSerializable<NBT>, NBT extends INBT> void cloneCapability(Capability<T> cap, ICapabilityProvider from, ICapabilityProvider to)
+	public static <T extends INBTSerializable<NBT>, NBT extends INBT> void cloneCapability(final Capability<T> cap, final ICapabilityProvider from, final ICapabilityProvider to)
 	{
 		T fromCap = from.getCapability(cap).orElse(null);
 		T toCap = to.getCapability(cap).orElse(null);

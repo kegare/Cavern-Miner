@@ -1,4 +1,4 @@
-package cavern.miner.world;
+package cavern.miner.storage;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;

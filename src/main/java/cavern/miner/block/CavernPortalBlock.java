@@ -6,8 +6,8 @@ import com.google.common.cache.LoadingCache;
 
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
+import cavern.miner.storage.TeleporterCache;
 import cavern.miner.world.CavernTeleporter;
-import cavern.miner.world.TeleporterCache;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

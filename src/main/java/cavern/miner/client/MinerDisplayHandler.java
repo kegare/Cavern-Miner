@@ -6,9 +6,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import cavern.miner.config.DisplayCorner;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.miner.Miner;
-import cavern.miner.miner.MinerRank;
-import cavern.miner.miner.MiningCache;
+import cavern.miner.storage.Miner;
+import cavern.miner.storage.MinerRank;
+import cavern.miner.storage.MinerCache;
 import cavern.miner.world.CavernDimension;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MainWindow;
@@ -165,7 +165,7 @@ public class MinerDisplayHandler
 		ItemRenderer itemRenderer = mc.getItemRenderer();
 		FontRenderer fontRenderer = mc.fontRenderer;
 
-		MiningCache cache = miner.getMiningCache();
+		MinerCache cache = miner.getMiningCache();
 		BlockState lastBlock = cache.getLastBlock();
 		long diffTime = System.currentTimeMillis() - cache.getLastTime();
 		boolean showLastMine = false;

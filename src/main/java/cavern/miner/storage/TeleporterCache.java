@@ -1,4 +1,4 @@
-package cavern.miner.world;
+package cavern.miner.storage;
 
 import java.util.Map;
 import java.util.Map.Entry;

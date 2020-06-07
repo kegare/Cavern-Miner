@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 import cavern.miner.CavernMod;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.miner.Miner;
+import cavern.miner.storage.Miner;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
