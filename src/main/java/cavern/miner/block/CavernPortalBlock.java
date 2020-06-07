@@ -198,7 +198,21 @@ public class CavernPortalBlock extends Block
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));
 
-		entity.changeDimension(dimNew, new CavernTeleporter(this));
+		BlockPos blockpos = pos;
+
+		while (world.getBlockState(blockpos).getBlock() == this)
+		{
+			blockpos = blockpos.down();
+		}
+
+		BlockState frame = world.getBlockState(blockpos);
+
+		if (!frame.isNormalCube(world, blockpos))
+		{
+			frame = Blocks.MOSSY_COBBLESTONE.getDefaultState();
+		}
+
+		entity.changeDimension(dimNew, new CavernTeleporter(this, frame));
 	}
 
 	public static BlockPattern.PatternHelper createPatternHelper(Block portal, IWorld world, BlockPos pos)

@@ -22,7 +22,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	private int point;
 	private MinerRank rank;
 
-	private MinerCache miningCache;
+	private MinerCache cache;
 
 	public Miner(PlayerEntity player)
 	{
@@ -149,11 +149,11 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 	public MinerCache getMiningCache()
 	{
-		if (miningCache == null)
+		if (cache == null)
 		{
-			miningCache = new MinerCache();
+			cache = new MinerCache();
 		}
 
-		return miningCache;
+		return cache;
 	}
 }

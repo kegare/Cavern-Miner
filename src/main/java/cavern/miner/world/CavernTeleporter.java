@@ -29,14 +29,13 @@ import net.minecraftforge.common.util.LazyOptional;
 
 public class CavernTeleporter implements ITeleporter
 {
-	private static final BlockState AIR = Blocks.AIR.getDefaultState();
-	private static final BlockState MOSSY_STONE = Blocks.MOSSY_COBBLESTONE.getDefaultState();
-
 	private final CavernPortalBlock portalBlock;
+	private final BlockState portalFrameBlock;
 
-	public CavernTeleporter(CavernPortalBlock portal)
+	public CavernTeleporter(CavernPortalBlock portal, BlockState frame)
 	{
 		this.portalBlock = portal;
+		this.portalFrameBlock = frame;
 	}
 
 	@Override
@@ -371,7 +370,7 @@ public class CavernTeleporter implements ITeleporter
 						int blockZ = z2 + (size2 - 1) * j1 - size1 * i1;
 						boolean flag = height < 0;
 
-						world.setBlockState(pos.setPos(blockX, blockY, blockZ), flag ? MOSSY_STONE : AIR);
+						world.setBlockState(pos.setPos(blockX, blockY, blockZ), flag ? portalFrameBlock : Blocks.AIR.getDefaultState());
 					}
 				}
 			}
@@ -385,7 +384,7 @@ public class CavernTeleporter implements ITeleporter
 				{
 					pos.setPos(x2 + width * i1, y2 + height, z2 + width * j1);
 
-					world.setBlockState(pos, MOSSY_STONE);
+					world.setBlockState(pos, portalFrameBlock);
 				}
 			}
 		}
