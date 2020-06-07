@@ -37,7 +37,7 @@ public class CavernConfig
 
 		VEINS_BLACKLIST.loadFromFile();
 
-		if (VEINS_BLACKLIST.getBlacklist().isEmpty())
+		if (VEINS_BLACKLIST.getEntries().isEmpty())
 		{
 			VEINS_BLACKLIST.setDefault();
 			VEINS_BLACKLIST.saveToFile();

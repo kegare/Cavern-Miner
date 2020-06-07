@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import cavern.miner.client.ClientProxy;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.CavernModConfig;
-import cavern.miner.config.OreEntryConfig;
+import cavern.miner.config.GeneralConfig;
 import cavern.miner.config.VeinConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveBlocks;
@@ -80,8 +80,8 @@ public final class CavernMod
 	@SubscribeEvent
 	public void onLoaded(final FMLLoadCompleteEvent event)
 	{
-		CavernConfig.loadConfig();
+		GeneralConfig.loadConfig();
 
-		OreEntryConfig.loadConfig();
+		CavernConfig.loadConfig();
 	}
 }

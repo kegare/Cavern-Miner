@@ -2,6 +2,7 @@ package cavern.miner.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -194,6 +195,18 @@ public class ItemStackTagList implements Iterable<ItemStack>
 		}
 
 		return cachedList;
+	}
+
+	public ItemStack getRandomElement(Random random)
+	{
+		NonNullList<ItemStack> list = getCachedList();
+
+		if (list.isEmpty())
+		{
+			return ItemStack.EMPTY;
+		}
+
+		return list.get(random.nextInt(list.size()));
 	}
 
 	@Override

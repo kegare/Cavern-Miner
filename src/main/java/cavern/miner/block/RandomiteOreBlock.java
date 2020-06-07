@@ -5,40 +5,19 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
+import cavern.miner.config.GeneralConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.OreBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameters;
-import net.minecraftforge.common.Tags;
 
 public class RandomiteOreBlock extends OreBlock
 {
-	private static final List<Tag<Item>> DROP_ITEM_TAGS = Lists.newArrayList();
-
-	static
-	{
-		DROP_ITEM_TAGS.add(Tags.Items.INGOTS);
-		DROP_ITEM_TAGS.add(Tags.Items.NUGGETS);
-		DROP_ITEM_TAGS.add(Tags.Items.GEMS);
-		DROP_ITEM_TAGS.add(Tags.Items.DUSTS);
-		DROP_ITEM_TAGS.add(Tags.Items.RODS);
-		DROP_ITEM_TAGS.add(Tags.Items.ENDER_PEARLS);
-		DROP_ITEM_TAGS.add(Tags.Items.BONES);
-		DROP_ITEM_TAGS.add(Tags.Items.ARROWS);
-		DROP_ITEM_TAGS.add(Tags.Items.GUNPOWDER);
-		DROP_ITEM_TAGS.add(Tags.Items.STRING);
-		DROP_ITEM_TAGS.add(Tags.Items.SEEDS);
-		DROP_ITEM_TAGS.add(Tags.Items.CROPS);
-		DROP_ITEM_TAGS.add(Tags.Items.DYES);
-	}
-
 	public RandomiteOreBlock(Block.Properties properties)
 	{
 		super(properties);
@@ -67,14 +46,14 @@ public class RandomiteOreBlock extends OreBlock
 
 		for (int i = 0; i <= fortune; ++i)
 		{
-			drops.add(new ItemStack(getRandomDropItem(RANDOM)));
+			drops.add(getRandomDropItem(RANDOM));
 		}
 
 		return drops;
 	}
 
-	protected Item getRandomDropItem(Random rand)
+	protected ItemStack getRandomDropItem(Random rand)
 	{
-		return DROP_ITEM_TAGS.get(rand.nextInt(DROP_ITEM_TAGS.size())).getRandomElement(rand);
+		return GeneralConfig.RANDOMITE_DROPS.getEntries().getRandomElement(rand);
 	}
 }

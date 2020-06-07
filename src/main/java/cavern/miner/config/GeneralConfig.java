@@ -35,4 +35,28 @@ public class GeneralConfig
 		displayConer = builder.comment("The display corner of miner status.").defineEnum("display_corner", DisplayCorner.BOTTOM_RIGHT);
 		builder.pop();
 	}
+
+	public static final OreEntryConfig ORE_ENTRIES = new OreEntryConfig();
+	public static final RandomiteDropConfig RANDOMITE_DROPS = new RandomiteDropConfig();
+
+	public static void loadConfig()
+	{
+		ORE_ENTRIES.loadFromFile();
+
+		if (ORE_ENTRIES.getEntries().isEmpty())
+		{
+			ORE_ENTRIES.setDefault();
+			ORE_ENTRIES.saveToFile();
+		}
+
+		ORE_ENTRIES.registerEntries();
+
+		RANDOMITE_DROPS.loadFromFile();
+
+		if (RANDOMITE_DROPS.getEntries().isEmpty())
+		{
+			RANDOMITE_DROPS.setDefault();
+			RANDOMITE_DROPS.saveToFile();
+		}
+	}
 }

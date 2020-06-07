@@ -11,8 +11,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.google.common.collect.Maps;
 
-import cavern.miner.config.VeinBlacklistConfig;
-import cavern.miner.config.VeinConfig;
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.vein.OreRegistry;
 import cavern.miner.vein.Vein;
@@ -41,13 +39,13 @@ public class VeinProvider
 	protected Pair<ChunkPos, NonNullList<Vein>> cachedVeins;
 
 	@Nullable
-	public VeinConfig getConfig()
+	public NonNullList<Vein> getVeins()
 	{
 		return null;
 	}
 
 	@Nullable
-	public VeinBlacklistConfig getBlacklistConfig()
+	public BlockStateTagList getBlacklist()
 	{
 		return null;
 	}
@@ -63,7 +61,7 @@ public class VeinProvider
 
 		for (Block block : Tags.Blocks.ORES.getAllElements())
 		{
-			if (getBlacklistConfig() != null && getBlacklistConfig().getBlacklist().contains(block))
+			if (getBlacklist() != null && getBlacklist().contains(block))
 			{
 				continue;
 			}
@@ -161,7 +159,7 @@ public class VeinProvider
 
 		for (BlockState state : getVariousEntries())
 		{
-			if (getBlacklistConfig() == null || !getBlacklistConfig().getBlacklist().contains(state))
+			if (getBlacklist() == null || !getBlacklist().contains(state))
 			{
 				blocks.add(state);
 			}
@@ -174,14 +172,13 @@ public class VeinProvider
 
 	public NonNullList<Vein> getVeins(IWorld world, IChunk chunk, Random rand)
 	{
-		VeinConfig config = getConfig();
+		NonNullList<Vein> list = getVeins();
 
-		if (config != null && !config.getVeins().isEmpty())
+		if (list != null && !list.isEmpty())
 		{
-			return config.getVeins();
+			return list;
 		}
 
-		NonNullList<Vein> list;
 		ChunkPos chunkPos = chunk.getPos();
 
 		if (cachedVeins == null || chunkPos.getChessboardDistance(cachedVeins.getLeft()) > 3)

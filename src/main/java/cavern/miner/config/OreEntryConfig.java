@@ -30,8 +30,6 @@ import net.minecraftforge.common.Tags;
 
 public class OreEntryConfig
 {
-	public static final OreEntryConfig INSTANCE = new OreEntryConfig();
-
 	private final NonNullList<OreRegistry.OreEntry> entries = NonNullList.create();
 
 	private final File file = new File(CavernModConfig.getConfigDir(), "ore_entries.json");
@@ -212,18 +210,5 @@ public class OreEntryConfig
 		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_AQUAMARINE, VeinProvider.Rarity.AQUA, 2));
 		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_RANDOMITE, VeinProvider.Rarity.RANDOMITE, 2));
 		entries.add(new OreRegistry.BlockEntry(CaveBlocks.CRACKED_STONE.get(), VeinProvider.Rarity.RANDOMITE, 2));
-	}
-
-	public static void loadConfig()
-	{
-		INSTANCE.loadFromFile();
-
-		if (INSTANCE.getEntries().isEmpty())
-		{
-			INSTANCE.setDefault();
-			INSTANCE.saveToFile();
-		}
-
-		INSTANCE.registerEntries();
 	}
 }

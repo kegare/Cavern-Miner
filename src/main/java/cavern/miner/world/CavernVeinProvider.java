@@ -1,20 +1,21 @@
 package cavern.miner.world;
 
 import cavern.miner.config.CavernConfig;
-import cavern.miner.config.VeinBlacklistConfig;
-import cavern.miner.config.VeinConfig;
+import cavern.miner.util.BlockStateTagList;
+import cavern.miner.vein.Vein;
+import net.minecraft.util.NonNullList;
 
 public class CavernVeinProvider extends VeinProvider
 {
 	@Override
-	public VeinConfig getConfig()
+	public NonNullList<Vein> getVeins()
 	{
-		return CavernConfig.VEINS;
+		return CavernConfig.VEINS.getVeins();
 	}
 
 	@Override
-	public VeinBlacklistConfig getBlacklistConfig()
+	public BlockStateTagList getBlacklist()
 	{
-		return CavernConfig.VEINS_BLACKLIST;
+		return CavernConfig.VEINS_BLACKLIST.getEntries();
 	}
 }
