@@ -1,4 +1,4 @@
-package cavern.miner.util;
+package cavern.miner.config.json;
 
 import java.lang.reflect.Type;
 
@@ -11,27 +11,27 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import cavern.miner.util.EntryTagList;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTagList>, JsonDeserializer<BlockStateTagList>
+public class BlockTagListSerializer implements JsonSerializer<EntryTagList<Block>>, JsonDeserializer<EntryTagList<Block>>
 {
-	public static final BlockStateTagListSerializer INSTANCE = new BlockStateTagListSerializer();
+	public static final BlockTagListSerializer INSTANCE = new BlockTagListSerializer();
 
 	@Override
-	public JsonElement serialize(BlockStateTagList src, Type typeOfSrc, JsonSerializationContext context)
+	public JsonElement serialize(EntryTagList<Block> src, Type typeOfSrc, JsonSerializationContext context)
 	{
 		JsonObject object = new JsonObject();
 
 		JsonArray array = new JsonArray();
 
-		for (BlockState state : src.getEntryList())
+		for (Block block : src.getEntryList())
 		{
-			array.add(BlockStateHelper.toJsonTree(state));
+			array.add(block.getRegistryName().toString());
 		}
 
 		object.add("blocks", array);
@@ -49,20 +49,20 @@ public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTag
 	}
 
 	@Override
-	public BlockStateTagList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+	public EntryTagList<Block> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
 		JsonObject object = json.getAsJsonObject();
-		BlockStateTagList list = BlockStateTagList.create();
+		EntryTagList<Block> list = EntryTagList.create();
 
 		JsonArray array = object.get("blocks").getAsJsonArray();
 
 		for (JsonElement e : array)
 		{
-			BlockState state = BlockStateHelper.fromJson(e);
+			Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(e.getAsString()));
 
-			if (state.getBlock() != Blocks.AIR)
+			if (block != null)
 			{
-				list.add(state);
+				list.add(block);
 			}
 		}
 

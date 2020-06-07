@@ -18,9 +18,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 import cavern.miner.CavernMod;
+import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.util.BlockStateTagList;
-import cavern.miner.util.BlockStateTagListSerializer;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.Tags;
 
@@ -123,14 +123,14 @@ public class VeinBlacklistConfig
 			return null;
 		}
 
-		return gson.toJson(BlockStateTagListSerializer.INSTANCE.serialize(list, Block.class, null));
+		return gson.toJson(BlockStateTagListSerializer.INSTANCE.serialize(list, BlockState.class, null));
 	}
 
 	public boolean fromJson(Reader json)
 	{
 		try
 		{
-			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonElement.class), Block.class, null);
+			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonElement.class), BlockState.class, null);
 
 			if (entries == null || entries.isEmpty())
 			{

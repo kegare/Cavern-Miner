@@ -1,4 +1,4 @@
-package cavern.miner.util;
+package cavern.miner.config.json;
 
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDes
 	@Override
 	public JsonElement serialize(BlockState src, Type typeOfSrc, JsonSerializationContext context)
 	{
-		final JsonObject object = new JsonObject();
+		JsonObject object = new JsonObject();
 
 		object.addProperty("name", src.getBlock().getRegistryName().toString());
 
@@ -52,7 +52,7 @@ public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDes
 	@Override
 	public BlockState deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
-		final JsonObject object = json.getAsJsonObject();
+		JsonObject object = json.getAsJsonObject();
 
 		String name = object.get("name").getAsString();
 		Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(name));

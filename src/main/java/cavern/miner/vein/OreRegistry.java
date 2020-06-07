@@ -47,7 +47,7 @@ public final class OreRegistry
 	{
 		if (obj == null)
 		{
-			return null;
+			return OreEntry.EMPTY;
 		}
 
 		if (obj instanceof OreEntry)
@@ -55,7 +55,7 @@ public final class OreRegistry
 			OreEntry entry = (OreEntry)obj;
 			OreEntry parent = getEntry(entry.getParent(), true);
 
-			if (parent != null)
+			if (parent != OreEntry.EMPTY)
 			{
 				return parent;
 			}

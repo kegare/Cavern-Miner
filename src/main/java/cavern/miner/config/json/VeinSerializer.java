@@ -1,4 +1,4 @@
-package cavern.miner.config;
+package cavern.miner.config.json;
 
 import java.lang.reflect.Type;
 import java.util.stream.Stream;
@@ -12,7 +12,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import cavern.miner.util.BlockStateHelper;
 import cavern.miner.vein.Vein;
 import net.minecraft.block.BlockState;
 
@@ -23,12 +22,12 @@ public class VeinSerializer implements JsonSerializer<Vein>, JsonDeserializer<Ve
 	@Override
 	public JsonElement serialize(Vein src, Type typeOfSrc, JsonSerializationContext context)
 	{
-		final JsonObject object = new JsonObject();
+		JsonObject object = new JsonObject();
 
-		object.add("block", BlockStateHelper.toJsonTree(src.getBlockState()));
+		object.add("block", JsonHelper.serializeBlockState(src.getBlockState()));
 
 		JsonArray array = new JsonArray();
-		src.getTargetBlocks().stream().map(BlockStateHelper::toJsonTree).forEach(array::add);
+		src.getTargetBlocks().stream().map(JsonHelper::serializeBlockState).forEach(array::add);
 		object.add("target_blocks", array);
 
 		object.addProperty("count", src.getCount());
@@ -45,14 +44,14 @@ public class VeinSerializer implements JsonSerializer<Vein>, JsonDeserializer<Ve
 	@Override
 	public Vein deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
-		final JsonObject object = json.getAsJsonObject();
+		JsonObject object = json.getAsJsonObject();
 
-		BlockState state = BlockStateHelper.fromJson(object.get("block").getAsJsonObject());
+		BlockState state = JsonHelper.deserializeBlockState(object.get("block").getAsJsonObject());
 		Vein.Properties properties = new Vein.Properties();
 
 		JsonArray array = object.get("target_blocks").getAsJsonArray();
 		Stream.Builder<BlockState> states = Stream.builder();
-		array.forEach(o -> states.add(BlockStateHelper.fromJson(o)));
+		array.forEach(o -> states.add(JsonHelper.deserializeBlockState((JsonObject)o)));
 		properties.target(states.build().toArray(BlockState[]::new));
 
 		properties.count(object.get("count").getAsInt());

@@ -16,10 +16,13 @@ import javax.annotation.Nullable;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import cavern.miner.CavernMod;
+import cavern.miner.config.json.VeinSerializer;
 import cavern.miner.vein.Vein;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.util.Direction;
@@ -30,7 +33,7 @@ public class VeinConfig
 	private final NonNullList<Vein> veins = NonNullList.create();
 
 	private final File file;
-	private final Gson gson = new GsonBuilder().setPrettyPrinting().registerTypeAdapter(Vein.class, VeinSerializer.INSTANCE).create();
+	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	public VeinConfig(String name)
 	{
@@ -124,27 +127,61 @@ public class VeinConfig
 			return null;
 		}
 
-		return gson.toJson(veins);
+		JsonArray array = new JsonArray();
+
+		for (Vein vein : veins)
+		{
+			JsonElement e = VeinSerializer.INSTANCE.serialize(vein, vein.getClass(), null);
+
+			if (e.isJsonNull() || e.toString().isEmpty())
+			{
+				continue;
+			}
+
+			array.add(e);
+		}
+
+		return gson.toJson(array);
 	}
 
-	public boolean fromJson(Reader json)
+	public void fromJson(Reader json)
 	{
 		try
 		{
-			Collection<Vein> entries = gson.fromJson(json, new TypeToken<Collection<Vein>>(){}.getType());
+			JsonArray array = gson.fromJson(json, JsonArray.class);
 
-			if (entries == null || entries.isEmpty())
+			if (array.size() == 0)
 			{
-				return false;
+				return;
 			}
 
-			return setVeins(entries);
+			veins.clear();
+
+			for (JsonElement e : array)
+			{
+				if (e.isJsonNull() || e.toString().isEmpty())
+				{
+					continue;
+				}
+
+				Vein vein = VeinSerializer.INSTANCE.deserialize(e, Vein.class, null);
+
+				if (vein.getBlockState().getBlock() instanceof AirBlock)
+				{
+					continue;
+				}
+
+				if (vein.getCount() <= 0 || vein.getSize() <= 0)
+				{
+					continue;
+				}
+
+				veins.add(vein);
+			}
 		}
 		catch (Exception e)
 		{
 			CavernMod.LOG.error("Failed to read from json", e);
-
-			return false;
 		}
 	}
 

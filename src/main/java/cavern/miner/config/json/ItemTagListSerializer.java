@@ -1,4 +1,4 @@
-package cavern.miner.util;
+package cavern.miner.config.json;
 
 import java.lang.reflect.Type;
 
@@ -11,6 +11,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import cavern.miner.util.EntryTagList;
 import net.minecraft.item.Item;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;

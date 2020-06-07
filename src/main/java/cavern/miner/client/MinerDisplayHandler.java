@@ -3,6 +3,7 @@ package cavern.miner.client;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import cavern.miner.config.DisplayCorner;
 import cavern.miner.config.MiningConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.miner.Miner;

@@ -1,6 +1,5 @@
 package cavern.miner.config;
 
-import cavern.miner.client.DisplayCorner;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class MiningConfig
