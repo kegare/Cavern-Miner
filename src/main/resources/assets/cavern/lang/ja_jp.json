@@ -16,6 +16,8 @@
 	"item.cavern.aquamarine_pickaxe": "アクアマリンのツルハシ",
 	"item.cavern.aquamarine_axe": "アクアマリンの斧",
 	"item.cavern.aquamarine_shovel": "アクアマリンのシャベル",
+	"enchantment.cavern.vein_miner": "一括採掘",
+	"enchantment.cavern.area_miner": "範囲採掘",
 	"cavern.miner.beginner": "初心者",
 	"cavern.miner.stone": "石掘り",
 	"cavern.miner.iron": "鉄掘り",

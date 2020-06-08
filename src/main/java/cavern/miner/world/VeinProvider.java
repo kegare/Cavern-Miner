@@ -1,6 +1,7 @@
 package cavern.miner.world;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -8,8 +9,6 @@ import java.util.Random;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.tuple.Pair;
-
-import com.google.common.collect.Maps;
 
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.vein.OreRegistry;
@@ -31,7 +30,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class VeinProvider
 {
-	private static final Map<Block, VeinProvider.Rarity> RARITY_CACHE = Maps.newHashMap();
+	private static final Map<Block, VeinProvider.Rarity> RARITY_CACHE = new HashMap<>();
 
 	protected NonNullList<BlockState> oreBlocks;
 	protected NonNullList<BlockState> variousBlocks;

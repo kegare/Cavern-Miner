@@ -1,8 +1,7 @@
 package cavern.miner.vein;
 
+import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.collect.Maps;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -18,7 +17,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class OrePointHelper
 {
-	private static final Map<OreRegistry.OreEntry, Integer> POINT_CACHE = Maps.newHashMap();
+	private static final Map<OreRegistry.OreEntry, Integer> POINT_CACHE = new HashMap<>();
 
 	public static int getPoint(OreRegistry.OreEntry entry)
 	{

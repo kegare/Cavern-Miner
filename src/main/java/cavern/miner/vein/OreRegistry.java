@@ -1,11 +1,11 @@
 package cavern.miner.vein;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
 
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.world.VeinProvider;
@@ -17,9 +17,9 @@ import net.minecraft.util.ResourceLocation;
 
 public final class OreRegistry
 {
-	private static final Map<Block, BlockEntry> BLOCK_ENTRIES = Maps.newHashMap();
-	private static final Map<BlockState, BlockStateEntry> BLOCK_STATE_ENTRIES = Maps.newHashMap();
-	private static final Map<ResourceLocation, TagEntry> TAG_ENTRIES = Maps.newHashMap();
+	private static final Map<Block, BlockEntry> BLOCK_ENTRIES = new HashMap<>();
+	private static final Map<BlockState, BlockStateEntry> BLOCK_STATE_ENTRIES = new HashMap<>();
+	private static final Map<ResourceLocation, TagEntry> TAG_ENTRIES = new HashMap<>();
 
 	private OreRegistry() {}
 

@@ -1,5 +1,6 @@
 package cavern.miner.storage;
 
+import cavern.miner.enchantment.MinerUnit;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
@@ -29,6 +30,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	private MinerRank.DisplayEntry displayRank;
 
 	private MinerCache cache;
+	private MinerUnit unit;
 
 	private MinerUpdateMessage prevUpdate;
 
@@ -181,9 +183,20 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return cache;
 	}
 
+	public MinerUnit getUnit()
+	{
+		if (unit == null)
+		{
+			unit = new MinerUnit(player);
+		}
+
+		return unit;
+	}
+
 	public Miner clearCache()
 	{
 		cache = null;
+		unit = null;
 		prevUpdate = null;
 
 		return this;

@@ -1,12 +1,12 @@
 package cavern.miner.storage;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
 
@@ -24,7 +24,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public class TeleporterCache implements INBTSerializable<CompoundNBT>
 {
-	private final Map<ResourceLocation, DimensionType> lastDim = Maps.newHashMap();
+	private final Map<ResourceLocation, DimensionType> lastDim = new HashMap<>();
 	private final Table<ResourceLocation, DimensionType, BlockPos> lastPos = HashBasedTable.create();
 
 	private Vec3d lastPortalVec;

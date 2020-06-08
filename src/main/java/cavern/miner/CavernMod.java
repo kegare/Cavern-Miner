@@ -11,6 +11,7 @@ import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
+import cavern.miner.init.CaveEnchantments;
 import cavern.miner.init.CaveItems;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.init.CaveWorldCarvers;
@@ -43,6 +44,7 @@ public final class CavernMod
 
 		CaveBlocks.REGISTRY.register(modEventBus);
 		CaveItems.REGISTRY.register(modEventBus);
+		CaveEnchantments.REGISTRY.register(modEventBus);
 		CaveBiomes.REGISTRY.register(modEventBus);
 		CaveDimensions.REGISTRY.register(modEventBus);
 		CaveWorldCarvers.REGISTRY.register(modEventBus);

@@ -1,5 +1,6 @@
 package cavern.miner.event;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -10,7 +11,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Maps;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -40,7 +40,7 @@ public class PlacedCache
 		return cache;
 	}
 
-	private static final Map<Pair<String, Dimension>, PlacedCache> CACHES = Maps.newHashMap();
+	private static final Map<Pair<String, Dimension>, PlacedCache> CACHES = new HashMap<>();
 
 	public static PlacedCache get(@Nullable String name, Dimension dim)
 	{
