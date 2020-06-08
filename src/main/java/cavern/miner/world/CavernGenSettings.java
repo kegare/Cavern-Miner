@@ -7,12 +7,12 @@ public class CavernGenSettings extends OverworldGenSettings
 	@Override
 	public int getBedrockRoofHeight()
 	{
-		return 0;
+		return 255;
 	}
 
 	@Override
 	public int getBedrockFloorHeight()
 	{
-		return 255;
+		return 0;
 	}
 }

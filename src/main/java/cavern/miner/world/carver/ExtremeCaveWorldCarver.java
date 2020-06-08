@@ -28,7 +28,7 @@ public class ExtremeCaveWorldCarver extends CaveWorldCarver
 
 		if (rand.nextInt(5) == 0)
 		{
-			f *= rand.nextFloat() * rand.nextFloat() * 3.0F + 1.0F;
+			f *= rand.nextFloat() * rand.nextFloat() * 5.0F + 1.0F;
 		}
 
 		return f;
@@ -43,6 +43,6 @@ public class ExtremeCaveWorldCarver extends CaveWorldCarver
 	@Override
 	protected int generateCaveStartY(Random random)
 	{
-		return random.nextInt(random.nextInt(10) + 5) + 120;
+		return random.nextInt(30) + 150;
 	}
 }

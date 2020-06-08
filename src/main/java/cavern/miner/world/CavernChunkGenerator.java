@@ -85,8 +85,8 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
 		T settings = getSettings();
-		int max = settings.getBedrockFloorHeight() - 1;
-		int min = settings.getBedrockRoofHeight() + 1;
+		int max = settings.getBedrockRoofHeight() - 1;
+		int min = settings.getBedrockFloorHeight() + 1;
 
 		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
 		{
