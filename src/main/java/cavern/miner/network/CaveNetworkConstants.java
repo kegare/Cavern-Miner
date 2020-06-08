@@ -25,6 +25,8 @@ public class CaveNetworkConstants
 
 		channel.messageBuilder(MinerUpdateMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(MinerUpdateMessage::decode).encoder(MinerUpdateMessage::encode).consumer(MinerUpdateMessage::handle).add();
+		channel.messageBuilder(MinerPointMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
+			.decoder(MinerPointMessage::decode).encoder(MinerPointMessage::encode).consumer(MinerPointMessage::handle).add();
 		channel.messageBuilder(MiningInteractMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(MiningInteractMessage::decode).encoder(MiningInteractMessage::encode).consumer(MiningInteractMessage::handle).add();
 

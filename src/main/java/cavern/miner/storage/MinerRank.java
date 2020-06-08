@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public final class MinerRank
 {
-	public static final MinerRank.RankEntry BEGINNER = new MinerRank.RankEntry("BEGINNER", 0, new ItemStack(Items.WOODEN_PICKAXE));
+	public static final RankEntry BEGINNER = new RankEntry("BEGINNER", 0, new ItemStack(Items.WOODEN_PICKAXE));
 
 	private static final List<RankEntry> ENTRIES = Lists.newArrayList(BEGINNER);
 
@@ -26,11 +26,11 @@ public final class MinerRank
 
 	public static void set(Collection<RankEntry> entries)
 	{
-		Iterator<MinerRank.RankEntry> iterator = entries.iterator();
+		Iterator<RankEntry> iterator = entries.iterator();
 
 		while (iterator.hasNext())
 		{
-			MinerRank.RankEntry entry = iterator.next();
+			RankEntry entry = iterator.next();
 
 			if (ENTRIES.contains(entry) || !ENTRIES.add(entry))
 			{

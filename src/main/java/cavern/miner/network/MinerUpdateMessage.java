@@ -5,7 +5,6 @@ import java.util.function.Supplier;
 import cavern.miner.CavernMod;
 import cavern.miner.client.ClientProxy;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRank;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,8 +18,6 @@ public class MinerUpdateMessage
 	private int point;
 	private MinerRank.DisplayEntry rank;
 
-	private boolean pointOnly;
-
 	private boolean failed;
 
 	public MinerUpdateMessage(int point, MinerRank.DisplayEntry rank)
@@ -32,12 +29,6 @@ public class MinerUpdateMessage
 	public MinerUpdateMessage(int point, MinerRank.RankEntry rank)
 	{
 		this(point, new MinerRank.DisplayEntry(rank));
-	}
-
-	public MinerUpdateMessage(int point)
-	{
-		this.point = point;
-		this.pointOnly = true;
 	}
 
 	private MinerUpdateMessage(boolean failed)
@@ -55,12 +46,6 @@ public class MinerUpdateMessage
 		try
 		{
 			int point = buf.readInt();
-			boolean pointOnly = buf.readBoolean();
-
-			if (pointOnly)
-			{
-				return new MinerUpdateMessage(point);
-			}
 
 			return new MinerUpdateMessage(point, new MinerRank.DisplayEntry(buf));
 		}
@@ -75,12 +60,8 @@ public class MinerUpdateMessage
 	public static void encode(final MinerUpdateMessage msg, final PacketBuffer buf)
 	{
 		buf.writeInt(msg.point);
-		buf.writeBoolean(msg.pointOnly);
 
-		if (!msg.pointOnly)
-		{
-			msg.rank.write(buf);
-		}
+		msg.rank.write(buf);
 	}
 
 	public static void handle(final MinerUpdateMessage msg, final Supplier<NetworkEvent.Context> ctx)
@@ -93,17 +74,7 @@ public class MinerUpdateMessage
 
 				if (player != null)
 				{
-					Miner miner = player.getCapability(CaveCapabilities.MINER).orElse(null);
-
-					if (miner != null)
-					{
-						miner.setPoint(msg.point);
-
-						if (!msg.pointOnly)
-						{
-							miner.setDisplayRank(msg.rank);
-						}
-					}
+					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.setPoint(msg.point).setDisplayRank(msg.rank));
 				}
 			});
 		}

@@ -2,6 +2,7 @@ package cavern.miner.storage;
 
 import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.network.MinerPointMessage;
 import cavern.miner.network.MinerUpdateMessage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -15,6 +16,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 public class Miner implements INBTSerializable<CompoundNBT>
 {
@@ -134,20 +136,18 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	{
 		if (player != null && player instanceof ServerPlayerEntity)
 		{
-			MinerUpdateMessage message;
+			PacketTarget target = PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player);
 
 			if (prevUpdate != null && getRank().equals(prevUpdate.getRank()))
 			{
-				message = new MinerUpdateMessage(getPoint());
+				CaveNetworkConstants.PLAY.send(target, new MinerPointMessage(getPoint()));
 			}
 			else
 			{
-				message = new MinerUpdateMessage(getPoint(), getRank());
+				prevUpdate = new MinerUpdateMessage(getPoint(), getRank());
 
-				prevUpdate = message;
+				CaveNetworkConstants.PLAY.send(target, prevUpdate);
 			}
-
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), message);
 		}
 
 		return this;
