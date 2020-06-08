@@ -31,6 +31,7 @@ public class GeneralConfig
 	}
 
 	public static final OreEntryConfig ORE_ENTRIES = new OreEntryConfig();
+	public static final MinerRankConfig MINER_RANKS = new MinerRankConfig();
 	public static final RandomiteDropConfig RANDOMITE_DROPS = new RandomiteDropConfig();
 
 	public static void loadConfig()
@@ -44,6 +45,16 @@ public class GeneralConfig
 		}
 
 		ORE_ENTRIES.registerEntries();
+
+		MINER_RANKS.loadFromFile();
+
+		if (MINER_RANKS.getEntries().isEmpty())
+		{
+			MINER_RANKS.setDefault();
+			MINER_RANKS.saveToFile();
+		}
+
+		MINER_RANKS.registerEntries();
 
 		RANDOMITE_DROPS.loadFromFile();
 

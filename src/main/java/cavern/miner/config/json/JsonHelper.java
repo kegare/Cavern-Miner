@@ -2,6 +2,7 @@ package cavern.miner.config.json;
 
 import org.apache.commons.lang3.ObjectUtils;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import net.minecraft.block.Block;
@@ -42,9 +43,23 @@ public class JsonHelper
 		return object;
 	}
 
-	public static Block deserializeBlock(JsonObject object)
+	public static Block deserializeBlock(JsonElement e)
 	{
-		return ObjectUtils.defaultIfNull(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(object.get("name").getAsString())), Blocks.AIR);
+		ResourceLocation key = null;
+
+		if (e.isJsonObject())
+		{
+			JsonObject object = e.getAsJsonObject();
+
+			key = new ResourceLocation(object.get("name").getAsString());
+		}
+
+		if (key == null)
+		{
+			key = new ResourceLocation(e.getAsString());
+		}
+
+		return ObjectUtils.defaultIfNull(ForgeRegistries.BLOCKS.getValue(key), Blocks.AIR);
 	}
 
 	public static BlockState deserializeBlockState(JsonObject object)
@@ -52,9 +67,23 @@ public class JsonHelper
 		return BlockStateSerializer.INSTANCE.deserialize(object, BlockState.class, null);
 	}
 
-	public static Tag<Block> deserializeBlockTag(JsonObject object)
+	public static Tag<Block> deserializeBlockTag(JsonElement e)
 	{
-		return new BlockTags.Wrapper(new ResourceLocation(object.get("tag").getAsString()));
+		ResourceLocation key = null;
+
+		if (e.isJsonObject())
+		{
+			JsonObject object = e.getAsJsonObject();
+
+			key = new ResourceLocation(object.get("tag").getAsString());
+		}
+
+		if (key == null)
+		{
+			key = new ResourceLocation(e.getAsString());
+		}
+
+		return new BlockTags.Wrapper(key);
 	}
 
 	public static JsonObject serializeItemStack(ItemStack stack)
@@ -62,9 +91,23 @@ public class JsonHelper
 		return ItemStackSerializer.INSTANCE.serialize(stack, ItemStack.class, null).getAsJsonObject();
 	}
 
-	public static Item deserializeItem(JsonObject object)
+	public static Item deserializeItem(JsonElement e)
 	{
-		return ObjectUtils.defaultIfNull(ForgeRegistries.ITEMS.getValue(new ResourceLocation(object.get("name").getAsString())), Items.AIR);
+		ResourceLocation key = null;
+
+		if (e.isJsonObject())
+		{
+			JsonObject object = e.getAsJsonObject();
+
+			key = new ResourceLocation(object.get("name").getAsString());
+		}
+
+		if (key == null)
+		{
+			key = new ResourceLocation(e.getAsString());
+		}
+
+		return ObjectUtils.defaultIfNull(ForgeRegistries.ITEMS.getValue(key), Items.AIR);
 	}
 
 	public static ItemStack deserializeItemStack(JsonObject object)
@@ -72,8 +115,22 @@ public class JsonHelper
 		return ItemStackSerializer.INSTANCE.deserialize(object, ItemStack.class, null);
 	}
 
-	public static Tag<Item> deserializeItemTag(JsonObject object)
+	public static Tag<Item> deserializeItemTag(JsonElement e)
 	{
-		return new ItemTags.Wrapper(new ResourceLocation(object.get("tag").getAsString()));
+		ResourceLocation key = null;
+
+		if (e.isJsonObject())
+		{
+			JsonObject object = e.getAsJsonObject();
+
+			key = new ResourceLocation(object.get("tag").getAsString());
+		}
+
+		if (key == null)
+		{
+			key = new ResourceLocation(e.getAsString());
+		}
+
+		return new ItemTags.Wrapper(key);
 	}
 }

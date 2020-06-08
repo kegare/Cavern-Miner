@@ -18,7 +18,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
@@ -158,7 +157,7 @@ public class MinerDisplayHandler
 			return;
 		}
 
-		MinerRank rank = miner.getRank();
+		MinerRank.RankEntry rank = miner.getRank();
 
 		MainWindow window = event.getWindow();
 		DisplayCorner corner = ClientConfig.INSTANCE.displayConer.get();
@@ -168,7 +167,7 @@ public class MinerDisplayHandler
 		int x = posX;
 		int y = posY;
 		String pointText = Integer.toString(miner.getPoint());
-		String rankText = I18n.format(rank.getTranslationKey());
+		String rankText = rank.getDisplayName();
 
 		ItemRenderer itemRenderer = mc.getItemRenderer();
 		FontRenderer fontRenderer = mc.fontRenderer;
@@ -215,15 +214,15 @@ public class MinerDisplayHandler
 			pointText = " " + pointText;
 		}
 
-		MinerRank next = rank.next();
+		MinerRank.RankEntry next = MinerRank.next(rank);
 
-		if (rank != next)
+		if (!rank.equals(next))
 		{
 			String per = String.format("%.2f", calcPointPer(miner.getPoint(), next.getPhase())) + "%";
 
 			pointText = corner.isLeft() ? pointText + " < " + per : per + " > " + pointText;
 		}
-		else if (next == next.next())
+		else if (next.equals(MinerRank.next(next)))
 		{
 			pointText = "MAX";
 		}

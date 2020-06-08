@@ -42,12 +42,20 @@ public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeser
 
 			for (String key : nbt.keySet())
 			{
+				if (key.equals("Damage") && nbt.getInt("Damage") == 0)
+				{
+					continue;
+				}
+
 				String value = nbt.get(key).toString();
 
 				nbtObject.addProperty(key, value);
 			}
 
-			object.add("nbt", nbtObject);
+			if (nbtObject.size() > 0)
+			{
+				object.add("nbt", nbtObject);
+			}
 		}
 
 		return object;

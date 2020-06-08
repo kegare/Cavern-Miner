@@ -72,7 +72,7 @@ public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTag
 
 		for (JsonElement e : array)
 		{
-			list.add(JsonHelper.deserializeBlockTag(e.getAsJsonObject()));
+			list.add(JsonHelper.deserializeBlockTag(e));
 		}
 
 		return list;
