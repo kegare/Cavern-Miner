@@ -34,7 +34,7 @@ public class MinerDisplayHandler
 {
 	private static int posX;
 	private static int posY;
-	private static double pointPer = -0.1D;
+	private static double pointPer;
 
 	private static boolean canDisplay()
 	{
@@ -105,29 +105,26 @@ public class MinerDisplayHandler
 		{
 			pointPer = per;
 		}
-		else
+		else if (per > pointPer)
 		{
-			if (per > pointPer)
+			if (diff > 1.0D)
 			{
-				if (diff > 1.0D)
-				{
-					pointPer += d2;
-				}
-				else
-				{
-					pointPer += d1;
-				}
+				pointPer += d2;
 			}
-			else if (per < pointPer)
+			else
 			{
-				if (diff > 1.0D)
-				{
-					pointPer -= d2 * 2.0D;
-				}
-				else
-				{
-					pointPer -= d1 * 1.5D;
-				}
+				pointPer += d1;
+			}
+		}
+		else if (per < pointPer)
+		{
+			if (diff > 1.0D)
+			{
+				pointPer -= d2 * 2.0D;
+			}
+			else
+			{
+				pointPer -= d1 * 1.5D;
 			}
 		}
 
@@ -144,7 +141,7 @@ public class MinerDisplayHandler
 
 		if (!canDisplay())
 		{
-			pointPer = -0.1D;
+			pointPer = -1.0D;
 
 			return;
 		}

@@ -16,28 +16,30 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class MinerRank
+public final class MinerRank
 {
 	public static final MinerRank.RankEntry BEGINNER = new MinerRank.RankEntry("BEGINNER", 0, new ItemStack(Items.WOODEN_PICKAXE));
 
-	private static final List<RankEntry> RANK_ENTRIES = Lists.newArrayList(BEGINNER);
+	private static final List<RankEntry> ENTRIES = Lists.newArrayList(BEGINNER);
+
+	private MinerRank() {}
 
 	public static boolean add(RankEntry entry)
 	{
-		if (RANK_ENTRIES.contains(entry))
+		if (ENTRIES.contains(entry))
 		{
 			return false;
 		}
 
-		if (RANK_ENTRIES.add(entry))
+		if (ENTRIES.add(entry))
 		{
-			Collections.sort(RANK_ENTRIES);
+			Collections.sort(ENTRIES);
 
-			int i = RANK_ENTRIES.indexOf(entry);
+			int i = ENTRIES.indexOf(entry);
 
-			if (i < RANK_ENTRIES.size() - 1)
+			if (i < ENTRIES.size() - 1)
 			{
-				entry.nextEntry = RANK_ENTRIES.get(++i);
+				entry.nextEntry = ENTRIES.get(++i);
 			}
 			else
 			{
@@ -58,21 +60,21 @@ public class MinerRank
 		{
 			MinerRank.RankEntry entry = iterator.next();
 
-			if (RANK_ENTRIES.contains(entry) || !RANK_ENTRIES.add(entry))
+			if (ENTRIES.contains(entry) || !ENTRIES.add(entry))
 			{
 				iterator.remove();
 			}
 		}
 
-		Collections.sort(RANK_ENTRIES);
+		Collections.sort(ENTRIES);
 
-		for (int i = 0, max = RANK_ENTRIES.size() - 1; i <= max; ++i)
+		for (int i = 0, max = ENTRIES.size() - 1; i <= max; ++i)
 		{
-			RankEntry entry = RANK_ENTRIES.get(i);
+			RankEntry entry = ENTRIES.get(i);
 
 			if (i < max)
 			{
-				entry.nextEntry = RANK_ENTRIES.get(i + 1);
+				entry.nextEntry = ENTRIES.get(i + 1);
 			}
 			else
 			{
@@ -83,7 +85,7 @@ public class MinerRank
 
 	public static RankEntry get(String name)
 	{
-		for (RankEntry entry : RANK_ENTRIES)
+		for (RankEntry entry : ENTRIES)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
@@ -113,7 +115,7 @@ public class MinerRank
 
 	public static ImmutableList<RankEntry> getEntries()
 	{
-		return ImmutableList.copyOf(RANK_ENTRIES);
+		return ImmutableList.copyOf(ENTRIES);
 	}
 
 	public static class RankEntry implements Comparable<RankEntry>, INBTSerializable<CompoundNBT>
@@ -178,7 +180,7 @@ public class MinerRank
 
 		public RankEntry getNextEntry()
 		{
-			return nextEntry;
+			return nextEntry == null ? this : nextEntry;
 		}
 
 		@Override
