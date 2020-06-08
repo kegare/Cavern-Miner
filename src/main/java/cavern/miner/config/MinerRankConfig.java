@@ -171,7 +171,7 @@ public class MinerRankConfig
 
 	public void registerEntries()
 	{
-		MinerRank.addAll(entries);
+		MinerRank.set(entries);
 	}
 
 	public void setDefault()

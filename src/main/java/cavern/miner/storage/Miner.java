@@ -11,6 +11,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -20,6 +22,9 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 	private int point;
 	private MinerRank.RankEntry rank;
+
+	@OnlyIn(Dist.CLIENT)
+	private MinerRank.DisplayEntry displayRank;
 
 	private MinerCache cache;
 
@@ -59,6 +64,18 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
+	@OnlyIn(Dist.CLIENT)
+	public MinerRank.DisplayEntry getDisplayRank()
+	{
+		return displayRank;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public void setDisplayRank(MinerRank.DisplayEntry rank)
+	{
+		displayRank = rank;
+	}
+
 	public Miner addPoint(int amount)
 	{
 		if (amount == 0)
@@ -73,7 +90,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 		if (positive)
 		{
-			MinerRank.RankEntry next = getRank().getNextEntry();
+			MinerRank.RankEntry next = MinerRank.getNextEntry(getRank());
 
 			if (!getRank().equals(next) && getPoint() >= next.getPhase())
 			{
@@ -126,11 +143,11 @@ public class Miner implements INBTSerializable<CompoundNBT>
 			else
 			{
 				message = new MinerUpdateMessage(getPoint(), getRank());
+
+				prevUpdate = message;
 			}
 
 			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), message);
-
-			prevUpdate = message;
 		}
 
 		return this;
@@ -162,5 +179,13 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		}
 
 		return cache;
+	}
+
+	public Miner clearCache()
+	{
+		cache = null;
+		prevUpdate = null;
+
+		return this;
 	}
 }

@@ -18,7 +18,7 @@ public class ClientConfig
 		builder.push("miner");
 		displayType = builder.comment("The display type of miner status.").defineEnum("display_type", DisplayType.HOLD);
 		displayConer = builder.comment("The display corner of miner status.").defineEnum("display_corner", DisplayCorner.BOTTOM_RIGHT);
-		showRank = builder.comment("When enabled, the miner rank will be shown along with the miner points.").define("show_rank", true);
+		showRank = builder.comment("When enabled, the miner rank name will be shown along with the miner points.").define("show_rank", true);
 		builder.pop();
 	}
 }

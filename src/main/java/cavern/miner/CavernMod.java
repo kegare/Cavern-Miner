@@ -3,7 +3,6 @@ package cavern.miner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import cavern.miner.client.ClientProxy;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.CavernModConfig;
 import cavern.miner.config.GeneralConfig;
@@ -16,14 +15,12 @@ import cavern.miner.init.CaveItems;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.init.CaveWorldCarvers;
 import cavern.miner.network.CaveNetworkConstants;
-import cavern.miner.proxy.CommonProxy;
 import net.minecraft.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -35,8 +32,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public final class CavernMod
 {
 	public static final Logger LOG = LogManager.getLogger("cavern");
-
-	public static final CommonProxy PROXY = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 
 	public CavernMod()
 	{

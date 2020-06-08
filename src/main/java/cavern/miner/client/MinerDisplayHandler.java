@@ -98,37 +98,22 @@ public class MinerDisplayHandler
 	{
 		double per = point == 0 ? 0.0D : (double)point / (double)phase * 100.0D;
 		double diff = Math.abs(per - pointPer);
-		double d1 = 0.0175D;
-		double d2 = 0.35D;
+		double move = diff * 0.1D;
 
-		if (pointPer < 0.0D || diff < d1)
+		if (pointPer < 0.0D)
 		{
 			pointPer = per;
 		}
 		else if (per > pointPer)
 		{
-			if (diff > 1.0D)
-			{
-				pointPer += d2;
-			}
-			else
-			{
-				pointPer += d1;
-			}
+			pointPer += move;
 		}
 		else if (per < pointPer)
 		{
-			if (diff > 1.0D)
-			{
-				pointPer -= d2 * 2.0D;
-			}
-			else
-			{
-				pointPer -= d1 * 1.5D;
-			}
+			pointPer -= move;
 		}
 
-		return pointPer;
+		return Math.max(pointPer, 0.0D);
 	}
 
 	@SubscribeEvent
@@ -154,7 +139,12 @@ public class MinerDisplayHandler
 			return;
 		}
 
-		MinerRank.RankEntry rank = miner.getRank();
+		MinerRank.DisplayEntry rank = miner.getDisplayRank();
+
+		if (rank == null)
+		{
+			return;
+		}
 
 		MainWindow window = event.getWindow();
 		DisplayCorner corner = ClientConfig.INSTANCE.displayConer.get();
@@ -211,15 +201,15 @@ public class MinerDisplayHandler
 			pointText = " " + pointText;
 		}
 
-		MinerRank.RankEntry next = rank.getNextEntry();
+		int nextPhase = rank.getNextPhase();
 
-		if (!rank.equals(next))
+		if (nextPhase > 0)
 		{
-			String per = String.format("%.2f", calcPointPer(miner.getPoint(), next.getPhase())) + "%";
+			String per = String.format("%.2f", calcPointPer(miner.getPoint(), nextPhase)) + "%";
 
 			pointText = corner.isLeft() ? pointText + " < " + per : per + " > " + pointText;
 		}
-		else if (next.equals(next.getNextEntry()))
+		else
 		{
 			pointText = "MAX";
 		}

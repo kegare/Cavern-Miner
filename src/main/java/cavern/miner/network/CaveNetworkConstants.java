@@ -1,6 +1,7 @@
 package cavern.miner.network;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -22,9 +23,9 @@ public class CaveNetworkConstants
 
 		int i = 0;
 
-		channel.messageBuilder(MinerUpdateMessage.class, i++)
+		channel.messageBuilder(MinerUpdateMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(MinerUpdateMessage::decode).encoder(MinerUpdateMessage::encode).consumer(MinerUpdateMessage::handle).add();
-		channel.messageBuilder(MiningInteractMessage.class, i++)
+		channel.messageBuilder(MiningInteractMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(MiningInteractMessage::decode).encoder(MiningInteractMessage::encode).consumer(MiningInteractMessage::handle).add();
 
 		return channel;

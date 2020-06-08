@@ -2,32 +2,36 @@ package cavern.miner.network;
 
 import java.util.function.Supplier;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-
 import cavern.miner.CavernMod;
+import cavern.miner.client.ClientProxy;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRank;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MinerUpdateMessage
 {
 	private int point;
-	private MinerRank.RankEntry rank;
+	private MinerRank.DisplayEntry rank;
 
 	private boolean pointOnly;
 
 	private boolean failed;
 
-	public MinerUpdateMessage(int point, MinerRank.RankEntry rank)
+	public MinerUpdateMessage(int point, MinerRank.DisplayEntry rank)
 	{
 		this.point = point;
 		this.rank = rank;
+	}
+
+	public MinerUpdateMessage(int point, MinerRank.RankEntry rank)
+	{
+		this(point, new MinerRank.DisplayEntry(rank));
 	}
 
 	public MinerUpdateMessage(int point)
@@ -43,7 +47,7 @@ public class MinerUpdateMessage
 
 	public MinerRank.RankEntry getRank()
 	{
-		return rank;
+		return rank == null ? null : rank.getParent();
 	}
 
 	public static MinerUpdateMessage decode(final PacketBuffer buf)
@@ -58,11 +62,9 @@ public class MinerUpdateMessage
 				return new MinerUpdateMessage(point);
 			}
 
-			MinerRank.RankEntry rank = MinerRank.getOrCreate(JsonToNBT.getTagFromJson(buf.readString()));
-
-			return new MinerUpdateMessage(point, rank);
+			return new MinerUpdateMessage(point, new MinerRank.DisplayEntry(buf));
 		}
-		catch (IndexOutOfBoundsException | CommandSyntaxException e)
+		catch (IndexOutOfBoundsException e)
 		{
 			CavernMod.LOG.error("MinerUpdateMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
@@ -77,7 +79,7 @@ public class MinerUpdateMessage
 
 		if (!msg.pointOnly)
 		{
-			buf.writeString(msg.rank.serializeNBT().toString());
+			msg.rank.write(buf);
 		}
 	}
 
@@ -87,7 +89,7 @@ public class MinerUpdateMessage
 		{
 			ctx.get().enqueueWork(() ->
 			{
-				PlayerEntity player = DistExecutor.safeRunForDist(() -> CavernMod.PROXY::getClientPlayer, () -> ctx.get()::getSender);
+				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getClientPlayer);
 
 				if (player != null)
 				{
@@ -99,7 +101,7 @@ public class MinerUpdateMessage
 
 						if (!msg.pointOnly)
 						{
-							miner.setRank(msg.rank);
+							miner.setDisplayRank(msg.rank);
 						}
 					}
 				}

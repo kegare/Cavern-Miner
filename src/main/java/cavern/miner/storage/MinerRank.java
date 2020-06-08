@@ -1,9 +1,10 @@
 package cavern.miner.storage;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -11,10 +12,9 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.INBTSerializable;
 
 public final class MinerRank
 {
@@ -24,35 +24,7 @@ public final class MinerRank
 
 	private MinerRank() {}
 
-	public static boolean add(RankEntry entry)
-	{
-		if (ENTRIES.contains(entry))
-		{
-			return false;
-		}
-
-		if (ENTRIES.add(entry))
-		{
-			Collections.sort(ENTRIES);
-
-			int i = ENTRIES.indexOf(entry);
-
-			if (i < ENTRIES.size() - 1)
-			{
-				entry.nextEntry = ENTRIES.get(++i);
-			}
-			else
-			{
-				entry.nextEntry = entry;
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-	public static void addAll(Collection<RankEntry> entries)
+	public static void set(Collection<RankEntry> entries)
 	{
 		Iterator<MinerRank.RankEntry> iterator = entries.iterator();
 
@@ -63,22 +35,6 @@ public final class MinerRank
 			if (ENTRIES.contains(entry) || !ENTRIES.add(entry))
 			{
 				iterator.remove();
-			}
-		}
-
-		Collections.sort(ENTRIES);
-
-		for (int i = 0, max = ENTRIES.size() - 1; i <= max; ++i)
-		{
-			RankEntry entry = ENTRIES.get(i);
-
-			if (i < max)
-			{
-				entry.nextEntry = ENTRIES.get(i + 1);
-			}
-			else
-			{
-				entry.nextEntry = entry;
 			}
 		}
 	}
@@ -96,21 +52,21 @@ public final class MinerRank
 		return BEGINNER;
 	}
 
-	public static RankEntry getOrCreate(CompoundNBT nbt)
+	public static RankEntry getNextEntry(RankEntry current)
 	{
-		RankEntry entry = get(nbt.getString("Name"));
+		int i = ENTRIES.indexOf(current);
 
-		if (entry == null)
+		if (i < 0)
 		{
-			entry = new RankEntry(nbt);
-
-			if (!add(entry))
-			{
-				return BEGINNER;
-			}
+			return BEGINNER;
 		}
 
-		return entry;
+		if (i < ENTRIES.size() - 1)
+		{
+			return ENTRIES.get(++i);
+		}
+
+		return current;
 	}
 
 	public static ImmutableList<RankEntry> getEntries()
@@ -118,14 +74,12 @@ public final class MinerRank
 		return ImmutableList.copyOf(ENTRIES);
 	}
 
-	public static class RankEntry implements Comparable<RankEntry>, INBTSerializable<CompoundNBT>
+	public static class RankEntry
 	{
-		private String name;
-		private String translationKey;
-		private int phase;
-		private ItemStack iconItem;
-
-		private RankEntry nextEntry;
+		private final String name;
+		private final String translationKey;
+		private final int phase;
+		private final ItemStack iconItem;
 
 		public RankEntry(String name, String key, int phase, ItemStack iconItem)
 		{
@@ -140,9 +94,78 @@ public final class MinerRank
 			this(name, "cavern.miner." + name.toLowerCase(), phase, iconItem);
 		}
 
-		public RankEntry(CompoundNBT nbt)
+		public String getName()
 		{
-			this.deserializeNBT(nbt);
+			return name;
+		}
+
+		public String getTranslationKey()
+		{
+			return translationKey;
+		}
+
+		public int getPhase()
+		{
+			return phase;
+		}
+
+		public ItemStack getIconItem()
+		{
+			return iconItem;
+		}
+
+		@Override
+		public boolean equals(Object obj)
+		{
+			if (obj == null || !(obj instanceof RankEntry))
+			{
+				return false;
+			}
+
+			RankEntry o = (RankEntry)obj;
+
+			return getName().equals(o.getName());
+		}
+
+		@Override
+		public int hashCode()
+		{
+			return getName().hashCode();
+		}
+	}
+
+	public static class DisplayEntry
+	{
+		private String name;
+		private String translationKey;
+		private ItemStack iconItem;
+		private int nextPhase;
+
+		private RankEntry parent;
+
+		public DisplayEntry(RankEntry entry)
+		{
+			this.name = entry.getName();
+			this.translationKey = entry.getTranslationKey();
+			this.iconItem = entry.getIconItem();
+
+			RankEntry next = getNextEntry(entry);
+
+			if (entry.equals(next))
+			{
+				this.nextPhase = -1;
+			}
+			else
+			{
+				this.nextPhase = next.getPhase();
+			}
+
+			this.parent = entry;
+		}
+
+		public DisplayEntry(PacketBuffer buf)
+		{
+			this.read(buf);
 		}
 
 		public String getName()
@@ -168,66 +191,36 @@ public final class MinerRank
 			return getName();
 		}
 
-		public int getPhase()
-		{
-			return phase;
-		}
-
 		public ItemStack getIconItem()
 		{
 			return iconItem;
 		}
 
-		public RankEntry getNextEntry()
+		public int getNextPhase()
 		{
-			return nextEntry == null ? this : nextEntry;
+			return nextPhase;
 		}
 
-		@Override
-		public boolean equals(Object obj)
+		@Nullable
+		public RankEntry getParent()
 		{
-			if (obj == null || !(obj instanceof RankEntry))
-			{
-				return false;
-			}
-
-			RankEntry o = (RankEntry)obj;
-
-			return getName().equals(o.getName()) || getPhase() == o.getPhase();
+			return parent;
 		}
 
-		@Override
-		public int hashCode()
+		public void write(PacketBuffer buf)
 		{
-			return Integer.hashCode(getPhase());
+			buf.writeString(getName());
+			buf.writeString(getTranslationKey());
+			buf.writeItemStack(getIconItem());
+			buf.writeInt(getNextPhase());
 		}
 
-		@Override
-		public int compareTo(RankEntry o)
+		public void read(PacketBuffer buf)
 		{
-			return Integer.compare(getPhase(), o.getPhase());
-		}
-
-		@Override
-		public CompoundNBT serializeNBT()
-		{
-			CompoundNBT nbt = new CompoundNBT();
-
-			nbt.putString("Name", getName());
-			nbt.putString("TranslationKey", getTranslationKey());
-			nbt.putInt("Phase", getPhase());
-			nbt.put("IconItem", getIconItem().write(new CompoundNBT()));
-
-			return nbt;
-		}
-
-		@Override
-		public void deserializeNBT(CompoundNBT nbt)
-		{
-			this.name = nbt.getString("Name");
-			this.translationKey = nbt.getString("TranslationKey");
-			this.phase = nbt.getInt("Phase");
-			this.iconItem = ItemStack.read(nbt.getCompound("IconItem"));
+			name = buf.readString();
+			translationKey = buf.readString();
+			iconItem = buf.readItemStack();
+			nextPhase = buf.readInt();
 		}
 	}
 }

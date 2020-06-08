@@ -34,8 +34,10 @@ public class MinerEventHandler
 	{
 		PlayerEntity player = event.getPlayer();
 
-		player.getCapability(CaveCapabilities.MINER).ifPresent(Miner::sendToClient);
-
+		if (player.world.getDimension() instanceof CavernDimension)
+		{
+			player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.clearCache().sendToClient());
+		}
 	}
 
 	@SubscribeEvent
@@ -43,7 +45,10 @@ public class MinerEventHandler
 	{
 		PlayerEntity player = event.getPlayer();
 
-		player.getCapability(CaveCapabilities.MINER).ifPresent(Miner::sendToClient);
+		if (player.world.getDimension() instanceof CavernDimension)
+		{
+			player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.clearCache().sendToClient());
+		}
 	}
 
 	@SubscribeEvent
@@ -54,9 +59,9 @@ public class MinerEventHandler
 		if (player.world.getDimension() instanceof CavernDimension)
 		{
 			player.timeUntilPortal = 100;
-		}
 
-		player.getCapability(CaveCapabilities.MINER).ifPresent(Miner::sendToClient);
+			player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.clearCache().sendToClient());
+		}
 	}
 
 	@SubscribeEvent

@@ -3,12 +3,14 @@ package cavern.miner.network;
 import java.util.function.Supplier;
 
 import cavern.miner.CavernMod;
+import cavern.miner.client.ClientProxy;
 import cavern.miner.init.CaveCapabilities;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -59,7 +61,7 @@ public class MiningInteractMessage
 		{
 			ctx.get().enqueueWork(() ->
 			{
-				PlayerEntity player = DistExecutor.safeRunForDist(() -> CavernMod.PROXY::getClientPlayer, () -> ctx.get()::getSender);
+				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getClientPlayer);
 
 				if (player != null)
 				{
