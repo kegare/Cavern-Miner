@@ -1,4 +1,4 @@
-package cavern.miner.event;
+package cavern.miner.handler;
 
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.network.CaveNetworkConstants;

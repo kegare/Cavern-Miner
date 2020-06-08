@@ -14,7 +14,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MinerPointMessage
 {
-	private int point;
+	private final int point;
 
 	public MinerPointMessage(int point)
 	{
@@ -48,7 +48,7 @@ public class MinerPointMessage
 		{
 			ctx.get().enqueueWork(() ->
 			{
-				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getClientPlayer);
+				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getPlayer);
 
 				if (player != null)
 				{

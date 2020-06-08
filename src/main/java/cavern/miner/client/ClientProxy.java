@@ -8,7 +8,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class ClientProxy
 {
-	public static PlayerEntity getClientPlayer()
+	public static PlayerEntity getPlayer()
 	{
 		Minecraft mc = Minecraft.getInstance();
 

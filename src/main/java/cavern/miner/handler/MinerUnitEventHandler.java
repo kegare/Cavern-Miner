@@ -1,10 +1,11 @@
-package cavern.miner.event;
+package cavern.miner.handler;
 
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import cavern.miner.config.GeneralConfig;
 import cavern.miner.enchantment.EnchantmentMiner;
 import cavern.miner.enchantment.MinerSnapshot;
 import cavern.miner.enchantment.MinerUnit;
@@ -86,8 +87,8 @@ public class MinerUnitEventHandler
 
 		PlayerInteractionManager im = ((ServerPlayerEntity)player).interactionManager;
 
-		mining.captureDrops(true);
-		mining.captureExperiences(true);
+		mining.captureDrops(GeneralConfig.INSTANCE.collectDrops.get());
+		mining.captureExperiences(GeneralConfig.INSTANCE.collectExps.get());
 
 		mining.setBreaking(true);
 

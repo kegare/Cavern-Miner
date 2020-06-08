@@ -16,19 +16,22 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MiningInteractMessage
 {
-	private BlockState state;
-	private int point;
+	private final BlockState state;
+	private final int point;
 
-	private boolean failed;
+	private final boolean failed;
 
 	public MiningInteractMessage(BlockState state, int point)
 	{
 		this.state = state;
 		this.point = point;
+		this.failed = false;
 	}
 
 	private MiningInteractMessage(boolean failed)
 	{
+		this.state = null;
+		this.point = 0;
 		this.failed = failed;
 	}
 
@@ -61,7 +64,7 @@ public class MiningInteractMessage
 		{
 			ctx.get().enqueueWork(() ->
 			{
-				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getClientPlayer);
+				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getPlayer);
 
 				if (player != null)
 				{

@@ -1,4 +1,4 @@
-package cavern.miner.event;
+package cavern.miner.handler;
 
 import org.apache.commons.lang3.ObjectUtils;
 

@@ -1,4 +1,4 @@
-package cavern.miner.client;
+package cavern.miner.client.handler;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;

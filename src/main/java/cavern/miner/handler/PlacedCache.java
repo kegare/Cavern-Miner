@@ -1,4 +1,4 @@
-package cavern.miner.event;
+package cavern.miner.handler;
 
 import java.util.HashMap;
 import java.util.Map;

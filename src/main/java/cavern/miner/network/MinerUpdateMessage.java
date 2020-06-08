@@ -2,6 +2,8 @@ package cavern.miner.network;
 
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import cavern.miner.CavernMod;
 import cavern.miner.client.ClientProxy;
 import cavern.miner.init.CaveCapabilities;
@@ -15,15 +17,16 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class MinerUpdateMessage
 {
-	private int point;
-	private MinerRank.DisplayEntry rank;
+	private final int point;
+	private final MinerRank.DisplayEntry displayRank;
 
-	private boolean failed;
+	private final boolean failed;
 
 	public MinerUpdateMessage(int point, MinerRank.DisplayEntry rank)
 	{
 		this.point = point;
-		this.rank = rank;
+		this.displayRank = rank;
+		this.failed = false;
 	}
 
 	public MinerUpdateMessage(int point, MinerRank.RankEntry rank)
@@ -33,12 +36,15 @@ public class MinerUpdateMessage
 
 	private MinerUpdateMessage(boolean failed)
 	{
+		this.point = 0;
+		this.displayRank = null;
 		this.failed = failed;
 	}
 
+	@Nullable
 	public MinerRank.RankEntry getRank()
 	{
-		return rank == null ? null : rank.getParent();
+		return displayRank == null ? null : displayRank.getParent();
 	}
 
 	public static MinerUpdateMessage decode(final PacketBuffer buf)
@@ -61,7 +67,7 @@ public class MinerUpdateMessage
 	{
 		buf.writeInt(msg.point);
 
-		msg.rank.write(buf);
+		msg.displayRank.write(buf);
 	}
 
 	public static void handle(final MinerUpdateMessage msg, final Supplier<NetworkEvent.Context> ctx)
@@ -70,11 +76,11 @@ public class MinerUpdateMessage
 		{
 			ctx.get().enqueueWork(() ->
 			{
-				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getClientPlayer);
+				PlayerEntity player = DistExecutor.safeCallWhenOn(Dist.CLIENT, () -> ClientProxy::getPlayer);
 
 				if (player != null)
 				{
-					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.setPoint(msg.point).setDisplayRank(msg.rank));
+					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.setPoint(msg.point).setDisplayRank(msg.displayRank));
 				}
 			});
 		}
