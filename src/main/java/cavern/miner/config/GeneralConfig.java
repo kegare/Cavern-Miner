@@ -29,8 +29,8 @@ public class GeneralConfig
 
 		builder.push("miner");
 		disableMiner = builder.comment("If disable the miner status for all players.").define("disable_miner", false);
-		collectDrops = builder.comment("When true, collects drop items in chain mining for the miner enchantment.").define("collect_drops", true);
-		collectExps = builder.comment("When true, collects experiences in chain mining for the miner enchantment.").define("collect_exps", true);
+		collectDrops = builder.comment("When true, collects drop items in chain mining for the miner enchantment.", serverSide).define("collect_drops", true);
+		collectExps = builder.comment("When true, collects experiences in chain mining for the miner enchantment.", serverSide).define("collect_exps", true);
 		builder.pop();
 	}
 

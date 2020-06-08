@@ -4,6 +4,7 @@ import java.util.Comparator;
 
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.init.CaveBlocks;
+import cavern.miner.util.ItemStackEntry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
@@ -35,6 +36,8 @@ public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
 	@Override
 	public void fill(NonNullList<ItemStack> items)
 	{
+		NonNullList<ItemStackEntry> entries = NonNullList.create();
+
 		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
 			for (BlockState state : portal.getFrameBlocks())
@@ -43,7 +46,12 @@ public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
 
 				if (item != null && item != Items.AIR)
 				{
-					items.add(new ItemStack(item));
+					ItemStackEntry entry = new ItemStackEntry(item);
+
+					if (!entries.contains(entry))
+					{
+						entries.add(entry);
+					}
 				}
 			}
 
@@ -51,10 +59,17 @@ public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
 			{
 				if (!stack.isEmpty())
 				{
-					items.add(stack);
+					ItemStackEntry entry = new ItemStackEntry(stack);
+
+					if (!entries.contains(entry))
+					{
+						entries.add(entry);
+					}
 				}
 			}
 		}
+
+		entries.forEach(o -> items.add(o.getItemStack()));
 
 		NonNullList<ItemStack> list = NonNullList.create();
 

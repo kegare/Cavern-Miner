@@ -83,7 +83,7 @@ public final class MinerRank
 
 		public RankEntry(String name, String key, int phase, ItemStack iconItem)
 		{
-			this.name = name.toUpperCase();
+			this.name = name;
 			this.translationKey = key;
 			this.phase = phase;
 			this.iconItem = iconItem;
@@ -124,13 +124,13 @@ public final class MinerRank
 
 			RankEntry o = (RankEntry)obj;
 
-			return getName().equals(o.getName());
+			return getName().toUpperCase().equals(o.getName().toUpperCase());
 		}
 
 		@Override
 		public int hashCode()
 		{
-			return getName().hashCode();
+			return getName().toUpperCase().hashCode();
 		}
 	}
 

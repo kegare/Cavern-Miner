@@ -5,6 +5,7 @@ import cavern.miner.vein.OrePointHelper;
 import cavern.miner.vein.OreRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.OreBlock;
+import net.minecraft.block.RedstoneOreBlock;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -40,7 +41,7 @@ public class EnchantmentVeinMiner extends EnchantmentMiner
 			return targets.contains(state);
 		}
 
-		return state.getBlock() instanceof OreBlock || OrePointHelper.getPoint(OreRegistry.getEntry(state)) > 0;
+		return state.getBlock() instanceof OreBlock || state.getBlock() instanceof RedstoneOreBlock || OrePointHelper.getPoint(OreRegistry.getEntry(state)) > 0;
 	}
 
 	@Override

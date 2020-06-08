@@ -35,7 +35,7 @@ import net.minecraftforge.fml.common.Mod;
 public class MinerUnitEventHandler
 {
 	@SubscribeEvent
-	public static void onBlockBreak(BreakEvent event)
+	public static void onBlockBreak(final BreakEvent event)
 	{
 		if (event.getWorld().isRemote() || !(event.getWorld() instanceof World))
 		{
@@ -163,7 +163,7 @@ public class MinerUnitEventHandler
 	}
 
 	@SubscribeEvent(priority = EventPriority.LOWEST)
-	public static void onHarvestDrops(HarvestDropsEvent event)
+	public static void onHarvestDrops(final HarvestDropsEvent event)
 	{
 		if (event.getWorld().isRemote() || !(event.getWorld() instanceof World))
 		{
