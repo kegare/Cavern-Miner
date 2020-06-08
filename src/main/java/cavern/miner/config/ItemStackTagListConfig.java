@@ -65,7 +65,7 @@ public class ItemStackTagListConfig
 				return;
 			}
 
-			if (file.canRead())
+			if (file.canRead() && file.length() > 0L)
 			{
 				FileInputStream fis = new FileInputStream(file);
 				BufferedReader buffer = new BufferedReader(new InputStreamReader(fis));

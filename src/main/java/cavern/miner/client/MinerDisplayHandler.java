@@ -214,7 +214,7 @@ public class MinerDisplayHandler
 			pointText = " " + pointText;
 		}
 
-		MinerRank.RankEntry next = MinerRank.next(rank);
+		MinerRank.RankEntry next = rank.getNextEntry();
 
 		if (!rank.equals(next))
 		{
@@ -222,7 +222,7 @@ public class MinerDisplayHandler
 
 			pointText = corner.isLeft() ? pointText + " < " + per : per + " > " + pointText;
 		}
-		else if (next.equals(MinerRank.next(next)))
+		else if (next.equals(next.getNextEntry()))
 		{
 			pointText = "MAX";
 		}

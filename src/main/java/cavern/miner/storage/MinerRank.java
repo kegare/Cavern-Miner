@@ -1,14 +1,12 @@
 package cavern.miner.storage;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -23,7 +21,6 @@ public class MinerRank
 	public static final MinerRank.RankEntry BEGINNER = new MinerRank.RankEntry("BEGINNER", 0, new ItemStack(Items.WOODEN_PICKAXE));
 
 	private static final List<RankEntry> RANK_ENTRIES = Lists.newArrayList(BEGINNER);
-	private static final Map<RankEntry, RankEntry> NEXT_CACHE = Maps.newHashMap();
 
 	public static boolean add(RankEntry entry)
 	{
@@ -36,7 +33,16 @@ public class MinerRank
 		{
 			Collections.sort(RANK_ENTRIES);
 
-			NEXT_CACHE.clear();
+			int i = RANK_ENTRIES.indexOf(entry);
+
+			if (i < RANK_ENTRIES.size() - 1)
+			{
+				entry.nextEntry = RANK_ENTRIES.get(++i);
+			}
+			else
+			{
+				entry.nextEntry = entry;
+			}
 
 			return true;
 		}
@@ -44,11 +50,42 @@ public class MinerRank
 		return false;
 	}
 
+	public static void addAll(Collection<RankEntry> entries)
+	{
+		Iterator<MinerRank.RankEntry> iterator = entries.iterator();
+
+		while (iterator.hasNext())
+		{
+			MinerRank.RankEntry entry = iterator.next();
+
+			if (RANK_ENTRIES.contains(entry) || !RANK_ENTRIES.add(entry))
+			{
+				iterator.remove();
+			}
+		}
+
+		Collections.sort(RANK_ENTRIES);
+
+		for (int i = 0, max = RANK_ENTRIES.size() - 1; i <= max; ++i)
+		{
+			RankEntry entry = RANK_ENTRIES.get(i);
+
+			if (i < max)
+			{
+				entry.nextEntry = RANK_ENTRIES.get(i + 1);
+			}
+			else
+			{
+				entry.nextEntry = entry;
+			}
+		}
+	}
+
 	public static RankEntry get(String name)
 	{
 		for (RankEntry entry : RANK_ENTRIES)
 		{
-			if (entry.getName().equals(name))
+			if (entry.getName().equalsIgnoreCase(name))
 			{
 				return entry;
 			}
@@ -74,42 +111,6 @@ public class MinerRank
 		return entry;
 	}
 
-	public static RankEntry next(@Nullable RankEntry current)
-	{
-		if (current == null)
-		{
-			return BEGINNER;
-		}
-
-		RankEntry next = NEXT_CACHE.get(current);
-
-		if (next != null)
-		{
-			return next;
-		}
-
-		int max = RANK_ENTRIES.size() - 1;
-		int index = RANK_ENTRIES.indexOf(current);
-
-		if (index < 0)
-		{
-			return BEGINNER;
-		}
-
-		if (index < max)
-		{
-			next = RANK_ENTRIES.get(index + 1);
-		}
-		else
-		{
-			next = current;
-		}
-
-		NEXT_CACHE.put(current, next);
-
-		return next;
-	}
-
 	public static ImmutableList<RankEntry> getEntries()
 	{
 		return ImmutableList.copyOf(RANK_ENTRIES);
@@ -121,6 +122,8 @@ public class MinerRank
 		private String translationKey;
 		private int phase;
 		private ItemStack iconItem;
+
+		private RankEntry nextEntry;
 
 		public RankEntry(String name, String key, int phase, ItemStack iconItem)
 		{
@@ -171,6 +174,11 @@ public class MinerRank
 		public ItemStack getIconItem()
 		{
 			return iconItem;
+		}
+
+		public RankEntry getNextEntry()
+		{
+			return nextEntry;
 		}
 
 		@Override

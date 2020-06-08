@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.annotation.Nullable;
 
@@ -66,7 +65,7 @@ public class MinerRankConfig
 				return;
 			}
 
-			if (file.canRead())
+			if (file.canRead() && file.length() > 0L)
 			{
 				FileInputStream fis = new FileInputStream(file);
 				BufferedReader buffer = new BufferedReader(new InputStreamReader(fis));
@@ -172,17 +171,7 @@ public class MinerRankConfig
 
 	public void registerEntries()
 	{
-		Iterator<MinerRank.RankEntry> iterator = entries.iterator();
-
-		while (iterator.hasNext())
-		{
-			MinerRank.RankEntry entry = iterator.next();
-
-			if (!MinerRank.add(entry))
-			{
-				iterator.remove();
-			}
-		}
+		MinerRank.addAll(entries);
 	}
 
 	public void setDefault()
