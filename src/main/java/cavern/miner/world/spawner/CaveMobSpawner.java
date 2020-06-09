@@ -55,8 +55,8 @@ public class CaveMobSpawner
 
 		for (PlayerEntity player : world.getPlayers(o -> !o.isSpectator()))
 		{
-			int x = MathHelper.floor(player.getPosX() / 16.0D);
-			int z = MathHelper.floor(player.getPosZ() / 16.0D);
+			int chunkX = MathHelper.floor(player.getPosX() / 16.0D);
+			int chunkZ = MathHelper.floor(player.getPosZ() / 16.0D);
 			int range = 6;
 
 			for (int rx = -range; rx <= range; ++rx)
@@ -64,13 +64,13 @@ public class CaveMobSpawner
 				for (int rz = -range; rz <= range; ++rz)
 				{
 					boolean flag = rx == -range || rx == range || rz == -range || rz == range;
-					ChunkPos pos = new ChunkPos(rx + x, rz + z);
+					ChunkPos chunkPos = new ChunkPos(rx + chunkX, rz + chunkZ);
 
-					if (!eligibleChunksForSpawning.containsKey(pos))
+					if (!eligibleChunksForSpawning.containsKey(chunkPos) && world.getChunkProvider().isChunkLoaded(chunkPos))
 					{
-						if (!flag && world.getWorldBorder().contains(pos))
+						if (!flag && world.getWorldBorder().contains(chunkPos))
 						{
-							eligibleChunksForSpawning.put(pos, player.getPosition());
+							eligibleChunksForSpawning.put(chunkPos, player.getPosition());
 						}
 					}
 				}
@@ -94,23 +94,28 @@ public class CaveMobSpawner
 
 			BlockPos.Mutable pos = new BlockPos.Mutable();
 
-			outside: for (ChunkPos chunkpos : shuffled)
+			outside: for (ChunkPos chunkPos : shuffled)
 			{
-				findRandomPosition(pos, chunkpos);
+				findRandomPosition(pos, chunkPos);
+
+				if (world.getBlockState(pos).isNormalCube(world, pos))
+				{
+					continue;
+				}
 
 				int mobCount = 0;
 
 				for (int i = 0; i < 3; ++i)
 				{
-					int n = 6;
+					int leftRight = 6;
 					Biome.SpawnListEntry entry = null;
 					ILivingEntityData data = null;
 
 					for (int j = 0, chance = MathHelper.ceil(Math.random() * 4.0D); j < chance; ++j)
 					{
-						int mx = rand.nextInt(n) - rand.nextInt(n);
+						int mx = rand.nextInt(leftRight) - rand.nextInt(leftRight);
 						int my = rand.nextInt(1) - rand.nextInt(1);
-						int mz = rand.nextInt(n) - rand.nextInt(n);
+						int mz = rand.nextInt(leftRight) - rand.nextInt(leftRight);
 
 						pos.setPos(pos.getX() + mx, pos.getY() + my, pos.getZ() + mz);
 
@@ -189,12 +194,12 @@ public class CaveMobSpawner
 
 	protected void findRandomPosition(BlockPos.Mutable pos, ChunkPos chunkPos)
 	{
-		BlockPos blockpos = eligibleChunksForSpawning.get(chunkPos);
+		BlockPos playerPos = eligibleChunksForSpawning.get(chunkPos);
 		int y = 0;
 
-		if (blockpos != null)
+		if (playerPos != null)
 		{
-			y = blockpos.getY();
+			y = playerPos.getY();
 		}
 
 		int posX = chunkPos.getXStart() + rand.nextInt(16);
