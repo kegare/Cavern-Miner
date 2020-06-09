@@ -1,12 +1,13 @@
 package cavern.miner.world;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
@@ -20,7 +21,6 @@ import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.WorldEntitySpawner;
@@ -29,26 +29,28 @@ import net.minecraftforge.eventbus.api.Event.Result;
 
 public class CaveMobSpawner
 {
+	private final ServerWorld world;
+	private final Random rand = new Random();
+
 	private final Map<ChunkPos, BlockPos> eligibleChunksForSpawning = Maps.newHashMap();
-	private final SpawnerProvider provider;
 
-	public CaveMobSpawner()
+	public CaveMobSpawner(ServerWorld world)
 	{
-		this(null);
+		this.world = world;
 	}
 
-	public CaveMobSpawner(@Nullable SpawnerProvider spawner)
+	public int getMaxCount(EntityClassification type)
 	{
-		this.provider = spawner;
+		return 150;
 	}
 
-	public int findChunksForSpawning(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs)
+	public double getSafeRange(EntityClassification type)
 	{
-		if (!spawnHostileMobs && !spawnPeacefulMobs)
-		{
-			return 0;
-		}
+		return 16.0D;
+	}
 
+	public void spawnMobs()
+	{
 		eligibleChunksForSpawning.clear();
 
 		for (PlayerEntity player : world.getPlayers(o -> !o.isSpectator()))
@@ -75,8 +77,6 @@ public class CaveMobSpawner
 			}
 		}
 
-		int totalCount = 0;
-
 		for (EntityClassification type : EntityClassification.values())
 		{
 			if (type.getAnimal() || type.getPeacefulCreature())
@@ -84,56 +84,47 @@ public class CaveMobSpawner
 				continue;
 			}
 
-			int maxNumber = getMaxNumberOfCreature(world, spawnHostileMobs, spawnPeacefulMobs, type);
-			double range = getSpawnRange(world, spawnHostileMobs, spawnPeacefulMobs, type);
-
-			if (maxNumber <= 0 || !canSpawnCreature(world, spawnHostileMobs, spawnPeacefulMobs, type))
+			if (world.countEntities().getInt(type) > getMaxCount(type))
 			{
 				continue;
 			}
 
-			if (world.countEntities().getInt(type) > maxNumber)
-			{
-				continue;
-			}
-
-			List<ChunkPos> shuffled = Lists.newArrayList(eligibleChunksForSpawning.keySet());
-			Collections.shuffle(shuffled);
+			List<ChunkPos> shuffled = new ArrayList<>(eligibleChunksForSpawning.keySet());
+			Collections.shuffle(shuffled, rand);
 
 			BlockPos.Mutable pos = new BlockPos.Mutable();
 
 			outside: for (ChunkPos chunkpos : shuffled)
 			{
-				BlockPos blockpos = getRandomPosition(world, chunkpos);
+				findRandomPosition(pos, chunkpos);
+
 				int mobCount = 0;
 
 				for (int i = 0; i < 3; ++i)
 				{
-					int x = blockpos.getX();
-					int y = blockpos.getY();
-					int z = blockpos.getZ();
 					int n = 6;
 					Biome.SpawnListEntry entry = null;
 					ILivingEntityData data = null;
 
 					for (int j = 0, chance = MathHelper.ceil(Math.random() * 4.0D); j < chance; ++j)
 					{
-						x += world.rand.nextInt(n) - world.rand.nextInt(n);
-						y += world.rand.nextInt(1) - world.rand.nextInt(1);
-						z += world.rand.nextInt(n) - world.rand.nextInt(n);
-						pos.setPos(x, y, z);
+						int mx = rand.nextInt(n) - rand.nextInt(n);
+						int my = rand.nextInt(1) - rand.nextInt(1);
+						int mz = rand.nextInt(n) - rand.nextInt(n);
 
-						float posX = x + 0.5F;
-						float posZ = z + 0.5F;
+						pos.setPos(pos.getX() + mx, pos.getY() + my, pos.getZ() + mz);
 
-						if (world.isPlayerWithin(posX, y, posZ, range))
+						float posX = pos.getX() + 0.5F;
+						float posZ = pos.getZ() + 0.5F;
+
+						if (world.isPlayerWithin(posX, pos.getY(), posZ, getSafeRange(type)))
 						{
 							continue;
 						}
 
 						if (entry == null)
 						{
-							entry = getSpawnListEntryForTypeAt(world, type, pos);
+							entry = getSpawnListEntryForTypeAt(type, pos);
 
 							if (entry == null)
 							{
@@ -141,7 +132,7 @@ public class CaveMobSpawner
 							}
 						}
 
-						if (!canCreatureTypeSpawnHere(world, type, entry, pos))
+						if (!entry.entityType.isSummonable() || !canCreatureTypeSpawnHere(type, entry, pos))
 						{
 							continue;
 						}
@@ -151,103 +142,54 @@ public class CaveMobSpawner
 							continue;
 						}
 
-						MobEntity entity = createSpawnCreature(world, type, pos, entry);
+						Entity entity = entry.entityType.create(world);
 
-						if (entity == null)
+						if (entity == null || !(entity instanceof MobEntity))
 						{
 							continue;
 						}
 
-						entity.setLocationAndAngles(posX, y, posZ, world.rand.nextFloat() * 360.0F, 0.0F);
+						MobEntity mobEntity = (MobEntity)entity;
 
-						Result canSpawn = ForgeEventFactory.canEntitySpawn(entity, world, posX, y, posZ, null, SpawnReason.NATURAL);
+						mobEntity.setLocationAndAngles(posX, pos.getY(), posZ, rand.nextFloat() * 360.0F, 0.0F);
+
+						Result canSpawn = ForgeEventFactory.canEntitySpawn(mobEntity, world, posX, pos.getY(), posZ, null, SpawnReason.NATURAL);
 
 						if (canSpawn == Result.DENY)
 						{
 							continue;
 						}
 
-						if (entity.canSpawn(world, SpawnReason.NATURAL) && entity.isNotColliding(world))
+						if (mobEntity.canSpawn(world, SpawnReason.NATURAL) && mobEntity.isNotColliding(world))
 						{
-							if (!ForgeEventFactory.doSpecialSpawn(entity, world, posX, y, posZ, null, SpawnReason.NATURAL))
+							if (!ForgeEventFactory.doSpecialSpawn(mobEntity, world, posX, pos.getY(), posZ, null, SpawnReason.NATURAL))
 							{
-								data = entity.onInitialSpawn(world, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.NATURAL, data, null);
+								data = mobEntity.onInitialSpawn(world, world.getDifficultyForLocation(pos), SpawnReason.NATURAL, data, null);
 							}
 
-							if (entity.isNotColliding(world))
+							if (mobEntity.isNotColliding(world) && world.addEntity(mobEntity))
 							{
 								++mobCount;
-
-								world.addEntity(entity);
 							}
 							else
 							{
-								entity.remove();
+								mobEntity.remove();
 							}
 
-							if (mobCount >= ForgeEventFactory.getMaxSpawnPackSize(entity))
+							if (mobCount >= ForgeEventFactory.getMaxSpawnPackSize(mobEntity))
 							{
 								continue outside;
 							}
-
-							totalCount += mobCount;
 						}
 					}
 				}
 			}
 		}
-
-		return totalCount;
 	}
 
-	protected boolean canSpawnCreature(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type)
+	protected void findRandomPosition(BlockPos.Mutable pos, ChunkPos chunkPos)
 	{
-		if (provider != null)
-		{
-			Boolean ret = provider.canSpawnCreature(world, spawnHostileMobs, spawnPeacefulMobs, type);
-
-			if (ret != null)
-			{
-				return ret;
-			}
-		}
-
-		return (!type.getPeacefulCreature() || spawnPeacefulMobs) && (type.getPeacefulCreature() || spawnHostileMobs);
-	}
-
-	protected int getMaxNumberOfCreature(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type)
-	{
-		if (provider != null)
-		{
-			Integer ret = provider.getMaxNumberOfCreature(world, spawnHostileMobs, spawnPeacefulMobs, type);
-
-			if (ret != null)
-			{
-				return ret;
-			}
-		}
-
-		return type.getMaxNumberOfCreature();
-	}
-
-	protected double getSpawnRange(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type)
-	{
-		if (provider != null)
-		{
-			Double ret = provider.getSpawnRange(world, spawnHostileMobs, spawnPeacefulMobs, type);
-
-			if (ret != null)
-			{
-				return ret;
-			}
-		}
-
-		return 16.0D;
-	}
-
-	protected BlockPos getRandomPosition(World world, ChunkPos pos)
-	{
-		BlockPos blockpos = eligibleChunksForSpawning.get(pos);
+		BlockPos blockpos = eligibleChunksForSpawning.get(chunkPos);
 		int y = 0;
 
 		if (blockpos != null)
@@ -255,8 +197,8 @@ public class CaveMobSpawner
 			y = blockpos.getY();
 		}
 
-		int posX = pos.getXStart() + world.rand.nextInt(16);
-		int posZ = pos.getZStart() + world.rand.nextInt(16);
+		int posX = chunkPos.getXStart() + rand.nextInt(16);
+		int posZ = chunkPos.getZStart() + rand.nextInt(16);
 		int posY;
 
 		if (y > 0)
@@ -264,79 +206,32 @@ public class CaveMobSpawner
 			int max = world.getActualHeight() - 1;
 			int range = 50;
 
-			posY = MathHelper.nextInt(world.rand, Math.max(y - range, 1), Math.min(y + range, max));
+			posY = MathHelper.nextInt(rand, Math.max(y - range, 1), Math.min(y + range, max));
 		}
 		else
 		{
-			posY = MathHelper.nextInt(world.rand, 1, world.getActualHeight() - 1);
+			posY = MathHelper.nextInt(rand, 1, world.getActualHeight() - 1);
 		}
 
-		return new BlockPos(posX, posY, posZ);
+		pos.setPos(posX, posY, posZ);
 	}
 
 	@Nullable
-	protected Biome.SpawnListEntry getSpawnListEntryForTypeAt(ServerWorld world, EntityClassification type, BlockPos pos)
+	protected Biome.SpawnListEntry getSpawnListEntryForTypeAt(EntityClassification type, BlockPos pos)
 	{
 		List<Biome.SpawnListEntry> list = world.getBiome(pos).getSpawns(type);
 
 		list = ForgeEventFactory.getPotentialSpawns(world, type, pos, list);
 
-		return list != null && !list.isEmpty() ? WeightedRandom.getRandomItem(world.rand, list) : null;
+		return list != null && !list.isEmpty() ? WeightedRandom.getRandomItem(rand, list) : null;
 	}
 
-	protected boolean canCreatureTypeSpawnHere(ServerWorld world, EntityClassification type, Biome.SpawnListEntry spawnListEntry, BlockPos pos)
+	protected boolean canCreatureTypeSpawnHere(EntityClassification type, Biome.SpawnListEntry spawnListEntry, BlockPos pos)
 	{
 		List<Biome.SpawnListEntry> list = world.getBiome(pos).getSpawns(type);
 
 		list = ForgeEventFactory.getPotentialSpawns(world, type, pos, list);
 
 		return list != null && !list.isEmpty() ? list.contains(spawnListEntry) : false;
-	}
-
-	@Nullable
-	protected MobEntity createSpawnCreature(ServerWorld world, EntityClassification type, BlockPos pos, Biome.SpawnListEntry entry)
-	{
-		if (provider != null)
-		{
-			MobEntity entity = provider.createSpawnCreature(world, type, pos, entry);
-
-			if (entity != null)
-			{
-				return entity;
-			}
-		}
-
-		Entity entity = entry.entityType.create(world);
-
-		if (entity != null && entity instanceof MobEntity)
-		{
-			return (MobEntity)entity;
-		}
-
-		return null;
-	}
-
-	public interface SpawnerProvider
-	{
-		@Nullable
-		default Boolean canSpawnCreature(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type)
-		{
-			return null;
-		}
-
-		@Nullable
-		Integer getMaxNumberOfCreature(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type);
-
-		@Nullable
-		default Double getSpawnRange(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type)
-		{
-			return null;
-		}
-
-		@Nullable
-		default MobEntity createSpawnCreature(ServerWorld world, EntityClassification type, BlockPos pos, Biome.SpawnListEntry entry)
-		{
-			return null;
-		}
 	}
 }

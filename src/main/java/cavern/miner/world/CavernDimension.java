@@ -2,6 +2,8 @@ package cavern.miner.world;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.client.render.EmptyRenderer;
 import cavern.miner.config.GeneralConfig;
@@ -28,14 +30,18 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.LazyOptional;
 
 public class CavernDimension extends Dimension
 {
 	public static final VeinProvider VEINS = new CavernVeinProvider();
 
+	protected final CaveMobSpawner caveMobSpawner;
+
 	public CavernDimension(World world, DimensionType type)
 	{
 		super(world, type, 0);
+		this.caveMobSpawner = createCaveMobSpawner();
 		this.setSkyRenderer(EmptyRenderer.INSTANCE);
 		this.setCloudRenderer(EmptyRenderer.INSTANCE);
 		this.setWeatherRenderer(EmptyRenderer.INSTANCE);
@@ -49,6 +55,22 @@ public class CavernDimension extends Dimension
 		SingleBiomeProviderSettings biomeSettings = biomeProvider.createSettings(world.getWorldInfo()).setBiome(CaveBiomes.CAVERN.get());
 
 		return new CavernChunkGenerator<>(world, biomeProvider.create(biomeSettings), genSettings);
+	}
+
+	@Nullable
+	public CaveMobSpawner createCaveMobSpawner()
+	{
+		if (world instanceof ServerWorld)
+		{
+			return new CaveMobSpawner((ServerWorld)world);
+		}
+
+		return null;
+	}
+
+	public LazyOptional<CaveMobSpawner> getCaveMobSpawner()
+	{
+		return caveMobSpawner == null ? LazyOptional.empty() : LazyOptional.of(() -> caveMobSpawner);
 	}
 
 	@Override
