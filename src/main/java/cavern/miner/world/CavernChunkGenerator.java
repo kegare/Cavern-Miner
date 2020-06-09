@@ -2,11 +2,16 @@ package cavern.miner.world;
 
 import java.util.Random;
 
+import cavern.miner.world.CaveMobSpawner.SpawnerProvider;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
@@ -15,15 +20,19 @@ import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.server.ServerWorld;
 
-public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGenerator<T>
+public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGenerator<T> implements SpawnerProvider
 {
 	protected final VeinGenerator veinGenerator;
+
+	protected final CaveMobSpawner caveMobSpawner;
 
 	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, T settings)
 	{
 		super(world, biomeProvider, settings);
 		this.veinGenerator = new VeinGenerator(CavernDimension.VEINS);
+		this.caveMobSpawner = new CaveMobSpawner(this);
 	}
 
 	@Override
@@ -52,11 +61,11 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 		int max = settings.getBedrockFloorHeight();
 		int min = settings.getBedrockRoofHeight();
 
-		for(BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
+		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
 		{
 			if (min > 0)
 			{
-				for(int y = min; y >= min - 4; --y)
+				for (int y = min; y >= min - 4; --y)
 				{
 					if (y >= min - rand.nextInt(5))
 					{
@@ -67,7 +76,7 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 
 			if (max < 256)
 			{
-				for(int y = max + 4; y >= max; --y)
+				for (int y = max + 4; y >= max; --y)
 				{
 					if (y <= max + rand.nextInt(5))
 					{
@@ -112,5 +121,32 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 	public int func_222529_a(int par1, int par2, Type heightmapType)
 	{
 		return 0;
+	}
+
+	@Override
+	public void spawnMobs(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs)
+	{
+		if (world.getWorldInfo().getGenerator() == WorldType.DEBUG_ALL_BLOCK_STATES)
+		{
+			return;
+		}
+
+		if (world.getDifficulty() == Difficulty.PEACEFUL || !world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING))
+		{
+			return;
+		}
+
+		caveMobSpawner.findChunksForSpawning(world, spawnHostileMobs, spawnPeacefulMobs);
+	}
+
+	@Override
+	public Integer getMaxNumberOfCreature(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs, EntityClassification type)
+	{
+		if (!type.getPeacefulCreature())
+		{
+			return 150;
+		}
+
+		return null;
 	}
 }
