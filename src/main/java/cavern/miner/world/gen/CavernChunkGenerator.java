@@ -1,7 +1,9 @@
-package cavern.miner.world;
+package cavern.miner.world.gen;
 
 import java.util.Random;
 
+import cavern.miner.world.CavernDimension;
+import cavern.miner.world.spawner.CaveMobSpawner;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;

@@ -14,8 +14,6 @@ public class GeneralConfig
 	public final ForgeConfigSpec.IntValue sleepWait;
 
 	public final ForgeConfigSpec.BooleanValue disableMiner;
-	public final ForgeConfigSpec.BooleanValue collectDrops;
-	public final ForgeConfigSpec.BooleanValue collectExps;
 
 	public GeneralConfig(final ForgeConfigSpec.Builder builder)
 	{
@@ -29,8 +27,6 @@ public class GeneralConfig
 
 		builder.push("miner");
 		disableMiner = builder.comment("If disable the miner status for all players.").define("disable_miner", false);
-		collectDrops = builder.comment("When true, collects drop items in chain mining for the miner enchantment.", serverSide).define("collect_drops", true);
-		collectExps = builder.comment("When true, collects experiences in chain mining for the miner enchantment.", serverSide).define("collect_exps", true);
 		builder.pop();
 	}
 

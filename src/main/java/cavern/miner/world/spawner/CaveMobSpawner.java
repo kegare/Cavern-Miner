@@ -1,4 +1,4 @@
-package cavern.miner.world;
+package cavern.miner.world.spawner;
 
 import java.util.ArrayList;
 import java.util.Collections;

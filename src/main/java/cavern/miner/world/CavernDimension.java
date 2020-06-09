@@ -1,6 +1,7 @@
 package cavern.miner.world;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -12,6 +13,9 @@ import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
+import cavern.miner.world.gen.CavernChunkGenerator;
+import cavern.miner.world.gen.CavernGenSettings;
+import cavern.miner.world.spawner.CaveMobSpawner;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -22,15 +26,12 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.provider.BiomeProviderType;
-import net.minecraft.world.biome.provider.SingleBiomeProvider;
 import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
-import net.minecraft.world.gen.OverworldGenSettings;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class CavernDimension extends Dimension
 {
@@ -50,11 +51,9 @@ public class CavernDimension extends Dimension
 	@Override
 	public ChunkGenerator<? extends GenerationSettings> createChunkGenerator()
 	{
-		BiomeProviderType<SingleBiomeProviderSettings, SingleBiomeProvider> biomeProvider = BiomeProviderType.FIXED;
-		OverworldGenSettings genSettings = new CavernGenSettings();
-		SingleBiomeProviderSettings biomeSettings = biomeProvider.createSettings(world.getWorldInfo()).setBiome(CaveBiomes.CAVERN.get());
+		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(CaveBiomes.CAVERN.get());
 
-		return new CavernChunkGenerator<>(world, biomeProvider.create(biomeSettings), genSettings);
+		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), new CavernGenSettings());
 	}
 
 	@Nullable
@@ -68,9 +67,9 @@ public class CavernDimension extends Dimension
 		return null;
 	}
 
-	public LazyOptional<CaveMobSpawner> getCaveMobSpawner()
+	public Optional<CaveMobSpawner> getCaveMobSpawner()
 	{
-		return caveMobSpawner == null ? LazyOptional.empty() : LazyOptional.of(() -> caveMobSpawner);
+		return Optional.ofNullable(caveMobSpawner);
 	}
 
 	@Override

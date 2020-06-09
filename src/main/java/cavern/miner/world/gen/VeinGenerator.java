@@ -1,10 +1,11 @@
-package cavern.miner.world;
+package cavern.miner.world.gen;
 
 import java.util.Random;
 import java.util.Set;
 
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.vein.Vein;
+import cavern.miner.world.VeinProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
