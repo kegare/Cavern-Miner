@@ -17,6 +17,7 @@ import cavern.miner.vein.Vein;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.IGrowable;
 import net.minecraft.block.OreBlock;
 import net.minecraft.block.RedstoneOreBlock;
 import net.minecraft.item.Item;
@@ -33,7 +34,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class VeinProvider
 {
-	private static final Map<Block, VeinProvider.Rarity> RARITY_CACHE = new HashMap<>();
+	private static final Map<Block, Rarity> RARITY_CACHE = new HashMap<>();
 
 	protected Pair<ChunkPos, NonNullList<Vein>> cachedVeins;
 
@@ -55,9 +56,9 @@ public class VeinProvider
 		return null;
 	}
 
-	protected VeinProvider.Rarity getOreRarity(BlockState state)
+	protected Rarity getOreRarity(BlockState state)
 	{
-		VeinProvider.Rarity rarity = OreRegistry.getEntry(state).getRarity();
+		Rarity rarity = OreRegistry.getEntry(state).getRarity();
 
 		if (rarity != null)
 		{
@@ -75,7 +76,7 @@ public class VeinProvider
 
 		if (harvestLevel < 0 || state.getHarvestTool() != ToolType.PICKAXE)
 		{
-			return VeinProvider.Rarity.UNKNOWN;
+			return Rarity.UNKNOWN;
 		}
 
 		int level = harvestLevel;
@@ -112,19 +113,19 @@ public class VeinProvider
 
 		if (level > 3)
 		{
-			rarity = VeinProvider.Rarity.EPIC;
+			rarity = Rarity.EPIC;
 		}
 		else if (level > 2)
 		{
-			rarity = VeinProvider.Rarity.RARE;
+			rarity = Rarity.RARE;
 		}
 		else if (level > 1)
 		{
-			rarity = VeinProvider.Rarity.UNCOMMON;
+			rarity = Rarity.UNCOMMON;
 		}
 		else
 		{
-			rarity = VeinProvider.Rarity.COMMON;
+			rarity = Rarity.COMMON;
 		}
 
 		RARITY_CACHE.put(block, rarity);
@@ -132,9 +133,31 @@ public class VeinProvider
 		return rarity;
 	}
 
-	protected BlockStateTagList getVariousEntries()
+	protected Rarity getVariousRarity(BlockState state)
 	{
-		return BlockStateTagList.create().add(Tags.Blocks.STONE).add(Tags.Blocks.DIRT).add(Tags.Blocks.GRAVEL).add(Tags.Blocks.SAND);
+		if (state.hasTileEntity() || !state.isSolid())
+		{
+			return Rarity.UNKNOWN;
+		}
+
+		Block block = state.getBlock();
+
+		if (block instanceof IGrowable)
+		{
+			return Rarity.UNKNOWN;
+		}
+
+		if (block.isIn(Tags.Blocks.STONE) || block.isIn(Tags.Blocks.DIRT))
+		{
+			return Rarity.COMMON;
+		}
+
+		if (block.isIn(Tags.Blocks.GRAVEL) || block.isIn(Tags.Blocks.SAND))
+		{
+			return Rarity.UNCOMMON;
+		}
+
+		return Rarity.RARE;
 	}
 
 	public NonNullList<Vein> getVeins(IWorld world, IChunk chunk, Random rand)
@@ -161,9 +184,9 @@ public class VeinProvider
 
 				if (block.isIn(Tags.Blocks.ORES) || block instanceof OreBlock || block instanceof RedstoneOreBlock)
 				{
-					VeinProvider.Rarity rarity = getOreRarity(state);
+					Rarity rarity = getOreRarity(state);
 
-					if (rarity == VeinProvider.Rarity.UNKNOWN)
+					if (rarity == Rarity.UNKNOWN)
 					{
 						continue;
 					}
@@ -187,13 +210,20 @@ public class VeinProvider
 						}
 					}
 				}
-				else if (getVariousEntries().contains(state))
+				else
 				{
-					List<Vein> veins = createVariousVeins(state, world, rand);
+					Rarity rarity = getVariousRarity(state);
+
+					if (rarity == Rarity.UNKNOWN)
+					{
+						continue;
+					}
+
+					List<Vein> veins = createVariousVeins(state, rarity, world, rand);
 
 					if (veins.isEmpty())
 					{
-						Vein vein = createVariousVein(state, world, rand);
+						Vein vein = createVariousVein(state, rarity, world, rand);
 
 						if (vein.getCount() > 0 && vein.getSize() > 0)
 						{
@@ -208,15 +238,6 @@ public class VeinProvider
 						}
 					}
 				}
-				else
-				{
-					Vein vein = createVein(state, VeinProvider.Rarity.RARE, world, rand);
-
-					if (vein.getCount() > 0 && vein.getSize() > 0)
-					{
-						list.add(vein);
-					}
-				}
 			}
 		}
 
@@ -225,7 +246,7 @@ public class VeinProvider
 		return list;
 	}
 
-	protected Vein createVein(BlockState state, VeinProvider.Rarity rarity, IWorld world, Random rand)
+	protected Vein createVein(BlockState state, Rarity rarity, IWorld world, Random rand)
 	{
 		Vein.Properties properties = new Vein.Properties().max(world.getMaxHeight() - 1);
 
@@ -274,22 +295,25 @@ public class VeinProvider
 		return new Vein(state, properties);
 	}
 
-	protected List<Vein> createVeins(BlockState state, VeinProvider.Rarity rarity, IWorld world, Random rand)
+	protected List<Vein> createVeins(BlockState state, Rarity rarity, IWorld world, Random rand)
 	{
 		return Collections.emptyList();
 	}
 
-	protected Vein createVariousVein(BlockState state, IWorld world, Random rand)
+	protected Vein createVariousVein(BlockState state, Rarity rarity, IWorld world, Random rand)
 	{
-		Vein.Properties properties = new Vein.Properties().max(world.getMaxHeight() - 1);
-
-		properties.count(MathHelper.nextInt(rand, 25, 40));
-		properties.size(MathHelper.nextInt(rand, 10, 30));
-
-		return new Vein(state, properties);
+		switch (rarity)
+		{
+			case COMMON:
+				return new Vein(state, new Vein.Properties().max(world.getMaxHeight() - 1).count(MathHelper.nextInt(rand, 25, 40)).size(MathHelper.nextInt(rand, 10, 30)));
+			case UNCOMMON:
+				return new Vein(state, new Vein.Properties().max(world.getMaxHeight() - 1).count(MathHelper.nextInt(rand, 20, 30)).size(MathHelper.nextInt(rand, 10, 20)));
+			default:
+				return createVein(state, rarity, world, rand);
+		}
 	}
 
-	protected List<Vein> createVariousVeins(BlockState state, IWorld world, Random rand)
+	protected List<Vein> createVariousVeins(BlockState state, Rarity rarity, IWorld world, Random rand)
 	{
 		return Collections.emptyList();
 	}

@@ -288,7 +288,7 @@ public class VeinConfig
 		veins.clear();
 
 		whitelist.clear();
-		whitelist.add(Tags.Blocks.ORES).add(Tags.Blocks.STONE).add(Tags.Blocks.GRAVEL).add(Blocks.DIRT);
+		whitelist.add(Tags.Blocks.ORES).add(Tags.Blocks.STONE).add(Blocks.DIRT).add(Blocks.GRAVEL);
 
 		blacklist.clear();
 		blacklist.add(Blocks.STONE).add(Blocks.POLISHED_ANDESITE).add(Blocks.POLISHED_DIORITE).add(Blocks.POLISHED_GRANITE);
