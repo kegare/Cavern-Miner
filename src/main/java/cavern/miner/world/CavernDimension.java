@@ -16,6 +16,8 @@ import cavern.miner.storage.Caver;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;
+import cavern.miner.world.vein.CavernVeinProvider;
+import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;

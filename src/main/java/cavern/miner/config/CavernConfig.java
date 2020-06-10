@@ -7,8 +7,7 @@ public class CavernConfig
 	public static final PortalTriggerConfig PORTAL_TRIGGER = new PortalTriggerConfig(getConfigDir(), "cavern");
 	public static final PortalFrameConfig PORTAL_FRAME = new PortalFrameConfig(getConfigDir(), "cavern");
 
-	public static final VeinConfig VEINS = new VeinConfig(getConfigDir(), "cavern");
-	public static final VeinBlacklistConfig VEINS_BLACKLIST = new VeinBlacklistConfig(getConfigDir(), "cavern");
+	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
 
 	public static File getConfigDir()
 	{
@@ -33,14 +32,10 @@ public class CavernConfig
 			PORTAL_FRAME.saveToFile();
 		}
 
-		VEINS.loadFromFile();
-
-		VEINS_BLACKLIST.loadFromFile();
-
-		if (VEINS_BLACKLIST.getEntries().isEmpty())
+		if (!VEINS.loadFromFile())
 		{
-			VEINS_BLACKLIST.setDefault();
-			VEINS_BLACKLIST.saveToFile();
+			VEINS.setDefault();
+			VEINS.saveToFile();
 		}
 	}
 }

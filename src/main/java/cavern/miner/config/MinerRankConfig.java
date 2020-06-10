@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
 import cavern.miner.CavernMod;
 import cavern.miner.config.json.MinerRankSerializer;
@@ -51,7 +52,7 @@ public class MinerRankConfig
 		return file;
 	}
 
-	public void loadFromFile()
+	public boolean loadFromFile()
 	{
 		try
 		{
@@ -62,7 +63,7 @@ public class MinerRankConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canRead() && file.length() > 0L)
@@ -74,15 +75,19 @@ public class MinerRankConfig
 
 				buffer.close();
 				fis.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to load miner ranks", e);
 		}
+
+		return false;
 	}
 
-	public void saveToFile()
+	public boolean saveToFile()
 	{
 		try
 		{
@@ -93,7 +98,7 @@ public class MinerRankConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canWrite())
@@ -105,12 +110,16 @@ public class MinerRankConfig
 
 				buffer.close();
 				fos.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to save miner ranks", e);
 		}
+
+		return false;
 	}
 
 	@Nullable
@@ -153,7 +162,7 @@ public class MinerRankConfig
 
 			for (JsonElement e : array)
 			{
-				if (e.isJsonNull() || e.toString().isEmpty())
+				if (e.isJsonNull() || !e.isJsonObject() || e.toString().isEmpty())
 				{
 					continue;
 				}
@@ -163,7 +172,7 @@ public class MinerRankConfig
 				entries.add(entry);
 			}
 		}
-		catch (Exception e)
+		catch (JsonParseException e)
 		{
 			CavernMod.LOG.error("Failed to read from json", e);
 		}

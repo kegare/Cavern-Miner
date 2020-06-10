@@ -18,22 +18,36 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import cavern.miner.CavernMod;
+import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.config.json.VeinSerializer;
+import cavern.miner.util.BlockStateTagList;
 import cavern.miner.vein.Vein;
 import net.minecraft.block.AirBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RotatedPillarBlock;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.Tags;
 
 public class VeinConfig
 {
 	private final NonNullList<Vein> veins = NonNullList.create();
 
+	private final BlockStateTagList whitelist = BlockStateTagList.create();
+	private final BlockStateTagList blacklist = BlockStateTagList.create();
+
 	private final File file;
 	private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+	public VeinConfig(File dir)
+	{
+		this.file = new File(dir, "veins.json");
+	}
 
 	public VeinConfig(File dir, String name)
 	{
@@ -52,12 +66,36 @@ public class VeinConfig
 		return veins;
 	}
 
+	public boolean setWhitelist(BlockStateTagList entries)
+	{
+		whitelist.clear();
+
+		return whitelist.addEntries(entries.getEntryList()) && whitelist.addTags(entries.getTagList());
+	}
+
+	public BlockStateTagList getWhitelist()
+	{
+		return whitelist;
+	}
+
+	public boolean setBlacklist(BlockStateTagList entries)
+	{
+		blacklist.clear();
+
+		return blacklist.addEntries(entries.getEntryList()) && blacklist.addTags(entries.getTagList());
+	}
+
+	public BlockStateTagList getBlacklist()
+	{
+		return blacklist;
+	}
+
 	public File getFile()
 	{
 		return file;
 	}
 
-	public void loadFromFile()
+	public boolean loadFromFile()
 	{
 		try
 		{
@@ -68,7 +106,7 @@ public class VeinConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canRead() && file.length() > 0L)
@@ -80,15 +118,19 @@ public class VeinConfig
 
 				buffer.close();
 				fis.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to load veins", e);
 		}
+
+		return false;
 	}
 
-	public void saveToFile()
+	public boolean saveToFile()
 	{
 		try
 		{
@@ -99,7 +141,7 @@ public class VeinConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canWrite())
@@ -111,21 +153,22 @@ public class VeinConfig
 
 				buffer.close();
 				fos.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to save veins", e);
 		}
+
+		return false;
 	}
 
 	@Nullable
 	public String toJson()
 	{
-		if (veins.isEmpty())
-		{
-			return null;
-		}
+		JsonObject object = new JsonObject();
 
 		JsonArray array = new JsonArray();
 
@@ -141,53 +184,122 @@ public class VeinConfig
 			array.add(e);
 		}
 
-		return gson.toJson(array);
+		object.add("veins", array);
+
+		JsonObject o = new JsonObject();
+
+		o.add("whitelist", BlockStateTagListSerializer.INSTANCE.serialize(whitelist, BlockState.class, null));
+		o.add("blacklist", BlockStateTagListSerializer.INSTANCE.serialize(blacklist, BlockState.class, null));
+
+		object.add("auto_entries", o);
+
+		return gson.toJson(object);
 	}
 
 	public void fromJson(Reader json)
 	{
 		try
 		{
-			JsonArray array = gson.fromJson(json, JsonArray.class);
+			JsonObject object = gson.fromJson(json, JsonObject.class);
 
-			if (array.size() == 0)
+			if (object.size() == 0)
 			{
 				return;
 			}
 
 			veins.clear();
+			whitelist.clear();
+			blacklist.clear();
 
-			for (JsonElement e : array)
+			JsonElement e = object.get("veins");
+
+			if (e != null && e.isJsonArray())
 			{
-				if (e.isJsonNull() || e.toString().isEmpty())
+				JsonArray array = e.getAsJsonArray();
+
+				for (JsonElement o : array)
 				{
-					continue;
+					if (o.isJsonNull() || !o.isJsonObject() || o.toString().isEmpty())
+					{
+						continue;
+					}
+
+					Vein vein = VeinSerializer.INSTANCE.deserialize(o, Vein.class, null);
+
+					if (vein.getBlockState().getBlock() instanceof AirBlock)
+					{
+						continue;
+					}
+
+					if (vein.getCount() <= 0 || vein.getSize() <= 0)
+					{
+						continue;
+					}
+
+					veins.add(vein);
 				}
 
-				Vein vein = VeinSerializer.INSTANCE.deserialize(e, Vein.class, null);
+			}
 
-				if (vein.getBlockState().getBlock() instanceof AirBlock)
+			e = object.get("auto_entries");
+
+			if (e != null && e.isJsonObject())
+			{
+				JsonObject o = e.getAsJsonObject();
+
+				if (o.size() == 0)
 				{
-					continue;
+					return;
 				}
 
-				if (vein.getCount() <= 0 || vein.getSize() <= 0)
+				e = o.get("whitelist");
+
+				if (e != null && e.isJsonObject())
 				{
-					continue;
+					BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(e, BlockState.class, null);
+
+					if (!entries.isEmpty())
+					{
+						setWhitelist(entries);
+					}
 				}
 
-				veins.add(vein);
+				e = o.get("blacklist");
+
+				if (e != null && e.isJsonObject())
+				{
+					BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(e, BlockState.class, null);
+
+					if (!entries.isEmpty())
+					{
+						setBlacklist(entries);
+					}
+				}
 			}
 		}
-		catch (Exception e)
+		catch (JsonParseException e)
 		{
 			CavernMod.LOG.error("Failed to read from json", e);
 		}
 	}
 
+	public void setDefault()
+	{
+		veins.clear();
+
+		whitelist.clear();
+		whitelist.add(Tags.Blocks.ORES).add(Tags.Blocks.STONE).add(Tags.Blocks.GRAVEL).add(Blocks.DIRT);
+
+		blacklist.clear();
+		blacklist.add(Blocks.STONE).add(Blocks.POLISHED_ANDESITE).add(Blocks.POLISHED_DIORITE).add(Blocks.POLISHED_GRANITE);
+		blacklist.add(Tags.Blocks.ORES_QUARTZ);
+	}
+
 	public static void createExampleConfig()
 	{
 		VeinConfig config = new VeinConfig(CavernModConfig.getConfigDir(), "example");
+
+		config.setDefault();
 
 		config.getVeins().add(new Vein(Blocks.COAL_ORE.getDefaultState(), new Vein.Properties().count(20).size(10)));
 		config.getVeins().add(new Vein(Blocks.SAND.getDefaultState(), new Vein.Properties().target(Blocks.DIRT.getDefaultState()).count(30).size(15).min(30)));

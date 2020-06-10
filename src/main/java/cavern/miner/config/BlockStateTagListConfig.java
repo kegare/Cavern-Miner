@@ -15,7 +15,8 @@ import javax.annotation.Nullable;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import cavern.miner.CavernMod;
 import cavern.miner.config.json.BlockStateTagListSerializer;
@@ -51,7 +52,7 @@ public class BlockStateTagListConfig
 		return file;
 	}
 
-	public void loadFromFile()
+	public boolean loadFromFile()
 	{
 		try
 		{
@@ -62,7 +63,7 @@ public class BlockStateTagListConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canRead() && file.length() > 0L)
@@ -74,15 +75,19 @@ public class BlockStateTagListConfig
 
 				buffer.close();
 				fis.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to load {}", file.getName(), e);
 		}
+
+		return false;
 	}
 
-	public void saveToFile()
+	public boolean saveToFile()
 	{
 		try
 		{
@@ -93,7 +98,7 @@ public class BlockStateTagListConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canWrite())
@@ -105,12 +110,16 @@ public class BlockStateTagListConfig
 
 				buffer.close();
 				fos.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to save {}", file.getName(), e);
 		}
+
+		return false;
 	}
 
 	@Nullable
@@ -128,7 +137,7 @@ public class BlockStateTagListConfig
 	{
 		try
 		{
-			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonElement.class), BlockState.class, null);
+			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonObject.class), BlockState.class, null);
 
 			if (entries == null || entries.isEmpty())
 			{
@@ -137,7 +146,7 @@ public class BlockStateTagListConfig
 
 			return setEntries(entries);
 		}
-		catch (Exception e)
+		catch (JsonParseException e)
 		{
 			CavernMod.LOG.error("Failed to read from json", e);
 

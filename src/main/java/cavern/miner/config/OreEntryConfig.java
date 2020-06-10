@@ -18,13 +18,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
 import cavern.miner.CavernMod;
 import cavern.miner.config.json.OreEntrySerializer;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveTags;
 import cavern.miner.vein.OreRegistry;
-import cavern.miner.world.VeinProvider;
+import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.Tags;
 
@@ -52,7 +53,7 @@ public class OreEntryConfig
 		return file;
 	}
 
-	public void loadFromFile()
+	public boolean loadFromFile()
 	{
 		try
 		{
@@ -63,7 +64,7 @@ public class OreEntryConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canRead() && file.length() > 0L)
@@ -75,15 +76,19 @@ public class OreEntryConfig
 
 				buffer.close();
 				fis.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to load ore entries", e);
 		}
+
+		return false;
 	}
 
-	public void saveToFile()
+	public boolean saveToFile()
 	{
 		try
 		{
@@ -94,7 +99,7 @@ public class OreEntryConfig
 
 			if (!file.exists() && !file.createNewFile())
 			{
-				return;
+				return false;
 			}
 
 			if (file.canWrite())
@@ -106,12 +111,16 @@ public class OreEntryConfig
 
 				buffer.close();
 				fos.close();
+
+				return true;
 			}
 		}
 		catch (IOException e)
 		{
 			CavernMod.LOG.error("Failed to save ore entries", e);
 		}
+
+		return false;
 	}
 
 	@Nullable
@@ -154,7 +163,7 @@ public class OreEntryConfig
 
 			for (JsonElement e : array)
 			{
-				if (e.isJsonNull() || e.toString().isEmpty())
+				if (e.isJsonNull() || !e.isJsonObject() || e.toString().isEmpty())
 				{
 					continue;
 				}
@@ -167,7 +176,7 @@ public class OreEntryConfig
 				}
 			}
 		}
-		catch (Exception e)
+		catch (JsonParseException e)
 		{
 			CavernMod.LOG.error("Failed to read from json", e);
 		}

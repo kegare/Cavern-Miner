@@ -8,8 +8,8 @@ import javax.annotation.Nullable;
 import com.google.common.base.Objects;
 
 import cavern.miner.util.BlockStateHelper;
-import cavern.miner.world.VeinProvider;
-import cavern.miner.world.VeinProvider.Rarity;
+import cavern.miner.world.vein.VeinProvider;
+import cavern.miner.world.vein.VeinProvider.Rarity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.Tag;

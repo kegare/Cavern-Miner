@@ -5,7 +5,7 @@ import java.util.Set;
 
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.vein.Vein;
-import cavern.miner.world.VeinProvider;
+import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;

@@ -1,4 +1,4 @@
-package cavern.miner.world;
+package cavern.miner.world.vein;
 
 import cavern.miner.config.CavernConfig;
 import cavern.miner.util.BlockStateTagList;
@@ -14,8 +14,14 @@ public class CavernVeinProvider extends VeinProvider
 	}
 
 	@Override
+	public BlockStateTagList getWhitelist()
+	{
+		return CavernConfig.VEINS.getWhitelist();
+	}
+
+	@Override
 	public BlockStateTagList getBlacklist()
 	{
-		return CavernConfig.VEINS_BLACKLIST.getEntries();
+		return CavernConfig.VEINS.getBlacklist();
 	}
 }

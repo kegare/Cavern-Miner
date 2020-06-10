@@ -16,7 +16,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import cavern.miner.vein.OreRegistry;
-import cavern.miner.world.VeinProvider;
+import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
