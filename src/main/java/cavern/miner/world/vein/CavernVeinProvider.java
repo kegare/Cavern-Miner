@@ -1,16 +1,17 @@
 package cavern.miner.world.vein;
 
+import com.google.common.collect.ImmutableList;
+
 import cavern.miner.config.CavernConfig;
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.vein.Vein;
-import net.minecraft.util.NonNullList;
 
 public class CavernVeinProvider extends VeinProvider
 {
 	@Override
-	public NonNullList<Vein> getVeins()
+	public ImmutableList<Vein> getVeins()
 	{
-		return CavernConfig.VEINS.getVeins();
+		return ImmutableList.copyOf(CavernConfig.VEINS.getVeins());
 	}
 
 	@Override

@@ -22,27 +22,14 @@ public class CavernWorldCarver extends CaveWorldCarver
 	}
 
 	@Override
-	protected float generateCaveRadius(Random rand)
-	{
-		float f = rand.nextFloat() * 2.0F + rand.nextFloat();
-
-		if (rand.nextInt(6) == 0)
-		{
-			f *= rand.nextFloat() * rand.nextFloat() * 4.0F + 1.0F;
-		}
-
-		return f;
-	}
-
-	@Override
 	protected double func_222725_b()
 	{
-		return 1.25D;
+		return 1.1D;
 	}
 
 	@Override
 	protected int generateCaveStartY(Random random)
 	{
-		return random.nextInt(random.nextInt(120) + 5) + 5;
+		return random.nextInt(120) + 5;
 	}
 }

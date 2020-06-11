@@ -8,8 +8,10 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.Pair;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.vein.OreRegistry;
@@ -22,7 +24,6 @@ import net.minecraft.block.OreBlock;
 import net.minecraft.block.RedstoneOreBlock;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -36,12 +37,11 @@ public class VeinProvider
 {
 	private static final Map<Block, Rarity> RARITY_CACHE = new HashMap<>();
 
-	protected Pair<ChunkPos, NonNullList<Vein>> cachedVeins;
+	protected Pair<ChunkPos, List<Vein>> cachedVeins;
 
-	@Nullable
-	public NonNullList<Vein> getVeins()
+	public ImmutableList<Vein> getVeins()
 	{
-		return null;
+		return ImmutableList.of();
 	}
 
 	@Nullable
@@ -160,7 +160,7 @@ public class VeinProvider
 		return Rarity.RARE;
 	}
 
-	public NonNullList<Vein> getVeins(IWorld world, IChunk chunk, Random rand)
+	public List<Vein> getVeins(IWorld world, IChunk chunk, Random rand)
 	{
 		ChunkPos chunkPos = chunk.getPos();
 
@@ -169,73 +169,75 @@ public class VeinProvider
 			return cachedVeins.getRight();
 		}
 
-		NonNullList<Vein> list = ObjectUtils.defaultIfNull(getVeins(), NonNullList.create());
-
-		if (getWhitelist() != null)
+		if (getWhitelist() == null)
 		{
-			for (BlockState state : getWhitelist())
+			return Collections.emptyList();
+		}
+
+		List<Vein> list = Lists.newArrayList(getVeins());
+
+		for (BlockState state : getWhitelist())
+		{
+			if (getBlacklist() != null && getBlacklist().contains(state))
 			{
-				if (getBlacklist() != null && getBlacklist().contains(state))
+				continue;
+			}
+
+			Block block = state.getBlock();
+
+			if (block.isIn(Tags.Blocks.ORES) || block instanceof OreBlock || block instanceof RedstoneOreBlock)
+			{
+				Rarity rarity = getOreRarity(state);
+
+				if (rarity == Rarity.UNKNOWN)
 				{
 					continue;
 				}
 
-				Block block = state.getBlock();
+				List<Vein> veins = createVeins(state, rarity, world, rand);
 
-				if (block.isIn(Tags.Blocks.ORES) || block instanceof OreBlock || block instanceof RedstoneOreBlock)
+				if (veins.isEmpty())
 				{
-					Rarity rarity = getOreRarity(state);
+					Vein vein = createVein(state, rarity, world, rand);
 
-					if (rarity == Rarity.UNKNOWN)
+					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						continue;
-					}
-
-					List<Vein> veins = createVeins(state, rarity, world, rand);
-
-					if (veins.isEmpty())
-					{
-						Vein vein = createVein(state, rarity, world, rand);
-
-						if (vein.getCount() > 0 && vein.getSize() > 0)
-						{
-							list.add(vein);
-						}
-					}
-					else for (Vein vein : veins)
-					{
-						if (vein.getCount() > 0 && vein.getSize() > 0)
-						{
-							list.add(vein);
-						}
+						list.add(vein);
 					}
 				}
-				else
+				else for (Vein vein : veins)
 				{
-					Rarity rarity = getVariousRarity(state);
-
-					if (rarity == Rarity.UNKNOWN)
+					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						continue;
+						list.add(vein);
 					}
+				}
+			}
+			else
+			{
+				Rarity rarity = getVariousRarity(state);
 
-					List<Vein> veins = createVariousVeins(state, rarity, world, rand);
+				if (rarity == Rarity.UNKNOWN)
+				{
+					continue;
+				}
 
-					if (veins.isEmpty())
+				List<Vein> veins = createVariousVeins(state, rarity, world, rand);
+
+				if (veins.isEmpty())
+				{
+					Vein vein = createVariousVein(state, rarity, world, rand);
+
+					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						Vein vein = createVariousVein(state, rarity, world, rand);
-
-						if (vein.getCount() > 0 && vein.getSize() > 0)
-						{
-							list.add(vein);
-						}
+						list.add(vein);
 					}
-					else for (Vein vein : veins)
+				}
+				else for (Vein vein : veins)
+				{
+					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						if (vein.getCount() > 0 && vein.getSize() > 0)
-						{
-							list.add(vein);
-						}
+						list.add(vein);
 					}
 				}
 			}
