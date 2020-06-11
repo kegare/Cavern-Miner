@@ -63,5 +63,7 @@ public class GeneralConfig
 			RANDOMITE_DROPS.setDefault();
 			RANDOMITE_DROPS.saveToFile();
 		}
+
+		RANDOMITE_DROPS.registerEntries();
 	}
 }

@@ -4,8 +4,8 @@ import java.io.File;
 
 public class CavernConfig
 {
-	public static final PortalTriggerConfig PORTAL_TRIGGER = new PortalTriggerConfig(getConfigDir(), "cavern");
-	public static final PortalFrameConfig PORTAL_FRAME = new PortalFrameConfig(getConfigDir(), "cavern");
+	public static final PortalTriggerConfig PORTAL_TRIGGER = new PortalTriggerConfig(getConfigDir());
+	public static final PortalFrameConfig PORTAL_FRAME = new PortalFrameConfig(getConfigDir());
 
 	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
 

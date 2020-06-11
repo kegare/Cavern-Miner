@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
-import cavern.miner.config.GeneralConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.OreBlock;
@@ -46,14 +45,19 @@ public class RandomiteOreBlock extends OreBlock
 
 		for (int i = 0; i <= fortune; ++i)
 		{
-			drops.add(getRandomDropItem(RANDOM));
+			ItemStack drop = getRandomDropItem();
+
+			if (!drop.isEmpty())
+			{
+				drops.add(drop);
+			}
 		}
 
 		return drops;
 	}
 
-	protected ItemStack getRandomDropItem(Random rand)
+	protected ItemStack getRandomDropItem()
 	{
-		return GeneralConfig.RANDOMITE_DROPS.getEntries().getRandomElement(rand);
+		return RandomiteDrop.get().getDropItem();
 	}
 }

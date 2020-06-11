@@ -6,9 +6,9 @@ import net.minecraftforge.common.Tags;
 
 public class PortalTriggerConfig extends ItemStackTagListConfig
 {
-	public PortalTriggerConfig(File dir, String name)
+	public PortalTriggerConfig(File dir)
 	{
-		super(dir, name + "_portal_triggers");
+		super(dir, "portal_triggers");
 	}
 
 	@Override

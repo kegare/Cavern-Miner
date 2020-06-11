@@ -6,9 +6,9 @@ import net.minecraft.block.Blocks;
 
 public class PortalFrameConfig extends BlockStateTagListConfig
 {
-	public PortalFrameConfig(File dir, String name)
+	public PortalFrameConfig(File dir)
 	{
-		super(dir, name + "_portal_frames");
+		super(dir, "portal_frames");
 	}
 
 	@Override
