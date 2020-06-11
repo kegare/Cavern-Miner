@@ -55,12 +55,12 @@ public class CavernPortalBlock extends Block
 
 	public ItemStackTagList getTriggerItems()
 	{
-		return CavernConfig.PORTAL_TRIGGER.getEntries();
+		return CavernConfig.PORTAL.getTriggerItems();
 	}
 
 	public BlockStateTagList getFrameBlocks()
 	{
-		return CavernConfig.PORTAL_FRAME.getEntries();
+		return CavernConfig.PORTAL.getFrameBlocks();
 	}
 
 	@Override

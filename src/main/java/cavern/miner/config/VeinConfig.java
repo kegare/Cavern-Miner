@@ -124,7 +124,7 @@ public class VeinConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to load veins", e);
+			CavernMod.LOG.error("Failed to load {}", file.getName(), e);
 		}
 
 		return false;
@@ -159,7 +159,7 @@ public class VeinConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to save veins", e);
+			CavernMod.LOG.error("Failed to save {}", file.getName(), e);
 		}
 
 		return false;

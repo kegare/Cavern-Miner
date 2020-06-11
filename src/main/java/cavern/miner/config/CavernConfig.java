@@ -2,10 +2,12 @@ package cavern.miner.config;
 
 import java.io.File;
 
+import net.minecraft.block.Blocks;
+import net.minecraftforge.common.Tags;
+
 public class CavernConfig
 {
-	public static final PortalTriggerConfig PORTAL_TRIGGER = new PortalTriggerConfig(getConfigDir());
-	public static final PortalFrameConfig PORTAL_FRAME = new PortalFrameConfig(getConfigDir());
+	public static final PortalConfig PORTAL = new PortalConfig(getConfigDir());
 
 	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
 
@@ -16,20 +18,15 @@ public class CavernConfig
 
 	public static void loadConfig()
 	{
-		PORTAL_TRIGGER.loadFromFile();
+		PORTAL.loadFromFile();
 
-		if (PORTAL_TRIGGER.getEntries().isEmpty())
+		if (PORTAL.getTriggerItems().isEmpty() || PORTAL.getFrameBlocks().isEmpty())
 		{
-			PORTAL_TRIGGER.setDefault();
-			PORTAL_TRIGGER.saveToFile();
-		}
-
-		PORTAL_FRAME.loadFromFile();
-
-		if (PORTAL_FRAME.getEntries().isEmpty())
-		{
-			PORTAL_FRAME.setDefault();
-			PORTAL_FRAME.saveToFile();
+			PORTAL.getTriggerItems().clear();
+			PORTAL.getTriggerItems().add(Tags.Items.GEMS_EMERALD);
+			PORTAL.getFrameBlocks().clear();
+			PORTAL.getFrameBlocks().add(Blocks.MOSSY_COBBLESTONE).add(Blocks.MOSSY_STONE_BRICKS);
+			PORTAL.saveToFile();
 		}
 
 		if (!VEINS.loadFromFile())

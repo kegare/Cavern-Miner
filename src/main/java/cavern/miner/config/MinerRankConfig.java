@@ -81,7 +81,7 @@ public class MinerRankConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to load miner ranks", e);
+			CavernMod.LOG.error("Failed to load {}", file.getName(), e);
 		}
 
 		return false;
@@ -116,7 +116,7 @@ public class MinerRankConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to save miner ranks", e);
+			CavernMod.LOG.error("Failed to save {}", file.getName(), e);
 		}
 
 		return false;

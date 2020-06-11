@@ -79,7 +79,7 @@ public class RandomiteDropConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to load randomite drops", e);
+			CavernMod.LOG.error("Failed to load {}", file.getName(), e);
 		}
 
 		return false;
@@ -114,7 +114,7 @@ public class RandomiteDropConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to save randomite drops", e);
+			CavernMod.LOG.error("Failed to save {}", file.getName(), e);
 		}
 
 		return false;

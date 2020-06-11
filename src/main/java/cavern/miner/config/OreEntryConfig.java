@@ -82,7 +82,7 @@ public class OreEntryConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to load ore entries", e);
+			CavernMod.LOG.error("Failed to load {}", file.getName(), e);
 		}
 
 		return false;
@@ -117,7 +117,7 @@ public class OreEntryConfig
 		}
 		catch (IOException e)
 		{
-			CavernMod.LOG.error("Failed to save ore entries", e);
+			CavernMod.LOG.error("Failed to save {}", file.getName(), e);
 		}
 
 		return false;
