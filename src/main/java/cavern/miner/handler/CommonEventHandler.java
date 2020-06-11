@@ -49,12 +49,7 @@ public class CommonEventHandler
 				continue;
 			}
 
-			if (!portal.getTriggerItems().contains(stack))
-			{
-				continue;
-			}
-
-			if (!portal.getFrameBlocks().contains(state))
+			if (!portal.getTriggerItems().contains(stack) || !portal.getFrameBlocks().contains(state))
 			{
 				continue;
 			}

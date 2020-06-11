@@ -1,6 +1,5 @@
 package cavern.miner.enchantment;
 
-import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.LivingEntity;
@@ -18,12 +17,6 @@ public class EnchantmentAreaMiner extends EnchantmentMiner
 	public int getMaxLevel()
 	{
 		return 2;
-	}
-
-	@Override
-	public BlockStateTagList getTargetBlocks()
-	{
-		return null;
 	}
 
 	@Override

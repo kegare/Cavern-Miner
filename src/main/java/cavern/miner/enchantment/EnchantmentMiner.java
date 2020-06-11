@@ -1,8 +1,5 @@
 package cavern.miner.enchantment;
 
-import javax.annotation.Nullable;
-
-import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;
@@ -50,21 +47,8 @@ public abstract class EnchantmentMiner extends Enchantment
 		return super.canApplyAtEnchantingTable(stack) && stack.getToolTypes().contains(ToolType.PICKAXE);
 	}
 
-	@Nullable
-	public BlockStateTagList getTargetBlocks()
-	{
-		return null;
-	}
-
 	public boolean isEffectiveTarget(ItemStack stack, BlockState state)
 	{
-		BlockStateTagList targets = getTargetBlocks();
-
-		if (targets != null && !targets.isEmpty())
-		{
-			return targets.contains(state);
-		}
-
 		return !stack.isEmpty() && stack.canHarvestBlock(state);
 	}
 

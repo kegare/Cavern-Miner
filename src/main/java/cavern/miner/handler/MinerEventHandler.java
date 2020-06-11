@@ -77,7 +77,7 @@ public class MinerEventHandler
 		ServerPlayerEntity player = (ServerPlayerEntity)breaker;
 		Miner miner = player.getCapability(CaveCapabilities.MINER).orElse(null);
 
-		if (miner == null)
+		if (miner == null || miner.getUnit().isBreaking())
 		{
 			return;
 		}
