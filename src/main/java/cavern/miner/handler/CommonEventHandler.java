@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = "cavern")
@@ -39,8 +40,15 @@ public class CommonEventHandler
 		BlockPos pos = event.getPos();
 		BlockState state = world.getBlockState(pos);
 
-		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
+		for (RegistryObject<CavernPortalBlock> entry : CaveBlocks.CAVE_PORTALS)
 		{
+			CavernPortalBlock portal = entry.orElse(null);
+
+			if (portal == null)
+			{
+				continue;
+			}
+
 			if (!portal.getTriggerItems().contains(stack))
 			{
 				continue;

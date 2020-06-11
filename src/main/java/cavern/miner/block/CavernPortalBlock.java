@@ -48,6 +48,7 @@ public class CavernPortalBlock extends Block
 		this.setDefaultState(stateContainer.getBaseState().with(AXIS, Direction.Axis.X));
 	}
 
+	@Nullable
 	public DimensionType getDimension()
 	{
 		return CaveDimensions.CAVERN_TYPE;
@@ -162,7 +163,7 @@ public class CavernPortalBlock extends Block
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity)
 	{
-		if (world.isRemote)
+		if (world.isRemote || getDimension() == null)
 		{
 			return;
 		}

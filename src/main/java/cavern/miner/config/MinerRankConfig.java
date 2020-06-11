@@ -188,9 +188,9 @@ public class MinerRankConfig
 		entries.clear();
 		entries.add(new MinerRank.RankEntry("STONE", 300, new ItemStack(Items.STONE_PICKAXE)));
 		entries.add(new MinerRank.RankEntry("IRON", 1000, new ItemStack(Items.IRON_PICKAXE)));
-		entries.add(new MinerRank.RankEntry("MAGNITE", 3000, new ItemStack(CaveItems.MAGNITE_PICKAXE.get())));
+		entries.add(new MinerRank.RankEntry("MAGNITE", 3000, new ItemStack(CaveItems.MAGNITE_PICKAXE.orElse(null))));
 		entries.add(new MinerRank.RankEntry("GOLD", 5000, new ItemStack(Items.GOLDEN_PICKAXE)));
-		entries.add(new MinerRank.RankEntry("AQUA", 10000, new ItemStack(CaveItems.AQUAMARINE_PICKAXE.get())));
+		entries.add(new MinerRank.RankEntry("AQUA", 10000, new ItemStack(CaveItems.AQUAMARINE_PICKAXE.orElse(null))));
 		entries.add(new MinerRank.RankEntry("DIAMOND", 50000, new ItemStack(Items.DIAMOND_PICKAXE)));
 	}
 }

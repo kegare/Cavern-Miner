@@ -127,7 +127,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 					server.getPlayerList().sendMessage(message);
 				}
 
-				player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), CaveSounds.MINER_RANKUP.get(), SoundCategory.AMBIENT, 0.5F, 1.0F);
+				CaveSounds.MINER_RANKUP.ifPresent(o -> player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), o, SoundCategory.AMBIENT, 0.5F, 1.0F));
 			}
 		}
 

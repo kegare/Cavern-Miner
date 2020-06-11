@@ -27,6 +27,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProviderType;
 import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.dimension.Dimension;
@@ -53,7 +54,7 @@ public class CavernDimension extends Dimension
 	@Override
 	public ChunkGenerator<? extends GenerationSettings> createChunkGenerator()
 	{
-		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(CaveBiomes.CAVERN.get());
+		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(CaveBiomes.CAVERN.orElse(Biomes.PLAINS));
 
 		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), new CavernGenSettings());
 	}

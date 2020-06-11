@@ -26,7 +26,7 @@ public final class CaveDimensions
 	@SubscribeEvent
 	public static void registerDimensions(final RegisterDimensionsEvent event)
 	{
-		CAVERN_TYPE = DimensionManager.registerOrGetDimension(CAVERN.getId(), CAVERN.get(), null, false);
+		CAVERN_TYPE = CAVERN.map(o -> DimensionManager.registerOrGetDimension(o.getRegistryName(), o, null, false)).orElse(null);
 	}
 
 	@Nullable
@@ -37,11 +37,11 @@ public final class CaveDimensions
 			return null;
 		}
 
-		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
+		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			if (portal.getDimension() == type)
+			if (portal.map(CavernPortalBlock::getDimension).orElse(null) == type)
 			{
-				return portal;
+				return portal.get();
 			}
 		}
 

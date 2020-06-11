@@ -1,6 +1,6 @@
 package cavern.miner.init;
 
-import java.util.function.Supplier;
+import com.google.common.collect.ImmutableList;
 
 import cavern.miner.block.CaveOreBlock;
 import cavern.miner.block.CavernPortalBlock;
@@ -29,7 +29,7 @@ public final class CaveBlocks
 
 	public static final RegistryObject<CavernPortalBlock> CAVERN_PORTAL = REGISTRY.register("cavern_portal", () -> new CavernPortalBlock(createPortalProperties()));
 
-	public static final Supplier<CavernPortalBlock[]> CAVE_PORTALS = () -> new CavernPortalBlock[] {CAVERN_PORTAL.get()};
+	public static final ImmutableList<RegistryObject<CavernPortalBlock>> CAVE_PORTALS = ImmutableList.of(CAVERN_PORTAL);
 
 	public static final RegistryObject<Block> MAGNITE_ORE = REGISTRY.register("magnite_ore", () -> new OreBlock(createOreProperties()));
 	public static final RegistryObject<Block> MAGNITE_BLOCK = REGISTRY.register("magnite_block",
@@ -64,18 +64,18 @@ public final class CaveBlocks
 	{
 		for (RegistryObject<Block> block : REGISTRY.getEntries())
 		{
-			registry.register(block.getId().getPath(), () -> createBlockItem(block.get()));
+			block.ifPresent(o -> registry.register(block.getId().getPath(), () -> createBlockItem(o)));
 		}
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public static void registerRenderType()
 	{
-		RenderTypeLookup.setRenderLayer(CAVERN_PORTAL.get(), RenderType.getTranslucent());
+		CAVERN_PORTAL.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getTranslucent()));
 
-		RenderTypeLookup.setRenderLayer(MAGNITE_ORE.get(), RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(AQUAMARINE_ORE.get(), RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(RANDOMITE_ORE.get(), RenderType.getCutoutMipped());
-		RenderTypeLookup.setRenderLayer(CRACKED_STONE.get(), RenderType.getCutoutMipped());
+		MAGNITE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
+		AQUAMARINE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
+		RANDOMITE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
+		CRACKED_STONE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
 	}
 }

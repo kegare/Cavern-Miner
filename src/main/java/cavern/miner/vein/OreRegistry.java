@@ -10,6 +10,7 @@ import com.google.common.base.Objects;
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.world.vein.VeinProvider;
 import cavern.miner.world.vein.VeinProvider.Rarity;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.Tag;
@@ -25,11 +26,21 @@ public final class OreRegistry
 
 	public static void registerBlock(BlockEntry entry)
 	{
+		if (entry.getBlock() instanceof AirBlock)
+		{
+			return;
+		}
+
 		BLOCK_ENTRIES.put(entry.getBlock(), entry);
 	}
 
 	public static void registerBlockState(BlockStateEntry entry)
 	{
+		if (entry.getBlockState().getBlock() instanceof AirBlock)
+		{
+			return;
+		}
+
 		BLOCK_STATE_ENTRIES.put(entry.getBlockState(), entry);
 	}
 
