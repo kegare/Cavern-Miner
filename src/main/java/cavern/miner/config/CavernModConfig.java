@@ -25,5 +25,14 @@ public class CavernModConfig
 
 		context.registerConfig(ModConfig.Type.COMMON, GeneralConfig.SPEC, "cavern_miner/general.toml");
 		context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "cavern_miner/client.toml");
+
+		dir = CavernConfig.getConfigDir();
+
+		if (!dir.exists())
+		{
+			dir.mkdirs();
+		}
+
+		context.registerConfig(ModConfig.Type.COMMON, CavernConfig.SPEC, "cavern_miner/cavern/dimension.toml");
 	}
 }

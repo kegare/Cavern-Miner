@@ -43,27 +43,27 @@ public class CavernTeleporter implements ITeleporter
 	{
 		Entity newEntity = repositionEntity.apply(false);
 		BlockPos pos = newEntity.getPosition();
-		int range = GeneralConfig.INSTANCE.findRange.get();
+		int radius = GeneralConfig.INSTANCE.findRadius.get();
 
-		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, range, o)).orElse(false))
+		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false))
 		{
 			return newEntity;
 		}
 
-		if (destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, range, pos, o)).orElse(false))
+		if (destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false))
 		{
 			return newEntity;
 		}
 
-		if (!placeInPortal(destWorld, newEntity, yaw, range, pos))
+		if (!placeInPortal(destWorld, newEntity, yaw, radius, pos))
 		{
-			placeInPortal(destWorld, newEntity, yaw, range, makePortal(destWorld, newEntity, range));
+			placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
 		}
 
 		return newEntity;
 	}
 
-	public boolean placeInCachedPortal(ServerWorld world, Entity entity, float yaw, int checkRange, TeleporterCache cache)
+	public boolean placeInCachedPortal(ServerWorld world, Entity entity, float yaw, int radius, TeleporterCache cache)
 	{
 		ResourceLocation key = portalBlock.getRegistryName();
 		DimensionType dim = world.getDimension().getType();
@@ -74,13 +74,13 @@ public class CavernTeleporter implements ITeleporter
 			return false;
 		}
 
-		return placeInPortal(world, entity, yaw, checkRange, pos);
+		return placeInPortal(world, entity, yaw, radius, pos);
 	}
 
-	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int checkRange, BlockPos checkPos, CavePortalList list)
+	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos, CavePortalList list)
 	{
 		List<BlockPos> positions = list.getPortalPositions(portalBlock).stream()
-			.filter(o -> Math.sqrt(o.distanceSq(checkPos)) <= checkRange)
+			.filter(o -> Math.sqrt(o.distanceSq(checkPos)) <= radius)
 			.sorted((o1, o2) -> Double.compare(o1.distanceSq(checkPos), o2.distanceSq(checkPos))).collect(Collectors.toList());
 
 		for (BlockPos portalPos : positions)
@@ -96,7 +96,7 @@ public class CavernTeleporter implements ITeleporter
 		return false;
 	}
 
-	public boolean placeInPortal(ServerWorld world, Entity entity, float yaw, int checkRange, BlockPos checkPos)
+	public boolean placeInPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos)
 	{
 		BlockPos pos = null;
 
@@ -109,13 +109,13 @@ public class CavernTeleporter implements ITeleporter
 			int max = world.getActualHeight() - 1;
 			BlockPos.Mutable findPos = new BlockPos.Mutable();
 
-			outside: for (int range = 1; range <= checkRange; ++range)
+			outside: for (int r = 1; r <= radius; ++r)
 			{
-				for (int i = -range; i <= range; ++i)
+				for (int i = -r; i <= r; ++i)
 				{
-					for (int j = -range; j <= range; ++j)
+					for (int j = -r; j <= r; ++j)
 					{
-						if (Math.abs(i) < range && Math.abs(j) < range) continue;
+						if (Math.abs(i) < r && Math.abs(j) < r) continue;
 
 						for (int y = checkPos.getY(); y < max; ++y)
 						{
@@ -182,7 +182,7 @@ public class CavernTeleporter implements ITeleporter
 	}
 
 	@Nullable
-	public BlockPos makePortal(ServerWorld world, Entity entity, int findRange)
+	public BlockPos makePortal(ServerWorld world, Entity entity, int radius)
 	{
 		double portalDist = -1.0D;
 		int max = world.getActualHeight() - 1;
@@ -196,13 +196,13 @@ public class CavernTeleporter implements ITeleporter
 		int j = world.rand.nextInt(4);
 		BlockPos.Mutable pos = new BlockPos.Mutable();
 
-		for (int range = 1; range <= findRange; ++range)
+		for (int r = 1; r <= radius; ++r)
 		{
-			for (int ix = -range; ix <= range; ++ix)
+			for (int ix = -r; ix <= r; ++ix)
 			{
-				for (int iz = -range; iz <= range; ++iz)
+				for (int iz = -r; iz <= r; ++iz)
 				{
-					if (Math.abs(ix) < range && Math.abs(iz) < range) continue;
+					if (Math.abs(ix) < r && Math.abs(iz) < r) continue;
 
 					int px = x + ix;
 					int pz = z + iz;
@@ -274,7 +274,7 @@ public class CavernTeleporter implements ITeleporter
 
 		if (portalDist < 0.0D)
 		{
-			for (int range = 1; range <= findRange; ++range)
+			for (int range = 1; range <= radius; ++range)
 			{
 				for (int ix = -range; ix <= range; ++ix)
 				{

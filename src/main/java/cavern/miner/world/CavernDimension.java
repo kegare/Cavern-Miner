@@ -16,6 +16,7 @@ import cavern.miner.storage.Caver;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;
+import cavern.miner.world.spawner.CavernMobSpawner;
 import cavern.miner.world.vein.CavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.monster.MonsterEntity;
@@ -69,7 +70,7 @@ public class CavernDimension extends Dimension
 	{
 		if (world instanceof ServerWorld)
 		{
-			return new CaveMobSpawner((ServerWorld)world);
+			return new CavernMobSpawner((ServerWorld)world);
 		}
 
 		return null;

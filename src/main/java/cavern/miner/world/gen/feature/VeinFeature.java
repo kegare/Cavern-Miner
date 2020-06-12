@@ -35,7 +35,7 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 		if (world.getDimension() instanceof CavernDimension)
 		{
 			VeinProvider provider = ((CavernDimension)world.getDimension()).getVeinProvider();
-			boolean ret = false;
+			boolean result = false;
 
 			for (Vein vein : provider.getVeins(world, new ChunkPos(pos), rand))
 			{
@@ -43,12 +43,12 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 				{
 					if (placeVein(world, rand, genPos, vein))
 					{
-						ret = true;
+						result = true;
 					}
 				}
 			}
 
-			return ret;
+			return result;
 		}
 
 		return false;
@@ -104,45 +104,45 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 		int count = 0;
 		BitSet posSet = new BitSet(width * height * width);
 		BlockPos.Mutable pos = new BlockPos.Mutable();
-		double[] d = new double[size * 4];
+		double[] dc = new double[size * 4];
 
 		for (int i = 0; i < size; ++i)
 		{
 			float f = i / (float)size;
-			double d0 = MathHelper.lerp(f, xStart, xEnd);
-			double d1 = MathHelper.lerp(f, yStart, yEnd);
-			double d2 = MathHelper.lerp(f, zStart, zEnd);
-			double d3 = random.nextDouble() * size / 16.0D;
-			double d4 = ((MathHelper.sin((float)Math.PI * f) + 1.0F) * d3 + 1.0D) / 2.0D;
+			double centerX = MathHelper.lerp(f, xStart, xEnd);
+			double centerY = MathHelper.lerp(f, yStart, yEnd);
+			double centerZ = MathHelper.lerp(f, zStart, zEnd);
+			double d = random.nextDouble() * size / 16.0D;
+			double ds = ((MathHelper.sin((float)Math.PI * f) + 1.0F) * d + 1.0D) / 2.0D;
 
-			d[i * 4 + 0] = d0;
-			d[i * 4 + 1] = d1;
-			d[i * 4 + 2] = d2;
-			d[i * 4 + 3] = d4;
+			dc[i * 4 + 0] = centerX;
+			dc[i * 4 + 1] = centerY;
+			dc[i * 4 + 2] = centerZ;
+			dc[i * 4 + 3] = ds;
 		}
 
 		for (int i = 0; i < size - 1; ++i)
 		{
-			if (!(d[i * 4 + 3] <= 0.0D))
+			if (!(dc[i * 4 + 3] <= 0.0D))
 			{
 				for (int j = i + 1; j < size; ++j)
 				{
-					if (!(d[j * 4 + 3] <= 0.0D))
+					if (!(dc[j * 4 + 3] <= 0.0D))
 					{
-						double d0 = d[i * 4 + 0] - d[j * 4 + 0];
-						double d1 = d[i * 4 + 1] - d[j * 4 + 1];
-						double d2 = d[i * 4 + 2] - d[j * 4 + 2];
-						double d3 = d[i * 4 + 3] - d[j * 4 + 3];
+						double d0 = dc[i * 4 + 0] - dc[j * 4 + 0];
+						double d1 = dc[i * 4 + 1] - dc[j * 4 + 1];
+						double d2 = dc[i * 4 + 2] - dc[j * 4 + 2];
+						double d3 = dc[i * 4 + 3] - dc[j * 4 + 3];
 
 						if (d3 * d3 > d0 * d0 + d1 * d1 + d2 * d2)
 						{
 							if (d3 > 0.0D)
 							{
-								d[j * 4 + 3] = -1.0D;
+								dc[j * 4 + 3] = -1.0D;
 							}
 							else
 							{
-								d[i * 4 + 3] = -1.0D;
+								dc[i * 4 + 3] = -1.0D;
 							}
 						}
 					}
@@ -152,44 +152,44 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 
 		for (int i = 0; i < size; ++i)
 		{
-			double d0 = d[i * 4 + 3];
+			double ds = dc[i * 4 + 3];
 
-			if (!(d0 < 0.0D))
+			if (!(ds < 0.0D))
 			{
-				double d1 = d[i * 4 + 0];
-				double d2 = d[i * 4 + 1];
-				double d3 = d[i * 4 + 2];
-				int i1 = Math.max(MathHelper.floor(d1 - d0), x);
-				int i2 = Math.max(MathHelper.floor(d2 - d0), y);
-				int i3 = Math.max(MathHelper.floor(d3 - d0), z);
-				int i4 = Math.max(MathHelper.floor(d1 + d0), i1);
-				int i5 = Math.max(MathHelper.floor(d2 + d0), i2);
-				int i6 = Math.max(MathHelper.floor(d3 + d0), i3);
+				double centerX = dc[i * 4 + 0];
+				double centerY = dc[i * 4 + 1];
+				double centerZ = dc[i * 4 + 2];
+				int minX = Math.max(MathHelper.floor(centerX - ds), x);
+				int minY = Math.max(MathHelper.floor(centerY - ds), y);
+				int minZ = Math.max(MathHelper.floor(centerZ - ds), z);
+				int maxX = Math.max(MathHelper.floor(centerX + ds), minX);
+				int maxY = Math.max(MathHelper.floor(centerY + ds), minY);
+				int maxZ = Math.max(MathHelper.floor(centerZ + ds), minZ);
 
-				for (int j = i1; j <= i4; ++j)
+				for (int posX = minX; posX <= maxX; ++posX)
 				{
-					double d4 = (j + 0.5D - d1) / d0;
+					double dx = (posX + 0.5D - centerX) / ds;
 
-					if (d4 * d4 < 1.0D)
+					if (dx * dx < 1.0D)
 					{
-						for (int k = i2; k <= i5; ++k)
+						for (int posY = minY; posY <= maxY; ++posY)
 						{
-							double d5 = (k + 0.5D - d2) / d0;
+							double dy = (posY + 0.5D - centerY) / ds;
 
-							if (d4 * d4 + d5 * d5 < 1.0D)
+							if (dx * dx + dy * dy < 1.0D)
 							{
-								for (int l = i3; l <= i6; ++l)
+								for (int posZ = minZ; posZ <= maxZ; ++posZ)
 								{
-									double d6 = (l + 0.5D - d3) / d0;
+									double dz = (posZ + 0.5D - centerZ) / ds;
 
-									if (d4 * d4 + d5 * d5 + d6 * d6 < 1.0D)
+									if (dx * dx + dy * dy + dz * dz < 1.0D)
 									{
-										int index = j - x + (k - y) * width + (l - z) * width * height;
+										int index = posX - x + (posY - y) * width + (posZ - z) * width * height;
 
 										if (!posSet.get(index))
 										{
 											posSet.set(index);
-											pos.setPos(j, k, l);
+											pos.setPos(posX, posY, posZ);
 
 											if (vein.isTargetBlock(world.getBlockState(pos)))
 											{

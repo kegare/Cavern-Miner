@@ -2,13 +2,12 @@ package cavern.miner.world.spawner;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.Nullable;
-
-import com.google.common.collect.Maps;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
@@ -32,11 +31,21 @@ public class CaveMobSpawner
 	private final ServerWorld world;
 	private final Random rand = new Random();
 
-	private final Map<ChunkPos, BlockPos> eligibleChunksForSpawning = Maps.newHashMap();
+	private final Map<ChunkPos, BlockPos> eligibleChunksForSpawning = new HashMap<>();
 
 	public CaveMobSpawner(ServerWorld world)
 	{
 		this.world = world;
+	}
+
+	public int getChunkRadius(PlayerEntity player)
+	{
+		return 6;
+	}
+
+	public int getHeightRadius(EntityClassification type)
+	{
+		return 50;
 	}
 
 	public int getMaxCount(EntityClassification type)
@@ -44,9 +53,9 @@ public class CaveMobSpawner
 		return 150;
 	}
 
-	public double getSafeRange(EntityClassification type)
+	public int getSafeDistance(EntityClassification type)
 	{
-		return 16.0D;
+		return 16;
 	}
 
 	public void spawnMobs()
@@ -55,23 +64,24 @@ public class CaveMobSpawner
 
 		for (PlayerEntity player : world.getPlayers(o -> !o.isSpectator()))
 		{
+			int radius = getChunkRadius(player);
 			int chunkX = MathHelper.floor(player.getPosX() / 16.0D);
 			int chunkZ = MathHelper.floor(player.getPosZ() / 16.0D);
-			int range = 6;
 
-			for (int rx = -range; rx <= range; ++rx)
+			for (int dx = -radius; dx <= radius; ++dx)
 			{
-				for (int rz = -range; rz <= range; ++rz)
+				for (int dz = -radius; dz <= radius; ++dz)
 				{
-					boolean flag = rx == -range || rx == range || rz == -range || rz == range;
-					ChunkPos chunkPos = new ChunkPos(rx + chunkX, rz + chunkZ);
-
-					if (!eligibleChunksForSpawning.containsKey(chunkPos) && world.getChunkProvider().isChunkLoaded(chunkPos))
+					if (dx == -radius || dx == radius || dz == -radius || dz == radius)
 					{
-						if (!flag && world.getWorldBorder().contains(chunkPos))
-						{
-							eligibleChunksForSpawning.put(chunkPos, player.getPosition());
-						}
+						continue;
+					}
+
+					ChunkPos chunkPos = new ChunkPos(dx + chunkX, dz + chunkZ);
+
+					if (!eligibleChunksForSpawning.containsKey(chunkPos) && world.getChunkProvider().isChunkLoaded(chunkPos) && world.getWorldBorder().contains(chunkPos))
+					{
+						eligibleChunksForSpawning.put(chunkPos, player.getPosition());
 					}
 				}
 			}
@@ -96,7 +106,7 @@ public class CaveMobSpawner
 
 			outside: for (ChunkPos chunkPos : shuffled)
 			{
-				findRandomPosition(pos, chunkPos);
+				findRandomPosition(pos, type, chunkPos);
 
 				if (world.getBlockState(pos).isNormalCube(world, pos))
 				{
@@ -122,7 +132,7 @@ public class CaveMobSpawner
 						float posX = pos.getX() + 0.5F;
 						float posZ = pos.getZ() + 0.5F;
 
-						if (world.isPlayerWithin(posX, pos.getY(), posZ, getSafeRange(type)))
+						if (world.isPlayerWithin(posX, pos.getY(), posZ, getSafeDistance(type)))
 						{
 							continue;
 						}
@@ -192,7 +202,7 @@ public class CaveMobSpawner
 		}
 	}
 
-	protected void findRandomPosition(BlockPos.Mutable pos, ChunkPos chunkPos)
+	protected void findRandomPosition(BlockPos.Mutable pos, EntityClassification type, ChunkPos chunkPos)
 	{
 		BlockPos playerPos = eligibleChunksForSpawning.get(chunkPos);
 		int y = 0;
@@ -209,9 +219,9 @@ public class CaveMobSpawner
 		if (y > 0)
 		{
 			int max = world.getActualHeight() - 1;
-			int range = 50;
+			int radius = getHeightRadius(type);
 
-			posY = MathHelper.nextInt(rand, Math.max(y - range, 1), Math.min(y + range, max));
+			posY = MathHelper.nextInt(rand, Math.max(y - radius, 1), Math.min(y + radius, max));
 		}
 		else
 		{
