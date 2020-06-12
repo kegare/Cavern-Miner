@@ -28,7 +28,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.chunk.IChunk;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -160,11 +159,9 @@ public class VeinProvider
 		return Rarity.RARE;
 	}
 
-	public List<Vein> getVeins(IWorld world, IChunk chunk, Random rand)
+	public List<Vein> getVeins(IWorld world, ChunkPos pos, Random rand)
 	{
-		ChunkPos chunkPos = chunk.getPos();
-
-		if (cachedVeins != null && chunkPos.getChessboardDistance(cachedVeins.getLeft()) <= 3)
+		if (cachedVeins != null && pos.getChessboardDistance(cachedVeins.getLeft()) <= 3)
 		{
 			return cachedVeins.getRight();
 		}
@@ -243,7 +240,7 @@ public class VeinProvider
 			}
 		}
 
-		cachedVeins = Pair.of(chunkPos, list);
+		cachedVeins = Pair.of(pos, list);
 
 		return list;
 	}

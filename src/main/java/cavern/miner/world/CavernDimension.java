@@ -59,6 +59,11 @@ public class CavernDimension extends Dimension
 		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), new CavernGenSettings());
 	}
 
+	public VeinProvider getVeinProvider()
+	{
+		return VEINS;
+	}
+
 	@Nullable
 	public CaveMobSpawner createCaveMobSpawner()
 	{

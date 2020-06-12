@@ -13,13 +13,11 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.WorldType;
-import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
-import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.IFeatureConfig;
@@ -27,12 +25,9 @@ import net.minecraft.world.server.ServerWorld;
 
 public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGenerator<T>
 {
-	protected final VeinGenerator veinGenerator;
-
 	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, T settings)
 	{
 		super(world, biomeProvider, settings);
-		this.veinGenerator = new VeinGenerator(CavernDimension.VEINS);
 	}
 
 	@Override
@@ -107,17 +102,6 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 	}
 
 	@Override
-	public void func_225550_a_(BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving carving)
-	{
-		super.func_225550_a_(biomeManager, chunk, carving);
-
-		if (carving == GenerationStage.Carving.AIR)
-		{
-			veinGenerator.makeVeins(world, chunk);
-		}
-	}
-
-	@Override
 	public void decorate(WorldGenRegion region)
 	{
 		super.decorate(region);
@@ -126,6 +110,8 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 		int chunkX = region.getMainChunkX();
 		int chunkZ = region.getMainChunkZ();
 		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
+
+		CaveFeatures.VEIN.ifPresent(o -> o.place(region, this, rand, pos, IFeatureConfig.NO_FEATURE_CONFIG));
 
 		if (rand.nextInt(100) == 0)
 		{

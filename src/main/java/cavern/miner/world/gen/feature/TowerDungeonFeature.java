@@ -38,8 +38,6 @@ public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 	@Override
 	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config)
 	{
-		System.out.println(pos.toString());
-
 		setDungeonSize(world, rand, pos);
 
 		while (pos.getY() > 1 && world.isAirBlock(pos))
