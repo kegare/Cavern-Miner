@@ -48,7 +48,6 @@ public class CavernConfig
 	}
 
 	public static final PortalConfig PORTAL = new PortalConfig(getConfigDir());
-
 	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
 
 	public static void loadConfig()

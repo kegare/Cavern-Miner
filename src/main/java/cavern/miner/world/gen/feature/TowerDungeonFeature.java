@@ -22,7 +22,6 @@ import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.storage.loot.LootTables;
-import net.minecraftforge.common.DungeonHooks;
 
 public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 {
@@ -256,6 +255,6 @@ public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 
 	private EntityType<?> getRandomDungeonMob(Random rand, int floor)
 	{
-		return DungeonHooks.getRandomDungeonMob(rand);
+		return TowerDungeonSpawner.get();
 	}
 }

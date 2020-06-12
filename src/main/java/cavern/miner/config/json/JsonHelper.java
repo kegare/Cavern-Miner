@@ -1,5 +1,7 @@
 package cavern.miner.config.json;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.ObjectUtils;
 
 import com.google.gson.JsonElement;
@@ -8,6 +10,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -43,23 +46,34 @@ public class JsonHelper
 		return object;
 	}
 
-	public static Block deserializeBlock(JsonElement e)
+	@Nullable
+	public static ResourceLocation deserializeKey(JsonElement e)
 	{
-		ResourceLocation key = null;
+		if (e.isJsonNull())
+		{
+			return null;
+		}
 
 		if (e.isJsonObject())
 		{
 			JsonObject object = e.getAsJsonObject();
 
-			key = new ResourceLocation(object.get("name").getAsString());
+			return new ResourceLocation(object.get("name").getAsString());
 		}
 
-		if (key == null)
+		if (e.isJsonPrimitive())
 		{
-			key = new ResourceLocation(e.getAsString());
+			return new ResourceLocation(e.getAsString());
 		}
 
-		return ObjectUtils.defaultIfNull(ForgeRegistries.BLOCKS.getValue(key), Blocks.AIR);
+		return null;
+	}
+
+	public static Block deserializeBlock(JsonElement e)
+	{
+		ResourceLocation key = deserializeKey(e);
+
+		return ObjectUtils.defaultIfNull(key == null ? null : ForgeRegistries.BLOCKS.getValue(key), Blocks.AIR);
 	}
 
 	public static BlockState deserializeBlockState(JsonObject object)
@@ -93,21 +107,9 @@ public class JsonHelper
 
 	public static Item deserializeItem(JsonElement e)
 	{
-		ResourceLocation key = null;
+		ResourceLocation key = deserializeKey(e);
 
-		if (e.isJsonObject())
-		{
-			JsonObject object = e.getAsJsonObject();
-
-			key = new ResourceLocation(object.get("name").getAsString());
-		}
-
-		if (key == null)
-		{
-			key = new ResourceLocation(e.getAsString());
-		}
-
-		return ObjectUtils.defaultIfNull(ForgeRegistries.ITEMS.getValue(key), Items.AIR);
+		return ObjectUtils.defaultIfNull(key == null ? null : ForgeRegistries.ITEMS.getValue(key), Items.AIR);
 	}
 
 	public static ItemStack deserializeItemStack(JsonObject object)
@@ -132,5 +134,13 @@ public class JsonHelper
 		}
 
 		return new ItemTags.Wrapper(key);
+	}
+
+	@Nullable
+	public static EntityType<?> deserializeEntityType(JsonElement e)
+	{
+		ResourceLocation key = deserializeKey(e);
+
+		return key == null ? null : ForgeRegistries.ENTITIES.getValue(key);
 	}
 }

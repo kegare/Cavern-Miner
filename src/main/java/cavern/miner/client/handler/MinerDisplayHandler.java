@@ -3,6 +3,7 @@ package cavern.miner.client.handler;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import cavern.miner.client.ItemStackCache;
 import cavern.miner.config.client.ClientConfig;
 import cavern.miner.config.client.DisplayCorner;
 import cavern.miner.config.client.DisplayType;
@@ -175,7 +176,7 @@ public class MinerDisplayHandler
 
 		if (lastBlock != null && diffTime <= 3000L)
 		{
-			ItemStack stack = new ItemStack(lastBlock.getBlock().asItem());
+			ItemStack stack = ItemStackCache.get(lastBlock.getBlock());
 
 			RenderSystem.enableRescaleNormal();
 			itemRenderer.renderItemIntoGUI(stack, x, y);
