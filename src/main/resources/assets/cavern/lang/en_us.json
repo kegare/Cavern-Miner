@@ -27,5 +27,7 @@
 	"cavern.miner.aqua": "Aqua Miner",
 	"cavern.miner.diamond": "Diamond Miner",
 	"cavern.miner.promoted": "%s is now a %s.",
+	"cavern.miner.record": "Mining Record",
+	"cavern.miner.score": "Mining Score",
 	"cavern.caver.no_sleep": "You are not tired."
 }

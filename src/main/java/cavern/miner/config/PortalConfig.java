@@ -13,6 +13,7 @@ import java.io.Reader;
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
@@ -21,8 +22,6 @@ import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.config.json.ItemStackTagListSerializer;
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.util.ItemStackTagList;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
 
 public class PortalConfig
 {
@@ -140,8 +139,8 @@ public class PortalConfig
 	{
 		JsonObject object = new JsonObject();
 
-		object.add("trigger_items", ItemStackTagListSerializer.INSTANCE.serialize(getTriggerItems(), ItemStack.class, null));
-		object.add("frame_blocks", BlockStateTagListSerializer.INSTANCE.serialize(getFrameBlocks(), BlockState.class, null));
+		object.add("trigger_items", ItemStackTagListSerializer.INSTANCE.serialize(triggerItems, triggerItems.getClass(), null));
+		object.add("frame_blocks", BlockStateTagListSerializer.INSTANCE.serialize(frameBlocks, frameBlocks.getClass(), null));
 
 		return gson.toJson(object);
 	}
@@ -152,8 +151,43 @@ public class PortalConfig
 		{
 			JsonObject object = gson.fromJson(json, JsonObject.class);
 
-			setTriggerItems(ItemStackTagListSerializer.INSTANCE.deserialize(object.get("trigger_items"), ItemStack.class, null));
-			setFrameBlocks(BlockStateTagListSerializer.INSTANCE.deserialize(object.get("frame_blocks"), BlockState.class, null));
+			JsonElement e = object.get("trigger_items");
+
+			triggerItems.clear();
+
+			if (e != null && e.isJsonObject())
+			{
+				ItemStackTagList list = ItemStackTagListSerializer.INSTANCE.deserialize(e, e.getClass(), null);
+
+				if (!list.getEntryList().isEmpty())
+				{
+					triggerItems.addEntries(list.getEntryList());
+				}
+
+				if (!list.getTagList().isEmpty())
+				{
+					triggerItems.addTags(list.getTagList());
+				}
+			}
+
+			e = object.get("frame_blocks");
+
+			frameBlocks.clear();
+
+			if (e != null && e.isJsonObject())
+			{
+				BlockStateTagList list = BlockStateTagListSerializer.INSTANCE.deserialize(e, e.getClass(), null);
+
+				if (!list.getEntryList().isEmpty())
+				{
+					frameBlocks.addEntries(list.getEntryList());
+				}
+
+				if (!list.getTagList().isEmpty())
+				{
+					frameBlocks.addTags(list.getTagList());
+				}
+			}
 		}
 		catch (JsonParseException e)
 		{

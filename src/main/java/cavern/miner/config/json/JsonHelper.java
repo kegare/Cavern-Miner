@@ -34,7 +34,7 @@ public class JsonHelper
 
 	public static JsonObject serializeBlockState(BlockState state)
 	{
-		return BlockStateSerializer.INSTANCE.serialize(state, BlockState.class, null).getAsJsonObject();
+		return BlockStateSerializer.INSTANCE.serialize(state, state.getClass(), null).getAsJsonObject();
 	}
 
 	public static JsonObject serializeTag(Tag<?> tag)
@@ -78,7 +78,7 @@ public class JsonHelper
 
 	public static BlockState deserializeBlockState(JsonObject object)
 	{
-		return BlockStateSerializer.INSTANCE.deserialize(object, BlockState.class, null);
+		return BlockStateSerializer.INSTANCE.deserialize(object, object.getClass(), null);
 	}
 
 	public static Tag<Block> deserializeBlockTag(JsonElement e)
@@ -102,7 +102,7 @@ public class JsonHelper
 
 	public static JsonObject serializeItemStack(ItemStack stack)
 	{
-		return ItemStackSerializer.INSTANCE.serialize(stack, ItemStack.class, null).getAsJsonObject();
+		return ItemStackSerializer.INSTANCE.serialize(stack, stack.getClass(), null).getAsJsonObject();
 	}
 
 	public static Item deserializeItem(JsonElement e)
@@ -114,7 +114,7 @@ public class JsonHelper
 
 	public static ItemStack deserializeItemStack(JsonObject object)
 	{
-		return ItemStackSerializer.INSTANCE.deserialize(object, ItemStack.class, null);
+		return ItemStackSerializer.INSTANCE.deserialize(object, object.getClass(), null);
 	}
 
 	public static Tag<Item> deserializeItemTag(JsonElement e)

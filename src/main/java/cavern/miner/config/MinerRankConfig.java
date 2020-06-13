@@ -167,7 +167,7 @@ public class MinerRankConfig
 					continue;
 				}
 
-				MinerRank.RankEntry entry = MinerRankSerializer.INSTANCE.deserialize(e, MinerRank.RankEntry.class, null);
+				MinerRank.RankEntry entry = MinerRankSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
 				entries.add(entry);
 			}

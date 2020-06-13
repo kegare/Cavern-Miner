@@ -16,6 +16,6 @@ public class ItemStackCache
 
 	public static ItemStack get(IItemProvider provider)
 	{
-		return ITEM_CACHE.computeIfAbsent(provider.asItem(), ItemStack::new);
+		return ITEM_CACHE.computeIfAbsent(provider.asItem(), Item::getDefaultInstance);
 	}
 }

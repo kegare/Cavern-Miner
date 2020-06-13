@@ -21,7 +21,6 @@ import com.google.gson.JsonParseException;
 import cavern.miner.CavernMod;
 import cavern.miner.config.json.ItemStackTagListSerializer;
 import cavern.miner.util.ItemStackTagList;
-import net.minecraft.item.ItemStack;
 
 public class ItemStackTagListConfig
 {
@@ -130,14 +129,21 @@ public class ItemStackTagListConfig
 			return null;
 		}
 
-		return gson.toJson(ItemStackTagListSerializer.INSTANCE.serialize(list, ItemStack.class, null));
+		return gson.toJson(ItemStackTagListSerializer.INSTANCE.serialize(list, list.getClass(), null));
 	}
 
 	public boolean fromJson(Reader json)
 	{
 		try
 		{
-			ItemStackTagList entries = ItemStackTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonObject.class), ItemStack.class, null);
+			JsonObject object = gson.fromJson(json, JsonObject.class);
+
+			if (object.size() == 0)
+			{
+				return false;
+			}
+
+			ItemStackTagList entries = ItemStackTagListSerializer.INSTANCE.deserialize(object, object.getClass(), null);
 
 			if (entries == null || entries.isEmpty())
 			{

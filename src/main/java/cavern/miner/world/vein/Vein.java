@@ -1,4 +1,4 @@
-package cavern.miner.vein;
+package cavern.miner.world.vein;
 
 import java.util.Arrays;
 

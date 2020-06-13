@@ -1,15 +1,12 @@
-package cavern.miner.vein;
+package cavern.miner.world.vein;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 import com.google.common.base.Objects;
 
 import cavern.miner.util.BlockStateHelper;
-import cavern.miner.world.vein.VeinProvider;
-import cavern.miner.world.vein.VeinProvider.Rarity;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -56,7 +53,7 @@ public final class OreRegistry
 
 	public static OreEntry getEntry(Object obj, boolean strict)
 	{
-		if (obj == null)
+		if (obj == null || obj == OreEntry.EMPTY)
 		{
 			return OreEntry.EMPTY;
 		}
@@ -64,7 +61,7 @@ public final class OreRegistry
 		if (obj instanceof OreEntry)
 		{
 			OreEntry entry = (OreEntry)obj;
-			OreEntry parent = getEntry(entry.getParent(), true);
+			OreEntry parent = getEntry(entry.getParent().orElse(OreEntry.EMPTY), true);
 
 			if (parent != OreEntry.EMPTY)
 			{
@@ -185,34 +182,31 @@ public final class OreRegistry
 	{
 		static final OreEntry EMPTY = new EmptyEntry();
 
-		@Nullable
-		Object getParent();
+		Optional<Object> getParent();
 
-		@Nullable
-		VeinProvider.Rarity getRarity();
+		Optional<VeinProvider.Rarity> getRarity();
 
-		@Nullable
-		Integer getPoint();
+		Optional<Integer> getPoint();
 	}
 
 	private static class EmptyEntry implements OreEntry
 	{
 		@Override
-		public Object getParent()
+		public Optional<Object> getParent()
 		{
-			return null;
+			return Optional.empty();
 		}
 
 		@Override
-		public Rarity getRarity()
+		public Optional<VeinProvider.Rarity> getRarity()
 		{
-			return null;
+			return Optional.empty();
 		}
 
 		@Override
-		public Integer getPoint()
+		public Optional<Integer> getPoint()
 		{
-			return null;
+			return Optional.empty();
 		}
 	}
 
@@ -246,21 +240,21 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Object getParent()
+		public Optional<Object> getParent()
 		{
-			return parentEntry;
+			return Optional.ofNullable(parentEntry);
 		}
 
 		@Override
-		public VeinProvider.Rarity getRarity()
+		public Optional<VeinProvider.Rarity> getRarity()
 		{
-			return rarity;
+			return Optional.ofNullable(rarity);
 		}
 
 		@Override
-		public Integer getPoint()
+		public Optional<Integer> getPoint()
 		{
-			return point;
+			return Optional.ofNullable(point);
 		}
 
 		@Override
@@ -323,21 +317,21 @@ public final class OreRegistry
 		}
 
 		@Override
-		public OreEntry getParent()
+		public Optional<Object> getParent()
 		{
-			return parentEntry;
+			return Optional.ofNullable(parentEntry);
 		}
 
 		@Override
-		public VeinProvider.Rarity getRarity()
+		public Optional<VeinProvider.Rarity> getRarity()
 		{
-			return rarity;
+			return Optional.ofNullable(rarity);
 		}
 
 		@Override
-		public Integer getPoint()
+		public Optional<Integer> getPoint()
 		{
-			return point;
+			return Optional.ofNullable(point);
 		}
 
 		@Override
@@ -400,21 +394,21 @@ public final class OreRegistry
 		}
 
 		@Override
-		public OreEntry getParent()
+		public Optional<Object> getParent()
 		{
-			return parentEntry;
+			return Optional.ofNullable(parentEntry);
 		}
 
 		@Override
-		public VeinProvider.Rarity getRarity()
+		public Optional<VeinProvider.Rarity> getRarity()
 		{
-			return rarity;
+			return Optional.ofNullable(rarity);
 		}
 
 		@Override
-		public Integer getPoint()
+		public Optional<Integer> getPoint()
 		{
-			return point;
+			return Optional.ofNullable(point);
 		}
 
 		@Override

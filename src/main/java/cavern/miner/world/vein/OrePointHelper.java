@@ -1,4 +1,4 @@
-package cavern.miner.vein;
+package cavern.miner.world.vein;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,25 +26,7 @@ public class OrePointHelper
 			return 0;
 		}
 
-		Integer point = entry.getPoint();
-
-		if (point != null && point.intValue() != 0)
-		{
-			return point;
-		}
-
-		point = POINT_CACHE.get(entry);
-
-		if (point != null)
-		{
-			return point;
-		}
-
-		point = calcPoint(entry);
-
-		POINT_CACHE.put(entry, point);
-
-		return point;
+		return entry.getPoint().orElseGet(() -> POINT_CACHE.computeIfAbsent(entry, OrePointHelper::calcPoint));
 	}
 
 	private static int calcPoint(OreRegistry.OreEntry entry)

@@ -24,7 +24,7 @@ import cavern.miner.CavernMod;
 import cavern.miner.config.json.OreEntrySerializer;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveTags;
-import cavern.miner.vein.OreRegistry;
+import cavern.miner.world.vein.OreRegistry;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.Tags;
@@ -168,7 +168,7 @@ public class OreEntryConfig
 					continue;
 				}
 
-				OreRegistry.OreEntry entry = OreEntrySerializer.INSTANCE.deserialize(e, OreRegistry.OreEntry.class, null);
+				OreRegistry.OreEntry entry = OreEntrySerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
 				if (entry != OreRegistry.OreEntry.EMPTY)
 				{

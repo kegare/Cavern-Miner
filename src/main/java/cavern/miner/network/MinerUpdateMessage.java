@@ -20,25 +20,15 @@ public class MinerUpdateMessage
 	private final int point;
 	private final MinerRank.DisplayEntry displayRank;
 
-	private final boolean failed;
-
 	public MinerUpdateMessage(int point, MinerRank.DisplayEntry rank)
 	{
 		this.point = point;
 		this.displayRank = rank;
-		this.failed = false;
 	}
 
 	public MinerUpdateMessage(int point, MinerRank.RankEntry rank)
 	{
 		this(point, new MinerRank.DisplayEntry(rank));
-	}
-
-	private MinerUpdateMessage(boolean failed)
-	{
-		this.point = 0;
-		this.displayRank = null;
-		this.failed = failed;
 	}
 
 	@Nullable
@@ -59,7 +49,7 @@ public class MinerUpdateMessage
 		{
 			CavernMod.LOG.error("MinerUpdateMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
-			return new MinerUpdateMessage(true);
+			return new MinerUpdateMessage(0, (MinerRank.DisplayEntry)null);
 		}
 	}
 
@@ -72,7 +62,7 @@ public class MinerUpdateMessage
 
 	public static void handle(final MinerUpdateMessage msg, final Supplier<NetworkEvent.Context> ctx)
 	{
-		if (!msg.failed)
+		if (msg.displayRank != null)
 		{
 			ctx.get().enqueueWork(() ->
 			{

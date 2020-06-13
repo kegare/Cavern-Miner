@@ -7,10 +7,15 @@ import com.google.common.cache.LoadingCache;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
+import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.network.MinerRecordMessage;
+import cavern.miner.storage.Miner;
+import cavern.miner.storage.MinerRecord;
 import cavern.miner.storage.TeleporterCache;
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.util.ItemStackTagList;
+import cavern.miner.world.CavernDimension;
 import cavern.miner.world.CavernTeleporter;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,14 +23,19 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.CachedBlockInfo;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -34,6 +44,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CavernPortalBlock extends Block
 {
@@ -158,6 +169,26 @@ public class CavernPortalBlock extends Block
 				world.setBlockState(pos, Blocks.AIR.getDefaultState());
 			}
 		}
+	}
+
+	@Override
+	public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit)
+	{
+		if (!world.isRemote && world.getDimension() instanceof CavernDimension)
+		{
+			if (player instanceof ServerPlayerEntity)
+			{
+				ServerPlayerEntity serverPlayer = (ServerPlayerEntity)player;
+				MinerRecord record = serverPlayer.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElse(null);
+
+				if (record != null)
+				{
+					CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new MinerRecordMessage(record));
+				}
+			}
+		}
+
+		return ActionResultType.PASS;
 	}
 
 	@Override

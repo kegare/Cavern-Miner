@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 
 import cavern.miner.config.CavernConfig;
 import cavern.miner.util.BlockStateTagList;
-import cavern.miner.vein.Vein;
 
 public class CavernVeinProvider extends VeinProvider
 {

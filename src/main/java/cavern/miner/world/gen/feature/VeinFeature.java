@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 
 import com.mojang.datafixers.Dynamic;
 
-import cavern.miner.vein.Vein;
 import cavern.miner.world.CavernDimension;
+import cavern.miner.world.vein.Vein;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;

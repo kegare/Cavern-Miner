@@ -29,6 +29,8 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	@OnlyIn(Dist.CLIENT)
 	private MinerRank.DisplayEntry displayRank;
 
+	private MinerRecord record;
+
 	private MinerCache cache;
 	private MinerUnit unit;
 
@@ -155,6 +157,16 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
+	public MinerRecord getRecord()
+	{
+		if (record == null)
+		{
+			record = new MinerRecord();
+		}
+
+		return record;
+	}
+
 	@Override
 	public CompoundNBT serializeNBT()
 	{
@@ -162,6 +174,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 		nbt.putInt("Point", getPoint());
 		nbt.putString("Rank", getRank().getName());
+		nbt.put("Record", getRecord().serializeNBT());
 
 		return nbt;
 	}
@@ -171,6 +184,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	{
 		setPoint(nbt.getInt("Point"));
 		setRank(MinerRank.get(nbt.getString("Rank")));
+		getRecord().deserializeNBT(nbt.getCompound("Record"));
 	}
 
 	public MinerCache getCache()

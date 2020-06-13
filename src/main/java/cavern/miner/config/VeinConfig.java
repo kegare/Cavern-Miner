@@ -25,7 +25,7 @@ import cavern.miner.CavernMod;
 import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.config.json.VeinSerializer;
 import cavern.miner.util.BlockStateTagList;
-import cavern.miner.vein.Vein;
+import cavern.miner.world.vein.Vein;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -254,25 +254,39 @@ public class VeinConfig
 
 				e = o.get("whitelist");
 
+				whitelist.clear();
+
 				if (e != null && e.isJsonObject())
 				{
-					BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(e, BlockState.class, null);
+					BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
-					if (!entries.isEmpty())
+					if (!entries.getEntryList().isEmpty())
 					{
-						setWhitelist(entries);
+						whitelist.addEntries(entries.getEntryList());
+					}
+
+					if (!entries.getTagList().isEmpty())
+					{
+						whitelist.addTags(entries.getTagList());
 					}
 				}
 
 				e = o.get("blacklist");
 
+				blacklist.clear();
+
 				if (e != null && e.isJsonObject())
 				{
-					BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(e, BlockState.class, null);
+					BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
-					if (!entries.isEmpty())
+					if (!entries.getEntryList().isEmpty())
 					{
-						setBlacklist(entries);
+						blacklist.addEntries(entries.getEntryList());
+					}
+
+					if (!entries.getTagList().isEmpty())
+					{
+						blacklist.addTags(entries.getTagList());
 					}
 				}
 			}

@@ -5,9 +5,9 @@ import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MiningInteractMessage;
 import cavern.miner.storage.Miner;
 import cavern.miner.util.BlockStateHelper;
-import cavern.miner.vein.OrePointHelper;
-import cavern.miner.vein.OreRegistry;
 import cavern.miner.world.CavernDimension;
+import cavern.miner.world.vein.OrePointHelper;
+import cavern.miner.world.vein.OreRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -112,6 +112,7 @@ public class MinerEventHandler
 		}
 
 		miner.addPoint(point).sendToClient();
+		miner.getRecord().add(state.getBlock());
 		miner.getCache().put(state, point);
 
 		CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new MiningInteractMessage(state, point));

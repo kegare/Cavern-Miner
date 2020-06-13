@@ -14,8 +14,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import cavern.miner.util.BlockStateTagList;
-import cavern.miner.vein.OreRegistry;
-import cavern.miner.vein.Vein;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -57,7 +55,7 @@ public class VeinProvider
 
 	protected Rarity getOreRarity(BlockState state)
 	{
-		Rarity rarity = OreRegistry.getEntry(state).getRarity();
+		Rarity rarity = OreRegistry.getEntry(state).getRarity().orElse(null);
 
 		if (rarity != null)
 		{

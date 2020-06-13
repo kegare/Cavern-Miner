@@ -15,7 +15,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import cavern.miner.vein.OreRegistry;
+import cavern.miner.world.vein.OreRegistry;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -38,7 +38,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 
 		object.add("entry", entry);
 
-		entry = serializeEntry(OreRegistry.getEntry(src.getParent(), true));
+		entry = src.getParent().map(o -> serializeEntry(OreRegistry.getEntry(o, true))).orElse(null);
 
 		if (entry != null)
 		{
@@ -47,19 +47,9 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 			return object;
 		}
 
-		VeinProvider.Rarity rarity = src.getRarity();
+		src.getRarity().ifPresent(o -> object.addProperty("rarity", o.toString().toLowerCase()));
 
-		if (rarity != null)
-		{
-			object.addProperty("rarity", rarity.toString().toLowerCase());
-		}
-
-		Integer point = src.getPoint();
-
-		if (point != null)
-		{
-			object.addProperty("point", point);
-		}
+		src.getPoint().ifPresent(o -> object.addProperty("point", o));
 
 		return object;
 	}

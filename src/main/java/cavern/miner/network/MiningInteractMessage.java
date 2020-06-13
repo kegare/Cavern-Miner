@@ -19,20 +19,10 @@ public class MiningInteractMessage
 	private final BlockState state;
 	private final int point;
 
-	private final boolean failed;
-
 	public MiningInteractMessage(BlockState state, int point)
 	{
 		this.state = state;
 		this.point = point;
-		this.failed = false;
-	}
-
-	private MiningInteractMessage(boolean failed)
-	{
-		this.state = null;
-		this.point = 0;
-		this.failed = failed;
 	}
 
 	public static MiningInteractMessage decode(final PacketBuffer buf)
@@ -48,7 +38,7 @@ public class MiningInteractMessage
 		{
 			CavernMod.LOG.error("MiningInteractMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
-			return new MiningInteractMessage(true);
+			return new MiningInteractMessage(null, 0);
 		}
 	}
 
@@ -60,7 +50,7 @@ public class MiningInteractMessage
 
 	public static void handle(final MiningInteractMessage msg, final Supplier<NetworkEvent.Context> ctx)
 	{
-		if (!msg.failed)
+		if (msg.state != null)
 		{
 			ctx.get().enqueueWork(() ->
 			{
@@ -68,7 +58,7 @@ public class MiningInteractMessage
 
 				if (player != null)
 				{
-					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getCache().put(msg.state, msg.point));
+					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getRecord().add(msg.state.getBlock()));
 				}
 			});
 		}

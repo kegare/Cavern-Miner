@@ -12,7 +12,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import cavern.miner.vein.Vein;
+import cavern.miner.world.vein.Vein;
 import net.minecraft.block.BlockState;
 
 public class VeinSerializer implements JsonSerializer<Vein>, JsonDeserializer<Vein>

@@ -21,7 +21,6 @@ import com.google.gson.JsonParseException;
 import cavern.miner.CavernMod;
 import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.util.BlockStateTagList;
-import net.minecraft.block.BlockState;
 
 public class BlockStateTagListConfig
 {
@@ -130,14 +129,21 @@ public class BlockStateTagListConfig
 			return null;
 		}
 
-		return gson.toJson(BlockStateTagListSerializer.INSTANCE.serialize(list, BlockState.class, null));
+		return gson.toJson(BlockStateTagListSerializer.INSTANCE.serialize(list, list.getClass(), null));
 	}
 
 	public boolean fromJson(Reader json)
 	{
 		try
 		{
-			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(gson.fromJson(json, JsonObject.class), BlockState.class, null);
+			JsonObject object = gson.fromJson(json, JsonObject.class);
+
+			if (object.size() == 0)
+			{
+				return false;
+			}
+
+			BlockStateTagList entries = BlockStateTagListSerializer.INSTANCE.deserialize(object, object.getClass(), null);
 
 			if (entries == null || entries.isEmpty())
 			{

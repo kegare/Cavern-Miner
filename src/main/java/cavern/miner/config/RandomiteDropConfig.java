@@ -165,7 +165,7 @@ public class RandomiteDropConfig
 					continue;
 				}
 
-				RandomiteDrop.DropEntry entry = RandomiteDropSerializer.INSTANCE.deserialize(e, RandomiteDrop.DropEntry.class, null);
+				RandomiteDrop.DropEntry entry = RandomiteDropSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
 				if (entry != RandomiteDrop.EMPTY)
 				{

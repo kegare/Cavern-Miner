@@ -166,7 +166,7 @@ public class TowerDungeonMobConfig
 					continue;
 				}
 
-				DungeonHooks.DungeonMob entry = DungeonMobSerializer.INSTANCE.deserialize(e, DungeonHooks.DungeonMob.class, null);
+				DungeonHooks.DungeonMob entry = DungeonMobSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
 				if (entry != null && entry.itemWeight > 0)
 				{

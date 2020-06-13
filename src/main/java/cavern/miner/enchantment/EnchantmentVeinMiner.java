@@ -1,6 +1,6 @@
 package cavern.miner.enchantment;
 
-import cavern.miner.vein.OreRegistry;
+import cavern.miner.world.vein.OreRegistry;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.OreBlock;
@@ -40,7 +40,7 @@ public class EnchantmentVeinMiner extends EnchantmentMiner
 			return true;
 		}
 
-		return OreRegistry.getEntry(state).getPoint() != null;
+		return OreRegistry.getEntry(state).getPoint().isPresent();
 	}
 
 	@Override
