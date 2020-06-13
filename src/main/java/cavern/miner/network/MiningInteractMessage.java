@@ -58,7 +58,7 @@ public class MiningInteractMessage
 
 				if (player != null)
 				{
-					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getRecord().add(msg.state.getBlock()));
+					player.getCapability(CaveCapabilities.MINER).ifPresent(o -> o.getCache().put(msg.state, msg.point));
 				}
 			});
 		}
