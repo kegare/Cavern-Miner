@@ -44,7 +44,7 @@ public class MinerRecordScreen extends Screen
 		list = new RecordList(minecraft);
 		children.add(list);
 
-		addButton(new Button(width / 2 + 10, height - 20 - 4, 150, 20, I18n.format("gui.done"), o -> onClose()));
+		addButton(new Button(width / 2 + 10, height - 20 - 4, 145, 20, I18n.format("gui.done"), o -> onClose()));
 
 		super.init();
 	}
@@ -134,18 +134,6 @@ public class MinerRecordScreen extends Screen
 			}
 
 			return "E";
-		}
-
-		@Override
-		protected int getScrollbarPosition()
-		{
-			return super.getScrollbarPosition() + 20;
-		}
-
-		@Override
-		public int getRowWidth()
-		{
-			return super.getRowWidth() + 30;
 		}
 
 		@Override

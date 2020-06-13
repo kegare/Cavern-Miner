@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.client.render.EmptyRenderer;
+import cavern.miner.config.CavernConfig;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveCapabilities;
@@ -45,7 +46,7 @@ public class CavernDimension extends Dimension
 
 	public CavernDimension(World world, DimensionType type)
 	{
-		super(world, type, 0);
+		super(world, type, CavernConfig.INSTANCE.lightBrightness.get().floatValue());
 		this.caveMobSpawner = createCaveMobSpawner();
 		this.setSkyRenderer(EmptyRenderer.INSTANCE);
 		this.setCloudRenderer(EmptyRenderer.INSTANCE);

@@ -13,6 +13,8 @@ public class CavernConfig
 	public static final CavernConfig INSTANCE = new CavernConfig(BUILDER);
 	public static final ForgeConfigSpec SPEC = BUILDER.build();
 
+	public final ForgeConfigSpec.DoubleValue lightBrightness;
+
 	public final ForgeConfigSpec.DoubleValue cave;
 	public final ForgeConfigSpec.DoubleValue extremeCave;
 	public final ForgeConfigSpec.DoubleValue extremeCanyon;
@@ -26,6 +28,10 @@ public class CavernConfig
 	public CavernConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
+
+		builder.push("render");
+		lightBrightness = builder.comment("The brightness of natural light.").defineInRange("light_brightness", 0.03D, 0.0D, 1.0D);
+		builder.pop();
 
 		builder.push("decoration");
 		cave = builder.comment("The generation probability of caves.", serverSide).defineInRange("cave", 0.2D, 0.0D, 1.0D);
