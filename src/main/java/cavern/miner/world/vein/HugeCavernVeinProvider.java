@@ -1,14 +1,10 @@
 package cavern.miner.world.vein;
 
-import java.util.Random;
-
 import com.google.common.collect.ImmutableList;
 
 import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.BlockState;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
 
 public class HugeCavernVeinProvider extends VeinProvider
 {
@@ -31,32 +27,32 @@ public class HugeCavernVeinProvider extends VeinProvider
 	}
 
 	@Override
-	protected Vein createVein(BlockState state, Rarity rarity, IWorld world, Random rand)
+	protected Vein createVein(BlockState state, Rarity rarity)
 	{
-		Vein.Properties properties = new Vein.Properties().max(world.getMaxHeight() - 1);
+		Vein.Properties properties = new Vein.Properties();
 
 		switch (rarity)
 		{
 			case COMMON:
-				properties.count(MathHelper.nextInt(rand, 10, 15));
-				properties.size(MathHelper.nextInt(rand, 20, 25));
+				properties.count(10);
+				properties.size(15);
 				break;
 			case UNCOMMON:
-				properties.count(MathHelper.nextInt(rand, 7, 10));
-				properties.size(MathHelper.nextInt(rand, 15, 20));
+				properties.count(5);
+				properties.size(12);
 				break;
 			case RARE:
-				properties.count(MathHelper.nextInt(rand, 5, 7));
-				properties.size(MathHelper.nextInt(rand, 7, 10));
+				properties.count(3);
+				properties.size(7);
 				break;
 			case EPIC:
 				properties.count(1);
-				properties.size(MathHelper.nextInt(rand, 5, 7));
+				properties.size(5);
 				properties.max(30);
 				break;
 			case EMERALD:
 				properties.count(2);
-				properties.size(MathHelper.nextInt(rand, 3, 7));
+				properties.size(5);
 				properties.max(70);
 				break;
 			case DIAMOND:
@@ -65,18 +61,32 @@ public class HugeCavernVeinProvider extends VeinProvider
 				properties.max(20);
 				break;
 			case AQUA:
-				properties.count(MathHelper.nextInt(rand, 2, 5));
-				properties.size(MathHelper.nextInt(rand, 5, 10));
+				properties.count(3);
+				properties.size(5);
 				properties.max(70);
 				break;
 			case RANDOMITE:
-				properties.count(MathHelper.nextInt(rand, 2, 5));
-				properties.size(MathHelper.nextInt(rand, 3, 5));
+				properties.count(5);
+				properties.size(5);
 				properties.min(20);
 				break;
 			default:
 		}
 
 		return new Vein(state, properties);
+	}
+
+	@Override
+	protected Vein createVariousVein(BlockState state, Rarity rarity)
+	{
+		switch (rarity)
+		{
+			case COMMON:
+				return new Vein(state, new Vein.Properties().count(12).size(25));
+			case UNCOMMON:
+				return new Vein(state, new Vein.Properties().count(10).size(20));
+			default:
+				return createVein(state, rarity);
+		}
 	}
 }

@@ -1,17 +1,14 @@
 package cavern.miner.world.vein;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.Block;
@@ -23,9 +20,7 @@ import net.minecraft.block.RedstoneOreBlock;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorld;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -34,7 +29,7 @@ public class VeinProvider
 {
 	private static final Map<Block, Rarity> RARITY_CACHE = new HashMap<>();
 
-	protected Pair<ChunkPos, List<Vein>> cachedVeins;
+	protected final List<Vein> autoEntries = new ArrayList<>();
 
 	public ImmutableList<Vein> getVeins()
 	{
@@ -157,19 +152,29 @@ public class VeinProvider
 		return Rarity.RARE;
 	}
 
-	public List<Vein> getVeins(IWorld world, ChunkPos pos, Random rand)
+	public List<Vein> getAutoEntries()
 	{
-		if (cachedVeins != null && pos.getChessboardDistance(cachedVeins.getLeft()) <= 3)
-		{
-			return cachedVeins.getRight();
-		}
-
 		if (getWhitelist() == null)
 		{
 			return Collections.emptyList();
 		}
 
-		List<Vein> list = Lists.newArrayList(getVeins());
+		if (autoEntries.isEmpty())
+		{
+			setupAutoEntries();
+		}
+
+		return autoEntries;
+	}
+
+	protected void setupAutoEntries()
+	{
+		autoEntries.clear();
+
+		if (getWhitelist() == null)
+		{
+			return;
+		}
 
 		for (BlockState state : getWhitelist())
 		{
@@ -189,22 +194,22 @@ public class VeinProvider
 					continue;
 				}
 
-				List<Vein> veins = createVeins(state, rarity, world, rand);
+				List<Vein> veins = createVeins(state, rarity);
 
 				if (veins.isEmpty())
 				{
-					Vein vein = createVein(state, rarity, world, rand);
+					Vein vein = createVein(state, rarity);
 
 					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						list.add(vein);
+						autoEntries.add(vein);
 					}
 				}
 				else for (Vein vein : veins)
 				{
 					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						list.add(vein);
+						autoEntries.add(vein);
 					}
 				}
 			}
@@ -217,73 +222,69 @@ public class VeinProvider
 					continue;
 				}
 
-				List<Vein> veins = createVariousVeins(state, rarity, world, rand);
+				List<Vein> veins = createVariousVeins(state, rarity);
 
 				if (veins.isEmpty())
 				{
-					Vein vein = createVariousVein(state, rarity, world, rand);
+					Vein vein = createVariousVein(state, rarity);
 
 					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						list.add(vein);
+						autoEntries.add(vein);
 					}
 				}
 				else for (Vein vein : veins)
 				{
 					if (vein.getCount() > 0 && vein.getSize() > 0)
 					{
-						list.add(vein);
+						autoEntries.add(vein);
 					}
 				}
 			}
 		}
-
-		cachedVeins = Pair.of(pos, list);
-
-		return list;
 	}
 
-	protected Vein createVein(BlockState state, Rarity rarity, IWorld world, Random rand)
+	protected Vein createVein(BlockState state, Rarity rarity)
 	{
-		Vein.Properties properties = new Vein.Properties().max(world.getMaxHeight() - 1);
+		Vein.Properties properties = new Vein.Properties();
 
 		switch (rarity)
 		{
 			case COMMON:
-				properties.count(MathHelper.nextInt(rand, 15, 20));
-				properties.size(MathHelper.nextInt(rand, 10, 20));
+				properties.count(20);
+				properties.size(10);
 				break;
 			case UNCOMMON:
-				properties.count(MathHelper.nextInt(rand, 12, 15));
-				properties.size(MathHelper.nextInt(rand, 7, 10));
+				properties.count(15);
+				properties.size(7);
 				break;
 			case RARE:
-				properties.count(MathHelper.nextInt(rand, 10, 12));
-				properties.size(MathHelper.nextInt(rand, 4, 7));
+				properties.count(10);
+				properties.size(5);
 				break;
 			case EPIC:
-				properties.count(MathHelper.nextInt(rand, 1, 3));
-				properties.size(MathHelper.nextInt(rand, 2, 7));
+				properties.count(2);
+				properties.size(5);
 				properties.max(30);
 				break;
 			case EMERALD:
-				properties.count(MathHelper.nextInt(rand, 1, 5));
-				properties.size(MathHelper.nextInt(rand, 1, 5));
+				properties.count(5);
+				properties.size(3);
 				properties.max(50);
 				break;
 			case DIAMOND:
-				properties.count(MathHelper.nextInt(rand, 1, 2));
-				properties.size(MathHelper.nextInt(rand, 2, 6));
+				properties.count(1);
+				properties.size(5);
 				properties.max(20);
 				break;
 			case AQUA:
-				properties.count(MathHelper.nextInt(rand, 5, 7));
-				properties.size(MathHelper.nextInt(rand, 2, 7));
+				properties.count(5);
+				properties.size(7);
 				properties.max(70);
 				break;
 			case RANDOMITE:
-				properties.count(MathHelper.nextInt(rand, 5, 10));
-				properties.size(MathHelper.nextInt(rand, 1, 4));
+				properties.count(5);
+				properties.size(3);
 				properties.min(20);
 				break;
 			default:
@@ -292,25 +293,25 @@ public class VeinProvider
 		return new Vein(state, properties);
 	}
 
-	protected List<Vein> createVeins(BlockState state, Rarity rarity, IWorld world, Random rand)
+	protected List<Vein> createVeins(BlockState state, Rarity rarity)
 	{
 		return Collections.emptyList();
 	}
 
-	protected Vein createVariousVein(BlockState state, Rarity rarity, IWorld world, Random rand)
+	protected Vein createVariousVein(BlockState state, Rarity rarity)
 	{
 		switch (rarity)
 		{
 			case COMMON:
-				return new Vein(state, new Vein.Properties().max(world.getMaxHeight() - 1).count(MathHelper.nextInt(rand, 25, 40)).size(MathHelper.nextInt(rand, 10, 30)));
+				return new Vein(state, new Vein.Properties().count(30).size(20));
 			case UNCOMMON:
-				return new Vein(state, new Vein.Properties().max(world.getMaxHeight() - 1).count(MathHelper.nextInt(rand, 20, 30)).size(MathHelper.nextInt(rand, 10, 20)));
+				return new Vein(state, new Vein.Properties().count(20).size(10));
 			default:
-				return createVein(state, rarity, world, rand);
+				return createVein(state, rarity);
 		}
 	}
 
-	protected List<Vein> createVariousVeins(BlockState state, Rarity rarity, IWorld world, Random rand)
+	protected List<Vein> createVariousVeins(BlockState state, Rarity rarity)
 	{
 		return Collections.emptyList();
 	}
