@@ -42,16 +42,14 @@ public class CavernTeleporter implements ITeleporter
 	public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
 	{
 		Entity newEntity = repositionEntity.apply(false);
-		BlockPos pos = newEntity.getPosition();
-
-		destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(pos), 3, pos);
-
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
 
 		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false))
 		{
 			return newEntity;
 		}
+
+		BlockPos pos = newEntity.getPosition();
 
 		if (destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false))
 		{
@@ -103,13 +101,17 @@ public class CavernTeleporter implements ITeleporter
 	{
 		BlockPos pos = null;
 
+		world.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(checkPos), 1, checkPos);
+
 		if (world.getBlockState(checkPos).getBlock() == portalBlock)
 		{
 			pos = checkPos;
 		}
 		else
 		{
-			int max = world.getActualHeight() - 1;
+			int yRadius = MathHelper.floor(radius * 1.5D);
+			int min = Math.max(checkPos.getY() - yRadius, 1);
+			int max = Math.min(checkPos.getY() + yRadius, world.getActualHeight() - 1);
 			BlockPos.Mutable findPos = new BlockPos.Mutable();
 
 			outside: for (int r = 1; r <= radius; ++r)
@@ -130,7 +132,7 @@ public class CavernTeleporter implements ITeleporter
 							}
 						}
 
-						for (int y = checkPos.getY(); y > 1; --y)
+						for (int y = checkPos.getY(); y > min; --y)
 						{
 							if (world.getBlockState(findPos.setPos(checkPos.getX() + i, y, checkPos.getZ() + j)).getBlock() == portalBlock)
 							{
@@ -179,10 +181,12 @@ public class CavernTeleporter implements ITeleporter
 	@Nullable
 	public BlockPos makePortal(ServerWorld world, Entity entity, int radius)
 	{
-		int max = world.getActualHeight() - 1;
 		int originX = MathHelper.floor(entity.getPosX());
 		int originY = MathHelper.floor(entity.getPosY());
 		int originZ = MathHelper.floor(entity.getPosZ());
+		int yRadius = MathHelper.floor(radius * 1.5D);
+		int min = Math.max(originY - yRadius, 10);
+		int max = Math.min(originY + yRadius, world.getActualHeight() - 10);
 		int x = originX;
 		int y = originY;
 		int z = originZ;
@@ -204,7 +208,7 @@ public class CavernTeleporter implements ITeleporter
 					double xSize = px + 0.5D - entity.getPosX();
 					double zSize = pz + 0.5D - entity.getPosZ();
 
-					int py = 1;
+					int py = min;
 
 					while (py < max && !world.isAirBlock(pos.setPos(px, py, pz)))
 					{
@@ -283,7 +287,7 @@ public class CavernTeleporter implements ITeleporter
 						double xSize = px + 0.5D - entity.getPosX();
 						double zSize = pz + 0.5D - entity.getPosZ();
 
-						int py = 1;
+						int py = min;
 
 						while (py < max && !world.isAirBlock(pos.setPos(px, py, pz)))
 						{
@@ -353,7 +357,7 @@ public class CavernTeleporter implements ITeleporter
 
 		if (portalDist < 0.0D)
 		{
-			y = MathHelper.clamp(y, 1, max - 10);
+			y = MathHelper.clamp(y, min, max);
 			y1 = y;
 
 			for (int size1 = -1; size1 <= 1; ++size1)
