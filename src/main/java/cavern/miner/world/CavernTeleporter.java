@@ -20,10 +20,12 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.common.util.LazyOptional;
 
@@ -43,6 +45,9 @@ public class CavernTeleporter implements ITeleporter
 	{
 		Entity newEntity = repositionEntity.apply(false);
 		BlockPos pos = newEntity.getPosition();
+
+		destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(pos), 3, pos);
+
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
 
 		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false))
