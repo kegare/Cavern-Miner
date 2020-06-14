@@ -209,58 +209,59 @@ public class CavernTeleporter implements ITeleporter
 					double xSize = px + 0.5D - entity.getPosX();
 					double zSize = pz + 0.5D - entity.getPosZ();
 
-					outside: for (int py = max; py > 1; --py)
+					int py = 1;
+
+					while (py < max && !world.isAirBlock(pos.setPos(px, py, pz)))
 					{
-						if (world.isAirBlock(pos.setPos(px, py, pz)))
+						++py;
+					}
+
+					if (py >= max)
+					{
+						continue;
+					}
+
+					outside: for (int k = j; k < j + 4; ++k)
+					{
+						int i1 = k % 2;
+						int j1 = 1 - i1;
+
+						if (k % 4 >= 2)
 						{
-							while (py > 0 && world.isAirBlock(pos.setPos(px, py - 1, pz)))
+							i1 = -i1;
+							j1 = -j1;
+						}
+
+						for (int size1 = 0; size1 < 3; ++size1)
+						{
+							for (int size2 = 0; size2 < 4; ++size2)
 							{
-								--py;
-							}
-
-							for (int k = j; k < j + 4; ++k)
-							{
-								int i1 = k % 2;
-								int j1 = 1 - i1;
-
-								if (k % 4 >= 2)
+								for (int height = -1; height < 4; ++height)
 								{
-									i1 = -i1;
-									j1 = -j1;
-								}
+									int checkX = px + (size2 - 1) * i1 + size1 * j1;
+									int checkY = py + height;
+									int checkZ = pz + (size2 - 1) * j1 - size1 * i1;
 
-								for (int size1 = 0; size1 < 3; ++size1)
-								{
-									for (int size2 = 0; size2 < 4; ++size2)
+									pos.setPos(checkX, checkY, checkZ);
+
+									if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 									{
-										for (int height = -1; height < 4; ++height)
-										{
-											int checkX = px + (size2 - 1) * i1 + size1 * j1;
-											int checkY = py + height;
-											int checkZ = pz + (size2 - 1) * j1 - size1 * i1;
-
-											pos.setPos(checkX, checkY, checkZ);
-
-											if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
-											{
-												continue outside;
-											}
-										}
+										break outside;
 									}
 								}
-
-								double ySize = py + 0.5D - entity.getPosY();
-								double size = xSize * xSize + ySize * ySize + zSize * zSize;
-
-								if (portalDist < 0.0D || size < portalDist)
-								{
-									portalDist = size;
-									x = px;
-									y = py;
-									z = pz;
-									i = k % 4;
-								}
 							}
+						}
+
+						double ySize = py + 0.5D - entity.getPosY();
+						double size = xSize * xSize + ySize * ySize + zSize * zSize;
+
+						if (portalDist < 0.0D || size < portalDist)
+						{
+							portalDist = size;
+							x = px;
+							y = py;
+							z = pz;
+							i = k % 4;
 						}
 					}
 				}
@@ -287,49 +288,50 @@ public class CavernTeleporter implements ITeleporter
 						double xSize = px + 0.5D - entity.getPosX();
 						double zSize = pz + 0.5D - entity.getPosZ();
 
-						outside: for (int py = max; py > 1; --py)
+						int py = 1;
+
+						while (py < max && !world.isAirBlock(pos.setPos(px, py, pz)))
 						{
-							if (world.isAirBlock(pos.setPos(px, py, pz)))
+							++py;
+						}
+
+						if (py >= max)
+						{
+							continue;
+						}
+
+						outside: for (int k = j; k < j + 2; ++k)
+						{
+							int i1 = k % 2;
+							int j1 = 1 - i1;
+
+							for (int width = 0; width < 4; ++width)
 							{
-								while (py > 0 && world.isAirBlock(pos.setPos(px, py - 1, pz)))
+								for (int height = -1; height < 4; ++height)
 								{
-									--py;
-								}
+									int px1 = px + (width - 1) * i1;
+									int py1 = py + height;
+									int pz1 = pz + (width - 1) * j1;
 
-								for (int k = j; k < j + 2; ++k)
-								{
-									int i1 = k % 2;
-									int j1 = 1 - i1;
+									pos.setPos(px1, py1, pz1);
 
-									for (int width = 0; width < 4; ++width)
+									if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 									{
-										for (int height = -1; height < 4; ++height)
-										{
-											int px1 = px + (width - 1) * i1;
-											int py1 = py + height;
-											int pz1 = pz + (width - 1) * j1;
-
-											pos.setPos(px1, py1, pz1);
-
-											if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
-											{
-												continue outside;
-											}
-										}
-									}
-
-									double ySize = py + 0.5D - entity.getPosY();
-									double size = xSize * xSize + ySize * ySize + zSize * zSize;
-
-									if (portalDist < 0.0D || size < portalDist)
-									{
-										portalDist = size;
-										x = px;
-										y = py;
-										z = pz;
-										i = k % 2;
+										break outside;
 									}
 								}
+							}
+
+							double ySize = py + 0.5D - entity.getPosY();
+							double size = xSize * xSize + ySize * ySize + zSize * zSize;
+
+							if (portalDist < 0.0D || size < portalDist)
+							{
+								portalDist = size;
+								x = px;
+								y = py;
+								z = pz;
+								i = k % 2;
 							}
 						}
 					}
