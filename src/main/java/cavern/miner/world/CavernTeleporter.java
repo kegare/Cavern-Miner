@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.ObjectUtils;
-
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
@@ -161,10 +159,10 @@ public class CavernTeleporter implements ITeleporter
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(portalBlock, portalPos));
 
 		LazyOptional<TeleporterCache> cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE);
-		Vec3d portalVec = ObjectUtils.defaultIfNull(cache.isPresent() ? cache.orElse(null).getLastPortalVec() : Vec3d.ZERO, Vec3d.ZERO);
-		Direction teleportDirection = ObjectUtils.defaultIfNull(cache.isPresent() ? cache.orElse(null).getTeleportDirection() : Direction.NORTH, Direction.NORTH);
+		Vec3d portalVec = cache.map(TeleporterCache::getLastPortalVec).orElse(Vec3d.ZERO);
+		Direction teleportDirection = cache.map(TeleporterCache::getTeleportDirection).orElse(Direction.NORTH);
 		BlockPattern.PatternHelper pattern = CavernPortalBlock.createPatternHelper(portalBlock, world, portalPos);
-		BlockPattern.PortalInfo portalInfo = pattern.getPortalInfo(teleportDirection, portalPos, portalVec.y, entity.getMotion(), portalVec.z);
+		BlockPattern.PortalInfo portalInfo = pattern.getPortalInfo(teleportDirection, portalPos, portalVec.y, entity.getMotion(), portalVec.x);
 
 		if (portalInfo == null)
 		{
@@ -173,15 +171,7 @@ public class CavernTeleporter implements ITeleporter
 
 		entity.setMotion(portalInfo.motion);
 		entity.rotationYaw = yaw + portalInfo.rotation;
-
-		if (world.getBlockState(new BlockPos(portalInfo.pos)).getBlock() == portalBlock)
-		{
-			entity.moveForced(portalInfo.pos.x, portalInfo.pos.y + 0.5D, portalInfo.pos.z);
-		}
-		else
-		{
-			entity.moveForced(portalPos.getX() + 0.5D, portalInfo.pos.y + 0.5D, portalPos.getZ() + 0.5D);
-		}
+		entity.moveForced(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z);
 
 		return true;
 	}
