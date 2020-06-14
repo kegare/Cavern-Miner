@@ -1,5 +1,6 @@
 {
-	"block.cavern.cavern_portal": "洞窟ポータル",
+	"block.cavern.cavern_portal": "大洞窟ポータル",
+	"block.cavern.huge_cavern_portal": "果てなき大洞窟ポータル",
 	"block.cavern.magnite_ore": "マグナイト鉱石",
 	"block.cavern.magnite_block": "マグナイトブロック",
 	"block.cavern.aquamarine_ore": "アクアマリン鉱石",

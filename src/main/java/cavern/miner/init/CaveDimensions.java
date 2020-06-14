@@ -3,7 +3,8 @@ package cavern.miner.init;
 import javax.annotation.Nullable;
 
 import cavern.miner.block.CavernPortalBlock;
-import cavern.miner.world.CavernDimension;
+import cavern.miner.world.dimension.CavernDimension;
+import cavern.miner.world.dimension.HugeCavernDimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
@@ -20,13 +21,16 @@ public final class CaveDimensions
 	public static final DeferredRegister<ModDimension> REGISTRY = new DeferredRegister<>(ForgeRegistries.MOD_DIMENSIONS, "cavern");
 
 	public static final RegistryObject<ModDimension> CAVERN = REGISTRY.register("cavern", () -> ModDimension.withFactory(CavernDimension::new));
+	public static final RegistryObject<ModDimension> HUGE_CAVERN = REGISTRY.register("huge_cavern", () -> ModDimension.withFactory(HugeCavernDimension::new));
 
 	public static DimensionType CAVERN_TYPE;
+	public static DimensionType HUGE_CAVERN_TYPE;
 
 	@SubscribeEvent
 	public static void registerDimensions(final RegisterDimensionsEvent event)
 	{
 		CAVERN_TYPE = CAVERN.map(o -> DimensionManager.registerOrGetDimension(o.getRegistryName(), o, null, false)).orElse(null);
+		HUGE_CAVERN_TYPE = HUGE_CAVERN.map(o -> DimensionManager.registerOrGetDimension(o.getRegistryName(), o, null, false)).orElse(null);
 	}
 
 	@Nullable

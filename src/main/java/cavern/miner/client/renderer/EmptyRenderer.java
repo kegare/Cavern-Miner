@@ -1,4 +1,4 @@
-package cavern.miner.client.render;
+package cavern.miner.client.renderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.world.ClientWorld;

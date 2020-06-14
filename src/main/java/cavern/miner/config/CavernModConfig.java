@@ -16,23 +16,17 @@ public class CavernModConfig
 
 	public static void register(ModLoadingContext context)
 	{
-		File dir = getConfigDir();
+		File[] configDirs = {getConfigDir(), CavernConfig.getConfigDir(), HugeCavernConfig.getConfigDir()};
 
-		if (!dir.exists())
+		for (File dir : configDirs)
 		{
-			dir.mkdirs();
+			if (!dir.exists()) dir.mkdirs();
 		}
 
 		context.registerConfig(ModConfig.Type.COMMON, GeneralConfig.SPEC, "cavern_miner/general.toml");
 		context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "cavern_miner/client.toml");
 
-		dir = CavernConfig.getConfigDir();
-
-		if (!dir.exists())
-		{
-			dir.mkdirs();
-		}
-
 		context.registerConfig(ModConfig.Type.COMMON, CavernConfig.SPEC, "cavern_miner/cavern/dimension.toml");
+		context.registerConfig(ModConfig.Type.COMMON, HugeCavernConfig.SPEC, "cavern_miner/huge_cavern/dimension.toml");
 	}
 }

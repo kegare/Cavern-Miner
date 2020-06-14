@@ -2,9 +2,8 @@ package cavern.miner.world.gen;
 
 import java.util.Random;
 
-import cavern.miner.config.CavernConfig;
-import cavern.miner.init.CaveFeatures;
-import cavern.miner.world.CavernDimension;
+import cavern.miner.world.biome.CavernBiome;
+import cavern.miner.world.dimension.CavernDimension;
 import cavern.miner.world.spawner.CaveMobSpawner;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.SharedSeedRandom;
@@ -21,7 +20,6 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
-import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.server.ServerWorld;
 
 public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGenerator<T>
@@ -107,17 +105,7 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 	{
 		super.decorate(region);
 
-		Random rand = region.getRandom();
-		int chunkX = region.getMainChunkX();
-		int chunkZ = region.getMainChunkZ();
-		BlockPos pos = new BlockPos(chunkX * 16, 0, chunkZ * 16);
-
-		CaveFeatures.VEIN.ifPresent(o -> o.place(region, this, rand, pos, IFeatureConfig.NO_FEATURE_CONFIG));
-
-		if (rand.nextDouble() < CavernConfig.INSTANCE.towerDungeon.get())
-		{
-			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> o.place(region, this, rand, pos.add(8, rand.nextInt(30) + 5, 8), IFeatureConfig.NO_FEATURE_CONFIG));
-		}
+		CavernBiome.get(region).ifPresent(o -> o.placeCaveFeatures(region, this, new BlockPos(region.getMainChunkX() * 16, 0, region.getMainChunkZ() * 16), region.getRandom()));
 	}
 
 	@Override

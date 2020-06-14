@@ -8,9 +8,9 @@ import com.mojang.datafixers.Dynamic;
 import net.minecraft.world.gen.carver.CaveWorldCarver;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 
-public class ExtremeCaveWorldCarver extends CaveWorldCarver
+public class HugeCaveWorldCarver extends CaveWorldCarver
 {
-	public ExtremeCaveWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> config, int maxHeight)
+	public HugeCaveWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> config, int maxHeight)
 	{
 		super(config, maxHeight);
 	}
@@ -18,17 +18,17 @@ public class ExtremeCaveWorldCarver extends CaveWorldCarver
 	@Override
 	protected int func_222724_a()
 	{
-		return 25;
+		return 5;
 	}
 
 	@Override
 	protected float generateCaveRadius(Random rand)
 	{
-		float f = rand.nextFloat() * 20.0F + rand.nextFloat();
+		float f = rand.nextFloat() * 50.0F + rand.nextFloat();
 
 		if (rand.nextInt(5) == 0)
 		{
-			f *= rand.nextFloat() * rand.nextFloat() * 2.0F + 1.0F;
+			f *= rand.nextFloat() * rand.nextFloat() + 1.0F;
 		}
 
 		return f;
@@ -37,12 +37,12 @@ public class ExtremeCaveWorldCarver extends CaveWorldCarver
 	@Override
 	protected double func_222725_b()
 	{
-		return 1.75D;
+		return 2.0D;
 	}
 
 	@Override
 	protected int generateCaveStartY(Random rand)
 	{
-		return 170 + rand.nextInt(15);
+		return 120 + rand.nextInt(rand.nextInt(15) + 5);
 	}
 }

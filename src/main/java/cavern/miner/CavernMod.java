@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.CavernModConfig;
 import cavern.miner.config.GeneralConfig;
+import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.config.VeinConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveBlocks;
@@ -82,5 +83,6 @@ public final class CavernMod
 		GeneralConfig.loadConfig();
 
 		CavernConfig.loadConfig();
+		HugeCavernConfig.loadConfig();
 	}
 }

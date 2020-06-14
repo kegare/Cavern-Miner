@@ -73,6 +73,11 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	@OnlyIn(Dist.CLIENT)
 	public MinerRank.DisplayEntry getDisplayRank()
 	{
+		if (displayRank == null)
+		{
+			displayRank = new MinerRank.DisplayEntry(getRank());
+		}
+
 		return displayRank;
 	}
 

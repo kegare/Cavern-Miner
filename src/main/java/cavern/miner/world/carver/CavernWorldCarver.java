@@ -28,8 +28,8 @@ public class CavernWorldCarver extends CaveWorldCarver
 	}
 
 	@Override
-	protected int generateCaveStartY(Random random)
+	protected int generateCaveStartY(Random rand)
 	{
-		return random.nextInt(120) + 5;
+		return rand.nextInt(120) + 5;
 	}
 }

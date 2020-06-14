@@ -1,0 +1,7 @@
+{
+    "parent": "cavern:block/cavern_portal",
+    "textures": {
+        "particle": "cavern:item/huge_cavern_portal",
+        "portal": "cavern:item/huge_cavern_portal"
+    }
+}

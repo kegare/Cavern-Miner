@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -21,9 +22,19 @@ public class MinerRecord implements INBTSerializable<CompoundNBT>
 		return entries.merge(block, 1, Integer::sum);
 	}
 
+	public int add(BlockState state)
+	{
+		return add(state.getBlock());
+	}
+
 	public int get(Block block)
 	{
 		return entries.getOrDefault(block, 0);
+	}
+
+	public int get(BlockState state)
+	{
+		return get(state.getBlock());
 	}
 
 	public void set(Block block, int count)
@@ -32,6 +43,11 @@ public class MinerRecord implements INBTSerializable<CompoundNBT>
 		{
 			entries.put(block, count);
 		}
+	}
+
+	public void set(BlockState state, int count)
+	{
+		set(state.getBlock(), count);
 	}
 
 	public ImmutableList<Map.Entry<Block, Integer>> getEntries()

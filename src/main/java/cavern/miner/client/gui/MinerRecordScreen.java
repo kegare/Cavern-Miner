@@ -158,11 +158,11 @@ public class MinerRecordScreen extends Screen
 			public void render(int entryID, int top, int left, int right, int bottom, int mouseX, int mouseY, boolean mouseOver, float particalTicks)
 			{
 				ITextComponent name = block.getNameTextComponent();
-				FontRenderer fontRenderer = MinerRecordScreen.this.font;
+				FontRenderer font = MinerRecordScreen.this.font;
 				int x = RecordList.this.width / 2;
 				int y = top + 1;
 
-				RecordList.this.drawCenteredString(fontRenderer, name.getFormattedText(), x, y, 0xFFFFFF);
+				RecordList.this.drawCenteredString(font, name.getFormattedText(), x, y, 0xFFFFFF);
 
 				ItemRenderer itemRenderer = MinerRecordScreen.this.itemRenderer;
 				ItemStack stack = ItemStackCache.get(block);
@@ -172,7 +172,7 @@ public class MinerRecordScreen extends Screen
 
 				RenderSystem.enableRescaleNormal();
 				itemRenderer.renderItemIntoGUI(stack, x, y);
-				itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x, y, Integer.toString(count));
+				itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, Integer.toString(count));
 				RenderSystem.disableRescaleNormal();
 
 				switch (entryID)
@@ -200,7 +200,7 @@ public class MinerRecordScreen extends Screen
 
 				RenderSystem.enableRescaleNormal();
 				itemRenderer.renderItemIntoGUI(stack, x, y);
-				itemRenderer.renderItemOverlayIntoGUI(fontRenderer, stack, x, y, String.format("%.2f", per) + "%");
+				itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, String.format("%.2f", per) + "%");
 				RenderSystem.disableRescaleNormal();
 			}
 		}

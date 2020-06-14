@@ -1,4 +1,4 @@
-package cavern.miner.world;
+package cavern.miner.world.dimension;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 import cavern.miner.block.CavernPortalBlock;
-import cavern.miner.client.render.EmptyRenderer;
+import cavern.miner.client.renderer.EmptyRenderer;
 import cavern.miner.config.CavernConfig;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveBiomes;
@@ -20,15 +20,18 @@ import cavern.miner.world.spawner.CaveMobSpawner;
 import cavern.miner.world.spawner.CavernMobSpawner;
 import cavern.miner.world.vein.CavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProviderType;
 import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
@@ -37,33 +40,57 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class CavernDimension extends Dimension
 {
-	public static final VeinProvider VEINS = new CavernVeinProvider();
-
+	protected final VeinProvider veinProvider;
 	protected final CaveMobSpawner caveMobSpawner;
+
+	protected final float[] lightBrightnessTable = new float[16];
 
 	public CavernDimension(World world, DimensionType type)
 	{
-		super(world, type, CavernConfig.INSTANCE.lightBrightness.get().floatValue());
+		super(world, type, 0);
+		this.veinProvider = createVeinProvider();
 		this.caveMobSpawner = createCaveMobSpawner();
 		this.setSkyRenderer(EmptyRenderer.INSTANCE);
 		this.setCloudRenderer(EmptyRenderer.INSTANCE);
 		this.setWeatherRenderer(EmptyRenderer.INSTANCE);
+
+		float brightness = getLightBrightness();
+
+		for (int i = 0; i <= 15; ++i)
+		{
+			float f = i / 15.0F;
+			float f1 = f / (4.0F - 3.0F * f);
+
+			this.lightBrightnessTable[i] = MathHelper.lerp(brightness, f1, 1.0F);
+		}
+	}
+
+	public Biome getBiome()
+	{
+		return CaveBiomes.CAVERN.orElse(Biomes.PLAINS);
 	}
 
 	@Override
 	public ChunkGenerator<? extends GenerationSettings> createChunkGenerator()
 	{
-		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(CaveBiomes.CAVERN.orElse(Biomes.PLAINS));
+		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(getBiome());
 
 		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), new CavernGenSettings());
 	}
 
+	public VeinProvider createVeinProvider()
+	{
+		return new CavernVeinProvider();
+	}
+
 	public VeinProvider getVeinProvider()
 	{
-		return VEINS;
+		return veinProvider;
 	}
 
 	@Nullable
@@ -80,6 +107,29 @@ public class CavernDimension extends Dimension
 	public Optional<CaveMobSpawner> getCaveMobSpawner()
 	{
 		return Optional.ofNullable(caveMobSpawner);
+	}
+
+	public float getLightBrightness()
+	{
+		return CavernConfig.INSTANCE.lightBrightness.get().floatValue();
+	}
+
+	@Override
+	public float getLightBrightness(int level)
+	{
+		return lightBrightnessTable[level];
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public float getFogDensity(Entity entity)
+	{
+		return 0.0F;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public float getFogDepth(Entity entity)
+	{
+		return 0.0F;
 	}
 
 	@Override
@@ -135,7 +185,7 @@ public class CavernDimension extends Dimension
 	@Override
 	public float calculateCelestialAngle(long worldTime, float partialTicks)
 	{
-		return 0;
+		return 0.5F;
 	}
 
 	@Override
@@ -147,6 +197,21 @@ public class CavernDimension extends Dimension
 		return false;
 	}
 
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public boolean isSkyColored()
+	{
+		return false;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public boolean doesXZShowFog(int x, int z)
+	{
+		return false;
+	}
+
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public Vec3d getFogColor(float celestialAngle, float partialTicks)
 	{
@@ -155,12 +220,6 @@ public class CavernDimension extends Dimension
 
 	@Override
 	public boolean canRespawnHere()
-	{
-		return false;
-	}
-
-	@Override
-	public boolean doesXZShowFog(int x, int z)
 	{
 		return false;
 	}

@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import cavern.miner.block.CaveOreBlock;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.block.CrackedStoneBlock;
+import cavern.miner.block.HugeCavernPortalBlock;
 import cavern.miner.block.RandomiteOreBlock;
 import cavern.miner.item.CavernPortalItem;
 import net.minecraft.block.Block;
@@ -28,8 +29,9 @@ public final class CaveBlocks
 	public static final DeferredRegister<Block> REGISTRY = new DeferredRegister<>(ForgeRegistries.BLOCKS, "cavern");
 
 	public static final RegistryObject<CavernPortalBlock> CAVERN_PORTAL = REGISTRY.register("cavern_portal", () -> new CavernPortalBlock(createPortalProperties()));
+	public static final RegistryObject<CavernPortalBlock> HUGE_CAVERN_PORTAL = REGISTRY.register("huge_cavern_portal", () -> new HugeCavernPortalBlock(createPortalProperties()));
 
-	public static final ImmutableList<RegistryObject<CavernPortalBlock>> CAVE_PORTALS = ImmutableList.of(CAVERN_PORTAL);
+	public static final ImmutableList<RegistryObject<CavernPortalBlock>> CAVE_PORTALS = ImmutableList.of(CAVERN_PORTAL, HUGE_CAVERN_PORTAL);
 
 	public static final RegistryObject<Block> MAGNITE_ORE = REGISTRY.register("magnite_ore", () -> new OreBlock(createOreProperties()));
 	public static final RegistryObject<Block> MAGNITE_BLOCK = REGISTRY.register("magnite_block",
@@ -71,7 +73,10 @@ public final class CaveBlocks
 	@OnlyIn(Dist.CLIENT)
 	public static void registerRenderType()
 	{
-		CAVERN_PORTAL.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getTranslucent()));
+		for (RegistryObject<CavernPortalBlock> portal : CAVE_PORTALS)
+		{
+			portal.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getTranslucent()));
+		}
 
 		MAGNITE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
 		AQUAMARINE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));

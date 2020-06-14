@@ -11,7 +11,7 @@ import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerCache;
 import cavern.miner.storage.MinerRank;
-import cavern.miner.world.CavernDimension;
+import cavern.miner.world.dimension.CavernDimension;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -33,9 +33,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = "cavern", value = Dist.CLIENT)
 public class MinerDisplayHandler
 {
-	private static int posX;
-	private static int posY;
-	private static double pointPer;
+	private static double pointPer = -1.0D;
 
 	private static boolean canDisplay()
 	{
@@ -64,44 +62,13 @@ public class MinerDisplayHandler
 		return mc.player.isCreative() || type == DisplayType.ALWAYS;
 	}
 
-	private static void setDisplayPosition(DisplayCorner corner, int width, int height)
-	{
-		switch (corner)
-		{
-			case TOP_RIGHT:
-				posX = width - 20;
-				posY = 5;
-
-				Minecraft mc = Minecraft.getInstance();
-
-				if (!mc.player.getActivePotionMap().isEmpty())
-				{
-					posY = 30;
-				}
-
-				break;
-			case TOP_LEFT:
-				posX = 5;
-				posY = 5;
-				break;
-			case BOTTOM_RIGHT:
-				posX = width - 20;
-				posY = height - 21;
-				break;
-			case BOTTOM_LEFT:
-				posX = 5;
-				posY = height - 21;
-				break;
-		}
-	}
-
 	private static double calcPointPer(int point, int phase)
 	{
-		double per = point == 0 ? 0.0D : (double)point / (double)phase * 100.0D;
-		double diff = Math.abs(per - pointPer);
+		double per = point <= 0 ? 0.0D : (double)point / (double)phase * 100.0D;
+		double diff = pointPer < 0.0D ? 0.0D : Math.abs(per - pointPer);
 		double move = diff * 0.1D;
 
-		if (pointPer < 0.0D)
+		if (pointPer < 0.0D || move <= 0.0D)
 		{
 			pointPer = per;
 		}
@@ -140,20 +107,32 @@ public class MinerDisplayHandler
 			return;
 		}
 
-		MinerRank.DisplayEntry rank = miner.getDisplayRank();
+		MainWindow window = event.getWindow();
+		int width = window.getScaledWidth();
+		int height = window.getScaledHeight();
 
-		if (rank == null)
+		DisplayCorner corner = ClientConfig.INSTANCE.displayConer.get();
+		int x = width - 20;
+		int y = height - 21;
+
+		if (corner.isTop())
 		{
-			return;
+			y = 5;
 		}
 
-		MainWindow window = event.getWindow();
-		DisplayCorner corner = ClientConfig.INSTANCE.displayConer.get();
+		if (corner.isLeft())
+		{
+			x = 5;
+		}
 
-		setDisplayPosition(corner, window.getScaledWidth(), window.getScaledHeight());
+		if (corner == DisplayCorner.TOP_RIGHT && !mc.player.getActivePotionMap().isEmpty())
+		{
+			y += 25;
+		}
 
-		int x = posX;
-		int y = posY;
+		final int originX = x;
+
+		MinerRank.DisplayEntry rank = miner.getDisplayRank();
 		String pointText = Integer.toString(miner.getPoint());
 		String rankText = rank.getDisplayName();
 
@@ -259,7 +238,7 @@ public class MinerDisplayHandler
 			matrix.push();
 			matrix.translate(0.0D, 0.0D, itemRenderer.zLevel + 200.0F);
 
-			x2 = corner.isLeft() ? posX + 5 : posX + 17 - fontRenderer.getStringWidth(rankText);
+			x2 = corner.isLeft() ? originX + 5 : originX + 17 - fontRenderer.getStringWidth(rankText);
 			z2 = corner.isTop() ? y + 21 : y - 12;
 
 			fontRenderer.renderString(rankText, x2, z2, 0xCECECE, true, matrix.getLast().getMatrix(), buffer, false, 0, 15728880);
@@ -276,7 +255,7 @@ public class MinerDisplayHandler
 			matrix.push();
 			matrix.translate(0.0D, 0.0D, itemRenderer.zLevel + 200.0F);
 
-			x2 = corner.isLeft() ? posX + 5 : posX + 17 - fontRenderer.getStringWidth(comboText);
+			x2 = corner.isLeft() ? originX + 5 : originX + 17 - fontRenderer.getStringWidth(comboText);
 			z2 = corner.isTop() ? y + 33 : y - 24;
 
 			fontRenderer.renderString(comboText, x2, z2, 0xFFFFFF, true, matrix.getLast().getMatrix(), buffer, false, 0, 15728880);
