@@ -18,13 +18,13 @@ public class ExtremeCaveWorldCarver extends CaveWorldCarver
 	@Override
 	protected int func_222724_a()
 	{
-		return 25;
+		return 10;
 	}
 
 	@Override
 	protected float generateCaveRadius(Random rand)
 	{
-		float f = rand.nextFloat() * 20.0F + rand.nextFloat();
+		float f = rand.nextFloat() * 10.0F + rand.nextFloat();
 
 		if (rand.nextInt(5) == 0)
 		{
@@ -37,12 +37,12 @@ public class ExtremeCaveWorldCarver extends CaveWorldCarver
 	@Override
 	protected double func_222725_b()
 	{
-		return 1.75D;
+		return 1.2D;
 	}
 
 	@Override
 	protected int generateCaveStartY(Random rand)
 	{
-		return 170 + rand.nextInt(15);
+		return 170 + rand.nextInt(5);
 	}
 }

@@ -18,7 +18,7 @@ public class CavernWorldCarver extends CaveWorldCarver
 	@Override
 	protected int func_222724_a()
 	{
-		return 25;
+		return 35;
 	}
 
 	@Override
@@ -30,6 +30,6 @@ public class CavernWorldCarver extends CaveWorldCarver
 	@Override
 	protected int generateCaveStartY(Random rand)
 	{
-		return rand.nextInt(120) + 5;
+		return rand.nextInt(maxHeight - 50) + 5;
 	}
 }
