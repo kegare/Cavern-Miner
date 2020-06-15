@@ -3,6 +3,8 @@ package cavern.miner.world.dimension;
 import cavern.miner.config.HugeCavernConfig;
 import cavern.miner.config.client.ClientConfig;
 import cavern.miner.init.CaveBiomes;
+import cavern.miner.world.gen.CavernGenSettings;
+import cavern.miner.world.gen.HugeCavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;
 import cavern.miner.world.spawner.HugeCavernMobSpawner;
 import cavern.miner.world.spawner.WorldSpawnerType;
@@ -31,6 +33,12 @@ public class HugeCavernDimension extends CavernDimension
 	public Biome getBiome()
 	{
 		return CaveBiomes.HUGE_CAVERN.orElse(Biomes.PLAINS);
+	}
+
+	@Override
+	public CavernGenSettings createGenerationSettings()
+	{
+		return new HugeCavernGenSettings();
 	}
 
 	@Override

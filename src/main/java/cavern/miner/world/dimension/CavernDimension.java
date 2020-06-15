@@ -81,7 +81,12 @@ public class CavernDimension extends Dimension
 	{
 		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(getBiome());
 
-		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), new CavernGenSettings());
+		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), createGenerationSettings());
+	}
+
+	public CavernGenSettings createGenerationSettings()
+	{
+		return new CavernGenSettings();
 	}
 
 	public VeinProvider createVeinProvider()

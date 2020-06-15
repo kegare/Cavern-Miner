@@ -18,6 +18,8 @@ import net.minecraft.world.gen.carver.WorldCarver;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.placement.ChanceRangeConfig;
+import net.minecraft.world.gen.placement.CountConfig;
+import net.minecraft.world.gen.placement.FrequencyConfig;
 import net.minecraft.world.gen.placement.IPlacementConfig;
 import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
@@ -27,7 +29,7 @@ public class CavernBiome extends Biome
 	public CavernBiome()
 	{
 		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
-			.depth(0.125F).scale(0.05F).temperature(1.0F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
+			.depth(0.125F).scale(0.05F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
 		this.addSpawns();
 	}
@@ -74,6 +76,15 @@ public class CavernBiome extends Biome
 			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES, o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG)
 				.withPlacement(CavePlacements.TOWER_DUNGEON.orElse(Placement.CHANCE_RANGE).configure(new ChanceRangeConfig(chance, 5, 0, 30)))));
 		}
+
+		CaveFeatures.GROUND_PATCH.ifPresent(o ->
+		{
+			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+				o.withConfiguration(DefaultBiomeFeatures.GRASS_CONFIG).withPlacement(Placement.COUNT_HEIGHTMAP_DOUBLE.configure(new FrequencyConfig(20))));
+		});
+
+		CaveFeatures.GROUND_TREE.ifPresent(o -> addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+			o.withConfiguration(new CountConfig(32)).withPlacement(Placement.COUNT_HEIGHTMAP_DOUBLE.configure(new FrequencyConfig(10)))));
 	}
 
 	protected void addFeatures()

@@ -5,10 +5,9 @@ import java.util.function.Function;
 
 import com.mojang.datafixers.Dynamic;
 
-import net.minecraft.world.gen.carver.CaveWorldCarver;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 
-public class ExtremeCaveWorldCarver extends CaveWorldCarver
+public class ExtremeCaveWorldCarver extends CavernWorldCarver
 {
 	public ExtremeCaveWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> config, int maxHeight)
 	{

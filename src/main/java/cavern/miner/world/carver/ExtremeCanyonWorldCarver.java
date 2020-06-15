@@ -23,7 +23,7 @@ public class ExtremeCanyonWorldCarver extends CanyonWorldCarver
 	}
 
 	@Override
-	public boolean func_225555_a_(IChunk chunk, Function<BlockPos, Biome> biomes, Random rand, int par4, int chunkX, int chunkZ, int par5, int par6, BitSet set, ProbabilityConfig config)
+	public boolean func_225555_a_(IChunk chunk, Function<BlockPos, Biome> biomes, Random rand, int par4, int chunkX, int chunkZ, int par5, int par6, BitSet carvingMask, ProbabilityConfig config)
 	{
 		int i = (func_222704_c() * 2 - 1) * 16;
 		double blockX = chunkX * 16 + rand.nextInt(16);
@@ -34,12 +34,12 @@ public class ExtremeCanyonWorldCarver extends CanyonWorldCarver
 		float scale = (rand.nextFloat() * 2.0F + rand.nextFloat()) * 8.0F;
 		int targetY = i - rand.nextInt(i / 4);
 
-		genCanyon(chunk, biomes, rand.nextLong(), par4, par5, par6, blockX, blockY, blockZ, scale, leftRightRadian, upDownRadian, 0, targetY, 9.0D, set);
+		genCanyon(chunk, biomes, rand.nextLong(), par4, par5, par6, blockX, blockY, blockZ, scale, leftRightRadian, upDownRadian, 0, targetY, 9.0D, carvingMask);
 
 		return true;
 	}
 
-	private void genCanyon(IChunk chunk, Function<BlockPos, Biome> biomes, long seed, int par4, int par5, int par6, double blockX, double blockY, double blockZ, float scale, float leftRightRadian, float upDownRadian, int startY, int targetY, double scaleHeight, BitSet set)
+	private void genCanyon(IChunk chunk, Function<BlockPos, Biome> biomes, long seed, int par4, int par5, int par6, double blockX, double blockY, double blockZ, float scale, float leftRightRadian, float upDownRadian, int startY, int targetY, double scaleHeight, BitSet carvingMask)
 	{
 		Random random = new Random(seed);
 		float f = 1.0F;
@@ -83,7 +83,7 @@ public class ExtremeCanyonWorldCarver extends CanyonWorldCarver
 					return;
 				}
 
-				func_227208_a_(chunk, biomes, seed, par4, par5, par6, blockX, blockY, blockZ, roomWidth, roomHeight, set);
+				func_227208_a_(chunk, biomes, seed, par4, par5, par6, blockX, blockY, blockZ, roomWidth, roomHeight, carvingMask);
 			}
 		}
 	}

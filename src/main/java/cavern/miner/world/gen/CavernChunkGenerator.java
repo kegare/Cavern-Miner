@@ -7,8 +7,12 @@ import java.util.Random;
 import cavern.miner.world.dimension.CavernDimension;
 import cavern.miner.world.spawner.CaveMobSpawner;
 import cavern.miner.world.spawner.WorldSpawnerType;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.EntityClassification;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -16,16 +20,19 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
+import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.registries.ForgeRegistries;
 
-public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGenerator<T>
+public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGenerator<T>
 {
 	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, T settings)
 	{
@@ -35,7 +42,7 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 	@Override
 	public int getGroundHeight()
 	{
-		return 50;
+		return getSettings().getGroundHeight();
 	}
 
 	@Override
@@ -55,29 +62,41 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
 		T settings = getSettings();
-		int max = settings.getBedrockFloorHeight();
-		int min = settings.getBedrockRoofHeight();
+		int floor = settings.getBedrockFloorHeight();
+		int roof = settings.getBedrockRoofHeight();
+		int ground = getGroundHeight();
 
 		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
 		{
-			if (min > 0)
+			if (floor < 256)
 			{
-				for (int y = min; y >= min - 4; --y)
+				for (int y = floor + 4; y >= floor; --y)
 				{
-					if (y >= min - rand.nextInt(5))
+					if (y <= floor + rand.nextInt(5))
 					{
 						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), Blocks.BEDROCK.getDefaultState(), false);
 					}
 				}
 			}
 
-			if (max < 256)
+			if (roof > 0)
 			{
-				for (int y = max + 4; y >= max; --y)
+				for (int y = roof; y >= roof - 4; --y)
 				{
-					if (y <= max + rand.nextInt(5))
+					if (y >= roof - rand.nextInt(5))
 					{
 						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), Blocks.BEDROCK.getDefaultState(), false);
+					}
+				}
+			}
+
+			if (ground > 0)
+			{
+				for (int y = ground; y >= ground - 4; --y)
+				{
+					if (y >= ground - rand.nextInt(5))
+					{
+						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), Blocks.DIRT.getDefaultState(), false);
 					}
 				}
 			}
@@ -91,14 +110,97 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
 		T settings = getSettings();
-		int max = settings.getBedrockRoofHeight() - 1;
-		int min = settings.getBedrockFloorHeight() + 1;
+		int floor = settings.getBedrockFloorHeight() + 1;
+		int roof = settings.getBedrockRoofHeight() - 1;
+		int ground = getGroundHeight();
 
 		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
 		{
-			for (int y = max; y >= min; --y)
+			for (int y = roof; y >= floor; --y)
 			{
-				chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), settings.getDefaultBlock(), false);
+				posCache.setPos(pos.getX(), y, pos.getZ());
+
+				if (ground > 0 && y >= ground)
+				{
+					chunk.setBlockState(posCache, Blocks.DIRT.getDefaultState(), false);
+				}
+				else
+				{
+					chunk.setBlockState(posCache, settings.getDefaultBlock(), false);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void func_225550_a_(BiomeManager manager, IChunk chunk, GenerationStage.Carving carving)
+	{
+		super.func_225550_a_(manager, chunk, carving);
+
+		int ground = getGroundHeight();
+
+		if (ground <= 0)
+		{
+			return;
+		}
+
+		BlockPos.Mutable posHere = new BlockPos.Mutable();
+		BlockPos.Mutable posAbove = new BlockPos.Mutable();
+		int xStart = chunk.getPos().getXStart();
+		int zStart = chunk.getPos().getZStart();
+		int roof = getSettings().getBedrockRoofHeight() - 1;
+
+		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
+		{
+			for (int y = roof; y > ground; --y)
+			{
+				BlockState stateHere = chunk.getBlockState(posHere.setPos(pos.getX(), y, pos.getZ()));
+				BlockState stateAbove = chunk.getBlockState(posAbove.setPos(posHere).move(Direction.UP));
+
+				if (stateHere.getBlock() == Blocks.DIRT && stateAbove.getBlock() == Blocks.CAVE_AIR)
+				{
+					chunk.setBlockState(posHere, Blocks.GRASS_BLOCK.getDefaultState(), false);
+				}
+			}
+		}
+	}
+
+	@Override
+	public void decorate(WorldGenRegion region)
+	{
+		int centerX = region.getMainChunkX();
+		int centerZ = region.getMainChunkZ();
+		int xStart = centerX * 16;
+		int zStart = centerZ * 16;
+		BlockPos pos = new BlockPos(xStart, 0, zStart);
+		Biome biome = this.getBiome(region.getBiomeManager(), pos.add(8, 8, 8));
+		SharedSeedRandom rand = new SharedSeedRandom();
+		long seed = rand.setDecorationSeed(region.getSeed(), xStart, zStart);
+
+		decorate(region, centerX, centerZ, pos, biome, rand, seed,
+			GenerationStage.Decoration.RAW_GENERATION, GenerationStage.Decoration.LOCAL_MODIFICATIONS,
+			GenerationStage.Decoration.UNDERGROUND_STRUCTURES, GenerationStage.Decoration.UNDERGROUND_ORES, GenerationStage.Decoration.UNDERGROUND_DECORATION);
+
+		if (getGroundHeight() > 0)
+		{
+			decorate(region, centerX, centerZ, pos, biome, rand, seed, GenerationStage.Decoration.VEGETAL_DECORATION);
+		}
+	}
+
+	public void decorate(WorldGenRegion region, int centerX, int centerZ, BlockPos pos, Biome biome, SharedSeedRandom rand, long seed, GenerationStage.Decoration... stages)
+	{
+		for (GenerationStage.Decoration stage : stages)
+		{
+			try
+			{
+				biome.decorate(stage, this, region, seed, rand, pos);
+			}
+			catch (Exception e)
+			{
+				CrashReport report = CrashReport.makeCrashReport(e, "Biome decoration");
+				report.makeCategory("Generation").addDetail("CenterX", centerX).addDetail("CenterZ", centerZ).addDetail("Step", stage).addDetail("Seed", seed).addDetail("Biome", ForgeRegistries.BIOMES.getKey(biome));
+
+				throw new ReportedException(report);
 			}
 		}
 	}

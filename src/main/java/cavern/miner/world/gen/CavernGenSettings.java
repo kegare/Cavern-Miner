@@ -15,4 +15,9 @@ public class CavernGenSettings extends GenerationSettings
 	{
 		return 0;
 	}
+
+	public int getGroundHeight()
+	{
+		return 150;
+	}
 }
