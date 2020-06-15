@@ -25,6 +25,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -36,6 +37,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -44,6 +46,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CavernPortalBlock extends Block
@@ -240,6 +244,26 @@ public class CavernPortalBlock extends Block
 
 			cache.setLastPortalVec(new Vec3d(d1, d2, 0.0D));
 			cache.setTeleportDirection(pattern.getForwards());
+		}
+
+		MinecraftServer server = entity.getServer();
+
+		if (server != null)
+		{
+			ServerWorld destWorld = server.getWorld(dimNew);
+
+			if (destWorld == null)
+			{
+				return;
+			}
+
+			BlockPos newPos = entity.getPosition();
+			ChunkPos chunkPos = new ChunkPos(newPos);
+
+			if (!destWorld.getChunkProvider().isChunkLoaded(chunkPos))
+			{
+				destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, newPos);
+			}
 		}
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));

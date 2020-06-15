@@ -11,6 +11,8 @@ import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.TeleporterCache;
+import it.unimi.dsi.fastutil.longs.LongArraySet;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;
@@ -101,8 +103,6 @@ public class CavernTeleporter implements ITeleporter
 	{
 		BlockPos pos = null;
 
-		world.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(checkPos), 1, checkPos);
-
 		if (world.getBlockState(checkPos).getBlock() == portalBlock)
 		{
 			pos = checkPos;
@@ -112,7 +112,10 @@ public class CavernTeleporter implements ITeleporter
 			int yRadius = MathHelper.floor(radius * 1.5D);
 			int min = Math.max(checkPos.getY() - yRadius, 1);
 			int max = Math.min(checkPos.getY() + yRadius, world.getActualHeight() - 1);
-			BlockPos.Mutable findPos = new BlockPos.Mutable();
+			BlockPos.Mutable findPos = new BlockPos.Mutable(checkPos);
+			LongSet findChunks = new LongArraySet();
+
+			findChunks.add(ChunkPos.asLong(checkPos.getX() >> 4, checkPos.getZ() >> 4));
 
 			outside: for (int r = 1; r <= radius; ++r)
 			{
@@ -122,9 +125,18 @@ public class CavernTeleporter implements ITeleporter
 					{
 						if (Math.abs(i) < r && Math.abs(j) < r) continue;
 
+						int x = checkPos.getX() + i;
+						int z = checkPos.getZ() + j;
+						ChunkPos chunkPos = new ChunkPos(findPos.setPos(x, 0, z));
+
+						if (findChunks.add(chunkPos.asLong()))
+						{
+							world.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 1, findPos);
+						}
+
 						for (int y = checkPos.getY(); y < max; ++y)
 						{
-							if (world.getBlockState(findPos.setPos(checkPos.getX() + i, y, checkPos.getZ() + j)).getBlock() == portalBlock)
+							if (world.getBlockState(findPos.setPos(x, y, z)).getBlock() == portalBlock)
 							{
 								pos = findPos.toImmutable();
 
@@ -134,7 +146,7 @@ public class CavernTeleporter implements ITeleporter
 
 						for (int y = checkPos.getY(); y > min; --y)
 						{
-							if (world.getBlockState(findPos.setPos(checkPos.getX() + i, y, checkPos.getZ() + j)).getBlock() == portalBlock)
+							if (world.getBlockState(findPos.setPos(x, y, z)).getBlock() == portalBlock)
 							{
 								pos = findPos.toImmutable();
 
