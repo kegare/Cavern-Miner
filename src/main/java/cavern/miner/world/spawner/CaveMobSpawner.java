@@ -16,6 +16,7 @@ import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -50,7 +51,7 @@ public class CaveMobSpawner
 
 	public int getMaxCount(EntityClassification type)
 	{
-		return 100;
+		return type.getAnimal() ? 0 : type.getMaxNumberOfCreature();
 	}
 
 	public int getSafeDistance(EntityClassification type)
@@ -62,46 +63,30 @@ public class CaveMobSpawner
 	{
 		eligibleChunksForSpawning.clear();
 
-		for (PlayerEntity player : world.getPlayers(o -> !o.isSpectator()))
+		ServerPlayerEntity player = world.getRandomPlayer();
+
+		if (player == null || player.isSpectator())
 		{
-			int radius = getChunkRadius(player);
-			int chunkX = MathHelper.floor(player.getPosX() / 16.0D);
-			int chunkZ = MathHelper.floor(player.getPosZ() / 16.0D);
-
-			for (int dx = -radius; dx <= radius; ++dx)
-			{
-				for (int dz = -radius; dz <= radius; ++dz)
-				{
-					if (dx == -radius || dx == radius || dz == -radius || dz == radius)
-					{
-						continue;
-					}
-
-					ChunkPos chunkPos = new ChunkPos(dx + chunkX, dz + chunkZ);
-
-					if (!eligibleChunksForSpawning.containsKey(chunkPos) && world.getChunkProvider().isChunkLoaded(chunkPos) && world.getWorldBorder().contains(chunkPos))
-					{
-						eligibleChunksForSpawning.put(chunkPos, player.getPosition());
-					}
-				}
-			}
+			return false;
 		}
+
+		BlockPos pos = player.getPosition();
+
+		ChunkPos.getAllInBox(new ChunkPos(pos), getChunkRadius(player))
+			.filter(o -> world.getChunkProvider().isChunkLoaded(o) && world.getWorldBorder().contains(o)).forEach(o -> eligibleChunksForSpawning.put(o, pos));
 
 		return !eligibleChunksForSpawning.isEmpty();
 	}
 
 	public void spawnMobs()
 	{
+		eligibleChunksForSpawning.clear();
+
 		for (EntityClassification type : EntityClassification.values())
 		{
-			if (type.getAnimal() || type.getPeacefulCreature())
-			{
-				continue;
-			}
-
 			int maxCount = getMaxCount(type);
 
-			if (maxCount <= 0 || world.countEntities().getInt(type) > maxCount)
+			if (maxCount <= 0 || world.countEntities().getInt(type) >= maxCount)
 			{
 				continue;
 			}

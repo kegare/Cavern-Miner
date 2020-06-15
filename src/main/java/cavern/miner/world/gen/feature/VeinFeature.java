@@ -83,9 +83,9 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 			final int max = vein.getMaxHeight() - size;
 			final IntList targetY = new IntArrayList();
 			final BlockPos.Mutable findPos = new BlockPos.Mutable();
+			final BlockPos.Mutable prevPos = new BlockPos.Mutable();
 
 			int count = vein.getCount();
-			BlockPos.Mutable prevPos = new BlockPos.Mutable();
 
 			@Override
 			protected BlockPos computeNext()

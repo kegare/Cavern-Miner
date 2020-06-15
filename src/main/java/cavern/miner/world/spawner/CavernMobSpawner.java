@@ -27,7 +27,12 @@ public class CavernMobSpawner extends CaveMobSpawner
 	@Override
 	public int getMaxCount(EntityClassification type)
 	{
-		return CavernConfig.INSTANCE.maxCount.get();
+		if (!type.getAnimal() && !type.getPeacefulCreature())
+		{
+			return CavernConfig.INSTANCE.maxCount.get();
+		}
+
+		return super.getMaxCount(type);
 	}
 
 	@Override

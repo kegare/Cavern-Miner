@@ -23,7 +23,7 @@ public class TowerDungeonPlacement extends Placement<ChanceRangeConfig>
 	@Override
 	public Stream<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random random, ChanceRangeConfig config, BlockPos pos)
 	{
-		if (random.nextDouble() < config.chance)
+		if (random.nextFloat() < config.chance)
 		{
 			int x = pos.getX() + 8;
 			int z = pos.getZ() + 8;
