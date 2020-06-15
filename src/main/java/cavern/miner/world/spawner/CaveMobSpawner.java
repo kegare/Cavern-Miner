@@ -9,6 +9,8 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import cavern.miner.init.CaveCapabilities;
+import cavern.miner.storage.CavePortalList;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
@@ -59,6 +61,31 @@ public class CaveMobSpawner
 		return 16;
 	}
 
+	public boolean canSpawnChunk(ChunkPos pos)
+	{
+		if (!world.getWorldBorder().contains(pos) || !world.getChunkProvider().isChunkLoaded(pos))
+		{
+			return false;
+		}
+
+		CavePortalList portalList = world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).orElse(null);
+
+		if (portalList != null)
+		{
+			BlockPos centerPos = pos.getBlock(8, 0, 8);
+
+			for (BlockPos portalPos : portalList.getPortalPositions())
+			{
+				if (centerPos.withinDistance(new BlockPos(portalPos.getX(), 0, portalPos.getZ()), 32.0D))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	public boolean findEligibleChunks()
 	{
 		eligibleChunksForSpawning.clear();
@@ -72,15 +99,17 @@ public class CaveMobSpawner
 
 		BlockPos pos = player.getPosition();
 
-		ChunkPos.getAllInBox(new ChunkPos(pos), getChunkRadius(player))
-			.filter(o -> world.getChunkProvider().isChunkLoaded(o) && world.getWorldBorder().contains(o)).forEach(o -> eligibleChunksForSpawning.put(o, pos));
+		ChunkPos.getAllInBox(new ChunkPos(pos), getChunkRadius(player)).filter(this::canSpawnChunk).forEach(o -> eligibleChunksForSpawning.put(o, pos));
 
 		return !eligibleChunksForSpawning.isEmpty();
 	}
 
 	public void spawnMobs()
 	{
-		eligibleChunksForSpawning.clear();
+		if (world.getGameTime() % 20L == 0L)
+		{
+			eligibleChunksForSpawning.clear();
+		}
 
 		for (EntityClassification type : EntityClassification.values())
 		{
