@@ -27,7 +27,6 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
-import net.minecraftforge.common.util.LazyOptional;
 
 public class CavernTeleporter implements ITeleporter
 {
@@ -172,9 +171,23 @@ public class CavernTeleporter implements ITeleporter
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(portalBlock, portalPos));
 
-		LazyOptional<TeleporterCache> cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE);
-		Vec3d portalVec = cache.map(TeleporterCache::getLastPortalVec).orElse(Vec3d.ZERO);
-		Direction teleportDirection = cache.map(TeleporterCache::getTeleportDirection).orElse(Direction.NORTH);
+		Vec3d portalVec = Vec3d.ZERO;
+		Direction teleportDirection = Direction.NORTH;
+		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
+
+		if (cache != null)
+		{
+			if (cache.getLastPortalVec() != null)
+			{
+				portalVec = cache.getLastPortalVec();
+			}
+
+			if (cache.getTeleportDirection() != null)
+			{
+				teleportDirection = cache.getTeleportDirection();
+			}
+		}
+
 		BlockPattern.PatternHelper pattern = CavernPortalBlock.createPatternHelper(portalBlock, world, portalPos);
 		BlockPattern.PortalInfo portalInfo = pattern.getPortalInfo(teleportDirection, portalPos, portalVec.y, entity.getMotion(), portalVec.x);
 

@@ -1,10 +1,14 @@
 package cavern.miner.world.gen;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import cavern.miner.world.dimension.CavernDimension;
 import cavern.miner.world.spawner.CaveMobSpawner;
+import cavern.miner.world.spawner.WorldSpawnerType;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -12,9 +16,9 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.Heightmap.Type;
@@ -123,11 +127,28 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 			return;
 		}
 
-		Dimension dim = world.getDimension();
-
-		if (dim instanceof CavernDimension)
+		if (world.getDimension() instanceof CavernDimension)
 		{
-			((CavernDimension)dim).getCaveMobSpawner().ifPresent(CaveMobSpawner::spawnMobs);
+			CavernDimension cavern = (CavernDimension)world.getDimension();
+
+			if (cavern.getSpawnerType() == WorldSpawnerType.CAVERN)
+			{
+				cavern.getCaveMobSpawner().ifPresent(CaveMobSpawner::spawnMobs);
+			}
 		}
+	}
+
+	@Override
+	public List<SpawnListEntry> getPossibleCreatures(EntityClassification creatureType, BlockPos pos)
+	{
+		if (world.getDimension() instanceof CavernDimension)
+		{
+			if (((CavernDimension)world.getDimension()).getSpawnerType() != WorldSpawnerType.VANILLA)
+			{
+				return Collections.emptyList();
+			}
+		}
+
+		return super.getPossibleCreatures(creatureType, pos);
 	}
 }

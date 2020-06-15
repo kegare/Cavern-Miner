@@ -18,6 +18,7 @@ import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;
 import cavern.miner.world.spawner.CavernMobSpawner;
+import cavern.miner.world.spawner.WorldSpawnerType;
 import cavern.miner.world.vein.CavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
@@ -91,6 +92,11 @@ public class CavernDimension extends Dimension
 	public VeinProvider getVeinProvider()
 	{
 		return veinProvider;
+	}
+
+	public WorldSpawnerType getSpawnerType()
+	{
+		return CavernConfig.INSTANCE.spawnerType.get();
 	}
 
 	@Nullable

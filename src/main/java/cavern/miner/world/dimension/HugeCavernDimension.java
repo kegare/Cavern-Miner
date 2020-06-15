@@ -5,6 +5,7 @@ import cavern.miner.config.client.ClientConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.spawner.CaveMobSpawner;
 import cavern.miner.world.spawner.HugeCavernMobSpawner;
+import cavern.miner.world.spawner.WorldSpawnerType;
 import cavern.miner.world.vein.HugeCavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
@@ -36,6 +37,12 @@ public class HugeCavernDimension extends CavernDimension
 	public VeinProvider createVeinProvider()
 	{
 		return new HugeCavernVeinProvider();
+	}
+
+	@Override
+	public WorldSpawnerType getSpawnerType()
+	{
+		return HugeCavernConfig.INSTANCE.spawnerType.get();
 	}
 
 	@Override

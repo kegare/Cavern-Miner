@@ -50,7 +50,7 @@ public class CaveMobSpawner
 
 	public int getMaxCount(EntityClassification type)
 	{
-		return 150;
+		return 100;
 	}
 
 	public int getSafeDistance(EntityClassification type)
@@ -58,7 +58,7 @@ public class CaveMobSpawner
 		return 16;
 	}
 
-	public void spawnMobs()
+	public boolean findEligibleChunks()
 	{
 		eligibleChunksForSpawning.clear();
 
@@ -87,6 +87,11 @@ public class CaveMobSpawner
 			}
 		}
 
+		return !eligibleChunksForSpawning.isEmpty();
+	}
+
+	public void spawnMobs()
+	{
 		for (EntityClassification type : EntityClassification.values())
 		{
 			if (type.getAnimal() || type.getPeacefulCreature())
@@ -94,9 +99,16 @@ public class CaveMobSpawner
 				continue;
 			}
 
-			if (world.countEntities().getInt(type) > getMaxCount(type))
+			int maxCount = getMaxCount(type);
+
+			if (maxCount <= 0 || world.countEntities().getInt(type) > maxCount)
 			{
 				continue;
+			}
+
+			if (eligibleChunksForSpawning.isEmpty() && !findEligibleChunks())
+			{
+				break;
 			}
 
 			List<ChunkPos> shuffled = new ArrayList<>(eligibleChunksForSpawning.keySet());
@@ -133,7 +145,7 @@ public class CaveMobSpawner
 						float posZ = pos.getZ() + 0.5F;
 						double safeDistance = getSafeDistance(type);
 
-						if (world.isPlayerWithin(posX, pos.getY(), posZ, safeDistance) || world.getSpawnPoint().withinDistance(pos, safeDistance))
+						if (world.isPlayerWithin(posX, pos.getY(), posZ, safeDistance))
 						{
 							continue;
 						}
@@ -154,6 +166,16 @@ public class CaveMobSpawner
 						}
 
 						if (!WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntitySpawnPlacementRegistry.getPlacementType(entry.entityType), world, pos, entry.entityType))
+						{
+							continue;
+						}
+
+						if (!EntitySpawnPlacementRegistry.func_223515_a(entry.entityType, world, SpawnReason.NATURAL, pos, rand))
+						{
+							continue;
+						}
+
+						if (!world.hasNoCollisions(entry.entityType.getBoundingBoxWithSizeApplied(posX, pos.getY(), posZ)))
 						{
 							continue;
 						}

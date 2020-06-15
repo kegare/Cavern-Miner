@@ -2,6 +2,7 @@ package cavern.miner.config;
 
 import java.io.File;
 
+import cavern.miner.world.spawner.WorldSpawnerType;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.Tags;
@@ -17,6 +18,7 @@ public class HugeCavernConfig
 
 	public final ForgeConfigSpec.DoubleValue cave;
 
+	public final ForgeConfigSpec.EnumValue<WorldSpawnerType> spawnerType;
 	public final ForgeConfigSpec.IntValue chunkRadius;
 	public final ForgeConfigSpec.IntValue heightRadius;
 	public final ForgeConfigSpec.IntValue maxCount;
@@ -35,9 +37,10 @@ public class HugeCavernConfig
 		builder.pop();
 
 		builder.push("natural_spawn");
-		chunkRadius = builder.comment("How far (in chunks) monsters must spawn.", serverSide).defineInRange("chunk_radius", 5, 1, 10);
-		heightRadius = builder.comment("How high (in blocks) monsters must spawn.", serverSide).defineInRange("height_radius", 50, 10, 200);
-		maxCount = builder.comment("How many monsters must spawn.", serverSide).defineInRange("max_count", 70, 50, 5000);
+		spawnerType = builder.comment("The spawner type of natural monsters spawn.", serverSide).defineEnum("spawner_type", WorldSpawnerType.CAVERN);
+		chunkRadius = builder.comment("How far (in chunks) monsters must spawn.", serverSide).defineInRange("chunk_radius", 6, 1, 10);
+		heightRadius = builder.comment("How high (in blocks) monsters must spawn.", serverSide).defineInRange("height_radius", 70, 10, 200);
+		maxCount = builder.comment("How many monsters must spawn.", serverSide).defineInRange("max_count", 30, 0, 5000);
 		safeDistance = builder.comment("How far (in blocks) monsters must not spawn from players.", serverSide).defineInRange("safe_distance", 20, 0, 100);
 		builder.pop();
 	}
