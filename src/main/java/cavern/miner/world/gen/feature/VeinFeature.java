@@ -85,6 +85,7 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 			final BlockPos.Mutable findPos = new BlockPos.Mutable();
 
 			int count = vein.getCount();
+			BlockPos.Mutable prevPos = new BlockPos.Mutable();
 
 			@Override
 			protected BlockPos computeNext()
@@ -107,7 +108,43 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 					}
 				}
 
-				return targetY.isEmpty() ? BlockPos.ZERO : findPos.setPos(x, targetY.getInt(random.nextInt(targetY.size())), z);
+				if (targetY.isEmpty())
+				{
+					return BlockPos.ZERO;
+				}
+
+				if (prevPos.equals(BlockPos.ZERO))
+				{
+					findPos.setPos(x, targetY.getInt(random.nextInt(targetY.size())), z);
+				}
+				else
+				{
+					boolean modified = false;
+
+					for (int i = 0, j = targetY.size(); i < j; ++i)
+					{
+						if (findPos.setPos(x, targetY.getInt(random.nextInt(j)), z).withinDistance(prevPos, size))
+						{
+							x = random.nextInt(16) + pos.getX();
+							z = random.nextInt(16) + pos.getZ();
+						}
+						else
+						{
+							modified = true;
+
+							break;
+						}
+					}
+
+					if (!modified)
+					{
+						return BlockPos.ZERO;
+					}
+				}
+
+				prevPos.setPos(findPos);
+
+				return findPos;
 			}
 		};
 	}
