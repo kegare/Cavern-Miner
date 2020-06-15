@@ -131,8 +131,9 @@ public class CaveMobSpawner
 
 						float posX = pos.getX() + 0.5F;
 						float posZ = pos.getZ() + 0.5F;
+						double safeDistance = getSafeDistance(type);
 
-						if (world.isPlayerWithin(posX, pos.getY(), posZ, getSafeDistance(type)))
+						if (world.isPlayerWithin(posX, pos.getY(), posZ, safeDistance) || world.getSpawnPoint().withinDistance(pos, safeDistance))
 						{
 							continue;
 						}

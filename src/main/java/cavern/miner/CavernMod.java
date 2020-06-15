@@ -15,6 +15,7 @@ import cavern.miner.init.CaveDimensions;
 import cavern.miner.init.CaveEnchantments;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CaveItems;
+import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.init.CaveWorldCarvers;
 import cavern.miner.network.CaveNetworkConstants;
@@ -51,6 +52,7 @@ public final class CavernMod
 		CaveDimensions.REGISTRY.register(modEventBus);
 		CaveWorldCarvers.REGISTRY.register(modEventBus);
 		CaveFeatures.REGISTRY.register(modEventBus);
+		CavePlacements.REGISTRY.register(modEventBus);
 		CaveSounds.REGISTRY.register(modEventBus);
 
 		LOG.debug("Loading network data for cavern net version: {}", CaveNetworkConstants.init());
@@ -60,6 +62,8 @@ public final class CavernMod
 	public void doCommonStuff(final FMLCommonSetupEvent event)
 	{
 		VeinConfig.createExampleConfig();
+
+		CaveBiomes.init();
 
 		CaveCapabilities.registerCapabilities();
 	}

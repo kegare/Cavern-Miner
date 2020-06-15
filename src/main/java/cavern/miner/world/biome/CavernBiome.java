@@ -1,26 +1,25 @@
 package cavern.miner.world.biome;
 
 import java.util.Optional;
-import java.util.Random;
 
 import cavern.miner.config.CavernConfig;
 import cavern.miner.init.CaveFeatures;
+import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
-import cavern.miner.world.carver.CaveConfiguredCarver;
 import cavern.miner.world.dimension.CavernDimension;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.carver.WorldCarver;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
+import net.minecraft.world.gen.placement.ChanceRangeConfig;
+import net.minecraft.world.gen.placement.IPlacementConfig;
+import net.minecraft.world.gen.placement.Placement;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 
 public class CavernBiome extends Biome
@@ -29,9 +28,14 @@ public class CavernBiome extends Biome
 	{
 		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
 			.depth(0.125F).scale(0.05F).temperature(1.0F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
-		this.addCarvers();
 		this.addFeatures();
 		this.addSpawns();
+	}
+
+	public void init()
+	{
+		addCarvers();
+		addCaveFeatures();
 	}
 
 	protected void addCarvers()
@@ -40,21 +44,35 @@ public class CavernBiome extends Biome
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new CaveConfiguredCarver<>(() -> CaveWorldCarvers.CAVERN.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.extremeCave.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new CaveConfiguredCarver<>(() -> CaveWorldCarvers.EXTREME_CAVE.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CAVE.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.extremeCanyon.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new CaveConfiguredCarver<>(() -> CaveWorldCarvers.EXTREME_CANYON.orElse(WorldCarver.CANYON), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CANYON.orElse(WorldCarver.CANYON), new ProbabilityConfig(probability)));
+		}
+	}
+
+	protected void addCaveFeatures()
+	{
+		CaveFeatures.VEIN.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
+			o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG))));
+
+		float chance = CavernConfig.INSTANCE.towerDungeon.get().floatValue();
+
+		if (chance > 0.0F)
+		{
+			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES, o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG)
+				.withPlacement(CavePlacements.TOWER_DUNGEON.orElse(Placement.CHANCE_RANGE).configure(new ChanceRangeConfig(chance, 5, 0, 30)))));
 		}
 	}
 
@@ -62,7 +80,6 @@ public class CavernBiome extends Biome
 	{
 		DefaultBiomeFeatures.addLakes(this);
 		DefaultBiomeFeatures.addMonsterRooms(this);
-		DefaultBiomeFeatures.addSedimentDisks(this);
 	}
 
 	protected void addSpawns()
@@ -76,16 +93,6 @@ public class CavernBiome extends Biome
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
-	}
-
-	public void placeCaveFeatures(WorldGenRegion region, ChunkGenerator<? extends GenerationSettings> generator, BlockPos pos, Random rand)
-	{
-		CaveFeatures.VEIN.ifPresent(o -> o.place(region, generator, rand, pos, IFeatureConfig.NO_FEATURE_CONFIG));
-
-		if (rand.nextDouble() < CavernConfig.INSTANCE.towerDungeon.get())
-		{
-			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> o.place(region, generator, rand, pos.add(8, rand.nextInt(30) + 5, 8), IFeatureConfig.NO_FEATURE_CONFIG));
-		}
 	}
 
 	public static Optional<CavernBiome> get(IWorld world)

@@ -2,7 +2,6 @@ package cavern.miner.world.gen;
 
 import java.util.Random;
 
-import cavern.miner.world.biome.CavernBiome;
 import cavern.miner.world.dimension.CavernDimension;
 import cavern.miner.world.spawner.CaveMobSpawner;
 import net.minecraft.block.Blocks;
@@ -98,14 +97,6 @@ public class CavernChunkGenerator<T extends GenerationSettings> extends ChunkGen
 				chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), settings.getDefaultBlock(), false);
 			}
 		}
-	}
-
-	@Override
-	public void decorate(WorldGenRegion region)
-	{
-		super.decorate(region);
-
-		CavernBiome.get(region).ifPresent(o -> o.placeCaveFeatures(region, this, new BlockPos(region.getMainChunkX() * 16, 0, region.getMainChunkZ() * 16), region.getRandom()));
 	}
 
 	@Override

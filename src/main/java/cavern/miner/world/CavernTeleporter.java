@@ -83,7 +83,7 @@ public class CavernTeleporter implements ITeleporter
 	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos, CavePortalList list)
 	{
 		List<BlockPos> positions = list.getPortalPositions(portalBlock).stream()
-			.filter(o -> Math.sqrt(o.distanceSq(checkPos)) <= radius)
+			.filter(o -> o.withinDistance(checkPos, radius))
 			.sorted((o1, o2) -> Double.compare(o1.distanceSq(checkPos), o2.distanceSq(checkPos))).collect(Collectors.toList());
 
 		for (BlockPos portalPos : positions)
