@@ -228,6 +228,13 @@ public class CavernPortalBlock extends Block
 		DimensionType dimOld = world.getDimension().getType();
 		DimensionType dimNew = dimOld != getDimension() ? getDimension() : DimensionType.OVERWORLD;
 
+		BlockPattern.PatternHelper pattern = createPatternHelper(this, world, pos);
+		double d0 = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
+		double d1 = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
+		double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
+		Vec3d portalVec = new Vec3d(d1, d2, 0.0D);
+		Direction teleportDirection = pattern.getForwards();
+
 		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
 
 		if (cache != null)
@@ -241,15 +248,8 @@ public class CavernPortalBlock extends Block
 
 			cache.setLastDim(key, dimOld);
 			cache.setLastPos(key, dimOld, entity.getPosition());
-
-			BlockPattern.PatternHelper pattern = createPatternHelper(this, world, pos);
-			double d0 = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
-			double d1 = pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX();
-			d1 = Math.abs(MathHelper.pct(d1 - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
-			double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
-
-			cache.setLastPortalVec(new Vec3d(d1, d2, 0.0D));
-			cache.setTeleportDirection(pattern.getForwards());
+			cache.setLastPortalVec(portalVec);
+			cache.setTeleportDirection(teleportDirection);
 		}
 
 		MinecraftServer server = entity.getServer();
@@ -288,7 +288,7 @@ public class CavernPortalBlock extends Block
 			frame = getFrameBlocks().getCachedList().get(0);
 		}
 
-		entity = entity.changeDimension(dimNew, new CavernTeleporter(this, frame));
+		entity = entity.changeDimension(dimNew, new CavernTeleporter(this, frame).setPortalInfo(portalVec, teleportDirection));
 
 		if (entity != null && entity instanceof ServerPlayerEntity)
 		{

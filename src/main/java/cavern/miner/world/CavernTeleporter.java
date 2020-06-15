@@ -33,10 +33,21 @@ public class CavernTeleporter implements ITeleporter
 	private final CavernPortalBlock portalBlock;
 	private final BlockState portalFrameBlock;
 
+	private Vec3d portalVec;
+	private Direction teleportDirection;
+
 	public CavernTeleporter(CavernPortalBlock portal, BlockState frame)
 	{
 		this.portalBlock = portal;
 		this.portalFrameBlock = frame;
+	}
+
+	public CavernTeleporter setPortalInfo(Vec3d vec, Direction direction)
+	{
+		portalVec = vec;
+		teleportDirection = direction;
+
+		return this;
 	}
 
 	@Override
@@ -171,21 +182,32 @@ public class CavernTeleporter implements ITeleporter
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(portalBlock, portalPos));
 
-		Vec3d portalVec = Vec3d.ZERO;
-		Direction teleportDirection = Direction.NORTH;
-		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
-
-		if (cache != null)
+		if (portalVec == null || teleportDirection == null)
 		{
-			if (cache.getLastPortalVec() != null)
-			{
-				portalVec = cache.getLastPortalVec();
-			}
+			TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
 
-			if (cache.getTeleportDirection() != null)
+			if (cache != null)
 			{
-				teleportDirection = cache.getTeleportDirection();
+				if (cache.getLastPortalVec() != null)
+				{
+					portalVec = cache.getLastPortalVec();
+				}
+
+				if (cache.getTeleportDirection() != null)
+				{
+					teleportDirection = cache.getTeleportDirection();
+				}
 			}
+		}
+
+		if (portalVec == null)
+		{
+			portalVec = Vec3d.ZERO;
+		}
+
+		if (teleportDirection == null)
+		{
+			teleportDirection = Direction.NORTH;
 		}
 
 		BlockPattern.PatternHelper pattern = CavernPortalBlock.createPatternHelper(portalBlock, world, portalPos);
