@@ -23,6 +23,8 @@ public class CaveNetworkConstants
 
 		int i = 0;
 
+		channel.messageBuilder(LoadingScreenMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
+			.decoder(LoadingScreenMessage::decode).encoder(LoadingScreenMessage::encode).consumer(LoadingScreenMessage::handle).add();
 		channel.messageBuilder(MinerUpdateMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(MinerUpdateMessage::decode).encoder(MinerUpdateMessage::encode).consumer(MinerUpdateMessage::handle).add();
 		channel.messageBuilder(MinerPointMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)

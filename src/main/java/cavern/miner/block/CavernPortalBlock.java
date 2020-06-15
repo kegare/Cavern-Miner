@@ -8,6 +8,7 @@ import cavern.miner.config.CavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRecord;
@@ -198,7 +199,7 @@ public class CavernPortalBlock extends Block
 	@Override
 	public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity)
 	{
-		if (world.isRemote || getDimension() == null)
+		if (getDimension() == null)
 		{
 			return;
 		}
@@ -217,10 +218,15 @@ public class CavernPortalBlock extends Block
 			return;
 		}
 
+		entity.timeUntilPortal = cd;
+
+		if (world.isRemote)
+		{
+			return;
+		}
+
 		DimensionType dimOld = world.getDimension().getType();
 		DimensionType dimNew = dimOld != getDimension() ? getDimension() : DimensionType.OVERWORLD;
-
-		entity.timeUntilPortal = cd;
 
 		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
 
@@ -282,7 +288,14 @@ public class CavernPortalBlock extends Block
 			frame = getFrameBlocks().getCachedList().get(0);
 		}
 
-		entity.changeDimension(dimNew, new CavernTeleporter(this, frame));
+		entity = entity.changeDimension(dimNew, new CavernTeleporter(this, frame));
+
+		if (entity != null && entity instanceof ServerPlayerEntity)
+		{
+			ServerPlayerEntity player = (ServerPlayerEntity)entity;
+
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new LoadingScreenMessage(1));
+		}
 	}
 
 	public static BlockPattern.PatternHelper createPatternHelper(CavernPortalBlock portal, IWorld world, BlockPos pos)

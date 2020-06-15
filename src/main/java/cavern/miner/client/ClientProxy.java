@@ -1,5 +1,6 @@
 package cavern.miner.client;
 
+import cavern.miner.client.gui.DownloadCaveTerrainScreen;
 import cavern.miner.client.gui.MinerRecordScreen;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.Miner;
@@ -17,6 +18,27 @@ public class ClientProxy
 		Minecraft mc = Minecraft.getInstance();
 
 		return mc.player;
+	}
+
+	public static void displayLoadingScreen()
+	{
+		Minecraft mc = Minecraft.getInstance();
+
+		mc.displayGuiScreen(new DownloadCaveTerrainScreen());
+	}
+
+	public static void closeLoadingScreen()
+	{
+		Minecraft mc = Minecraft.getInstance();
+
+		if (mc.currentScreen != null && mc.currentScreen instanceof DownloadCaveTerrainScreen)
+		{
+			DownloadCaveTerrainScreen loadScreen = (DownloadCaveTerrainScreen)mc.currentScreen;
+
+			loadScreen.setLoaded();
+
+			mc.displayGuiScreen(null);
+		}
 	}
 
 	public static void displayMinerRecordScreen()
