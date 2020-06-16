@@ -1,7 +1,6 @@
 package cavern.miner.world.dimension;
 
 import cavern.miner.config.HugeCavernConfig;
-import cavern.miner.config.client.ClientConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.gen.HugeCavernGenSettings;
@@ -11,7 +10,6 @@ import cavern.miner.world.spawner.WorldSpawnerType;
 import cavern.miner.world.vein.HugeCavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -22,7 +20,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class HugeCavernDimension extends CavernDimension
 {
-	private static final Vec3d FOG_COLOR = new Vec3d(0.1D, 0.1D, 0.1D);
 
 	public HugeCavernDimension(World world, DimensionType type)
 	{
@@ -68,20 +65,6 @@ public class HugeCavernDimension extends CavernDimension
 	public float getLightBrightness()
 	{
 		return HugeCavernConfig.INSTANCE.lightBrightness.get().floatValue();
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public boolean doesXZShowFog(int x, int z)
-	{
-		return ClientConfig.INSTANCE.caveFog.get();
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public Vec3d getFogColor(float celestialAngle, float partialTicks)
-	{
-		return ClientConfig.INSTANCE.caveFog.get() ? FOG_COLOR : Vec3d.ZERO;
 	}
 
 	@OnlyIn(Dist.CLIENT)

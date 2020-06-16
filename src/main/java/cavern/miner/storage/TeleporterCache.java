@@ -14,10 +14,8 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -26,9 +24,6 @@ public class TeleporterCache implements INBTSerializable<CompoundNBT>
 {
 	private final Map<ResourceLocation, DimensionType> lastDim = new HashMap<>();
 	private final Table<ResourceLocation, DimensionType, BlockPos> lastPos = HashBasedTable.create();
-
-	private Vec3d lastPortalVec;
-	private Direction teleportDirection;
 
 	public DimensionType getLastDim(ResourceLocation key)
 	{
@@ -81,26 +76,6 @@ public class TeleporterCache implements INBTSerializable<CompoundNBT>
 				lastPos.remove(entry.getRowKey(), entry.getColumnKey());
 			}
 		}
-	}
-
-	public Vec3d getLastPortalVec()
-	{
-		return lastPortalVec;
-	}
-
-	public void setLastPortalVec(Vec3d vec)
-	{
-		lastPortalVec = vec;
-	}
-
-	public Direction getTeleportDirection()
-	{
-		return teleportDirection;
-	}
-
-	public void setTeleportDirection(Direction direction)
-	{
-		teleportDirection = direction;
 	}
 
 	@Override

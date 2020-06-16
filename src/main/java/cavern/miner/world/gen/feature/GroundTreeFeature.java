@@ -37,13 +37,13 @@ public class GroundTreeFeature extends Feature<CountConfig>
 		BlockState state = OAK_SAPLING;
 		Tree tree = OAK_TREE;
 
-		if (rand.nextInt(5) == 0)
+		if (rand.nextInt(10) == 0)
 		{
 			state = BIRCH_SAPLING;
 			tree = BIRCH_TREE;
 		}
 
-		int max = generator.getMaxHeight() - 1;
+		int max = world.getMaxHeight() - 1;
 		int ground = generator.getGroundHeight();
 		int groundHeight = max - ground - 10;
 		BlockPos blockPos = new BlockPos(pos.getX(), ground, pos.getZ());

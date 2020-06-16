@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.google.common.cache.LoadingCache;
 
 import cavern.miner.config.CavernConfig;
+import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.network.CaveNetworkConstants;
@@ -225,50 +226,47 @@ public class CavernPortalBlock extends Block
 			return;
 		}
 
-		DimensionType dimOld = world.getDimension().getType();
-		DimensionType dimNew = dimOld != getDimension() ? getDimension() : DimensionType.OVERWORLD;
-
-		BlockPattern.PatternHelper pattern = createPatternHelper(this, world, pos);
-		double d0 = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
-		double d1 = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
-		double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
-		Vec3d portalVec = new Vec3d(d1, d2, 0.0D);
-		Direction teleportDirection = pattern.getForwards();
+		DimensionType currentDim = world.getDimension().getType();
+		DimensionType destDim = currentDim != getDimension() ? getDimension() : DimensionType.OVERWORLD;
 
 		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
+		BlockPos prevPos = null;
 
 		if (cache != null)
 		{
 			ResourceLocation key = getRegistryName();
+			DimensionType prevDim = destDim;
 
-			if (dimOld != getDimension())
+			destDim = cache.getLastDim(key, destDim);
+
+			if (destDim == currentDim)
 			{
-				dimNew = cache.getLastDim(key, dimNew);
+				destDim = prevDim;
 			}
 
-			cache.setLastDim(key, dimOld);
-			cache.setLastPos(key, dimOld, entity.getPosition());
-			cache.setLastPortalVec(portalVec);
-			cache.setTeleportDirection(teleportDirection);
+			prevPos = cache.getLastPos(key, destDim);
+
+			cache.setLastDim(key, currentDim);
+			cache.setLastPos(key, currentDim, entity.getPosition());
 		}
 
 		MinecraftServer server = entity.getServer();
 
 		if (server != null)
 		{
-			ServerWorld destWorld = server.getWorld(dimNew);
+			ServerWorld destWorld = server.getWorld(destDim);
 
 			if (destWorld == null)
 			{
 				return;
 			}
 
-			BlockPos newPos = entity.getPosition();
-			ChunkPos chunkPos = new ChunkPos(newPos);
+			BlockPos destPos = GeneralConfig.INSTANCE.posCache.get() && prevPos != null ? prevPos : entity.getPosition();
+			ChunkPos chunkPos = new ChunkPos(destPos);
 
 			if (!destWorld.getChunkProvider().isChunkLoaded(chunkPos))
 			{
-				destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, newPos);
+				destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, destPos);
 			}
 		}
 
@@ -288,7 +286,12 @@ public class CavernPortalBlock extends Block
 			frame = getFrameBlocks().getCachedList().get(0);
 		}
 
-		entity = entity.changeDimension(dimNew, new CavernTeleporter(this, frame).setPortalInfo(portalVec, teleportDirection));
+		BlockPattern.PatternHelper pattern = createPatternHelper(this, world, pos);
+		double d0 = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
+		double d1 = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
+		double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
+
+		entity = entity.changeDimension(destDim, new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(d1, d2, 0.0D), pattern.getForwards()));
 
 		if (entity != null && entity instanceof ServerPlayerEntity)
 		{

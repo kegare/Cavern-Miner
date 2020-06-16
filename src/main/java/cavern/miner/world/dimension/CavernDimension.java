@@ -35,7 +35,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProviderType;
-import net.minecraft.world.biome.provider.SingleBiomeProviderSettings;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -46,6 +45,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class CavernDimension extends Dimension
 {
+	private static final Vec3d FOG_COLOR = new Vec3d(0.01D, 0.01D, 0.01D);
+
+	protected final CavernGenSettings settings;
 	protected final VeinProvider veinProvider;
 	protected final CaveMobSpawner caveMobSpawner;
 
@@ -54,6 +56,7 @@ public class CavernDimension extends Dimension
 	public CavernDimension(World world, DimensionType type)
 	{
 		super(world, type, 0);
+		this.settings = createGenerationSettings();
 		this.veinProvider = createVeinProvider();
 		this.caveMobSpawner = createCaveMobSpawner();
 		this.setSkyRenderer(EmptyRenderer.INSTANCE);
@@ -79,9 +82,7 @@ public class CavernDimension extends Dimension
 	@Override
 	public ChunkGenerator<? extends GenerationSettings> createChunkGenerator()
 	{
-		SingleBiomeProviderSettings biomeSettings = BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(getBiome());
-
-		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(biomeSettings), createGenerationSettings());
+		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(getBiome())), settings);
 	}
 
 	public CavernGenSettings createGenerationSettings()
@@ -129,18 +130,6 @@ public class CavernDimension extends Dimension
 	public float getLightBrightness(int level)
 	{
 		return lightBrightnessTable[level];
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public float getFogDensity(Entity entity)
-	{
-		return 0.0F;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public float getFogDepth(Entity entity)
-	{
-		return 0.0F;
 	}
 
 	@Override
@@ -226,7 +215,19 @@ public class CavernDimension extends Dimension
 	@Override
 	public Vec3d getFogColor(float celestialAngle, float partialTicks)
 	{
-		return Vec3d.ZERO;
+		return FOG_COLOR;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public float getFogDensity(Entity entity)
+	{
+		return 0.0F;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public float getFogDepth(Entity entity)
+	{
+		return 0.0F;
 	}
 
 	@Override

@@ -93,7 +93,7 @@ public class CavernTeleporter implements ITeleporter
 	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos, CavePortalList list)
 	{
 		List<BlockPos> positions = list.getPortalPositions(portalBlock).stream()
-			.filter(o -> o.withinDistance(checkPos, radius))
+			.filter(o -> new BlockPos(o.getX(), 0, o.getZ()).withinDistance(new BlockPos(checkPos.getX(), 0, checkPos.getZ()), radius))
 			.sorted((o1, o2) -> Double.compare(o1.distanceSq(checkPos), o2.distanceSq(checkPos))).collect(Collectors.toList());
 
 		for (BlockPos portalPos : positions)
@@ -119,9 +119,8 @@ public class CavernTeleporter implements ITeleporter
 		}
 		else
 		{
-			int yRadius = MathHelper.floor(radius * 1.5D);
-			int min = Math.max(checkPos.getY() - yRadius, 1);
-			int max = Math.min(checkPos.getY() + yRadius, world.getActualHeight() - 1);
+			int min = 1;
+			int max = world.getActualHeight() - 1;
 			BlockPos.Mutable findPos = new BlockPos.Mutable(checkPos);
 			LongSet findChunks = new LongArraySet();
 
@@ -182,24 +181,6 @@ public class CavernTeleporter implements ITeleporter
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(portalBlock, portalPos));
 
-		if (portalVec == null || teleportDirection == null)
-		{
-			TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
-
-			if (cache != null)
-			{
-				if (cache.getLastPortalVec() != null)
-				{
-					portalVec = cache.getLastPortalVec();
-				}
-
-				if (cache.getTeleportDirection() != null)
-				{
-					teleportDirection = cache.getTeleportDirection();
-				}
-			}
-		}
-
 		if (portalVec == null)
 		{
 			portalVec = Vec3d.ZERO;
@@ -231,9 +212,8 @@ public class CavernTeleporter implements ITeleporter
 		int originX = MathHelper.floor(entity.getPosX());
 		int originY = MathHelper.floor(entity.getPosY());
 		int originZ = MathHelper.floor(entity.getPosZ());
-		int yRadius = MathHelper.floor(radius * 1.5D);
-		int min = Math.max(originY - yRadius, 10);
-		int max = Math.min(originY + yRadius, world.getActualHeight() - 10);
+		int min = 10;
+		int max = world.getActualHeight() - 10;
 		int x = originX;
 		int y = originY;
 		int z = originZ;
