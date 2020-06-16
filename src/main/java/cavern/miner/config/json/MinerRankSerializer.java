@@ -13,6 +13,7 @@ import com.google.gson.JsonSerializer;
 import cavern.miner.storage.MinerRank;
 import cavern.miner.storage.MinerRank.RankEntry;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 public class MinerRankSerializer implements JsonSerializer<MinerRank.RankEntry>, JsonDeserializer<MinerRank.RankEntry>
 {
@@ -28,6 +29,11 @@ public class MinerRankSerializer implements JsonSerializer<MinerRank.RankEntry>,
 		object.addProperty("phase", src.getPhase());
 		object.add("icon_item", JsonHelper.serializeItemStack(src.getIconItem()));
 
+		if (src.getAdvancementKey() != null)
+		{
+			object.addProperty("advancement", src.getAdvancementKey().toString());
+		}
+
 		return object;
 	}
 
@@ -40,7 +46,13 @@ public class MinerRankSerializer implements JsonSerializer<MinerRank.RankEntry>,
 		String key = object.get("translation_key").getAsString();
 		int phase = object.get("phase").getAsInt();
 		ItemStack iconItem = JsonHelper.deserializeItemStack(object.get("icon_item").getAsJsonObject());
+		ResourceLocation advancement = null;
 
-		return new MinerRank.RankEntry(name, key, phase, iconItem);
+		if (object.has("advancement"))
+		{
+			advancement = new ResourceLocation(object.get("advancement").getAsString());
+		}
+
+		return new MinerRank.RankEntry(name, key, phase, iconItem, advancement);
 	}
 }

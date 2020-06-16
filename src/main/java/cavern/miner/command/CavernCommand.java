@@ -57,7 +57,7 @@ public final class CavernCommand
 
 	private static Miner getMiner(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
-		ServerPlayerEntity player = EntityArgument.getPlayer(context, "targets");
+		ServerPlayerEntity player = EntityArgument.getPlayer(context, "target");
 
 		return player.getCapability(CaveCapabilities.MINER).orElseThrow(() -> INVALID_MINER.create());
 	}

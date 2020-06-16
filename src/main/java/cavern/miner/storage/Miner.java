@@ -11,7 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -100,8 +99,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 				server.getPlayerList().sendMessage(message);
 
-				ResourceLocation key = new ResourceLocation("cavern", getRank().getName().toLowerCase() + "_miner");
-				Advancement advancement = server.getAdvancementManager().getAdvancement(key);
+				Advancement advancement = getRank().getAdvancement(server);
 
 				if (advancement != null && player instanceof ServerPlayerEntity)
 				{

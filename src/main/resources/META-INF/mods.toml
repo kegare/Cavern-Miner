@@ -11,7 +11,18 @@ logoFile="logo.png"
 credits=""
 authors="kegare"
 description='''
-New Cavern Project
+Adds new cave dimension to make mining more fun!
+
+[Quick Guide]
+For go to Cavern, collect moss stones and an emerald.
+Build the portal frames of moss stone.
+Place an emerald into the portal frame.
+If go to Huge Cavern, place a diamond instead of emerald.
+
+[Miner]
+In the caverns, you can get points when mining ores.
+Miner ranks will promote by accumulate points.
+Let's aim for the Diamond Miner!
 '''
 
 [[dependencies.cavern]]
