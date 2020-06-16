@@ -17,6 +17,7 @@ public class CavernConfig
 	public final ForgeConfigSpec.DoubleValue lightBrightness;
 
 	public final ForgeConfigSpec.DoubleValue cave;
+	public final ForgeConfigSpec.DoubleValue canyon;
 	public final ForgeConfigSpec.DoubleValue extremeCave;
 	public final ForgeConfigSpec.DoubleValue extremeCanyon;
 	public final ForgeConfigSpec.DoubleValue towerDungeon;
@@ -37,6 +38,7 @@ public class CavernConfig
 
 		builder.push("decoration");
 		cave = builder.comment("The generation probability of caves.", serverSide).defineInRange("cave", 0.2D, 0.0D, 1.0D);
+		canyon = builder.comment("The generation probability of canyons.", serverSide).defineInRange("canyon", 0.02D, 0.0D, 1.0D);
 		extremeCave = builder.comment("The generation probability of extreme caves.", serverSide).defineInRange("extreme_cave", 0.15D, 0.0D, 1.0D);
 		extremeCanyon = builder.comment("The generation probability of extreme canyons.", serverSide).defineInRange("extreme_canyon", 0.001D, 0.0D, 1.0D);
 		towerDungeon = builder.comment("The generation probability of tower dungeons.", serverSide).defineInRange("tower_dungeon", 0.01D, 0.0D, 1.0D);

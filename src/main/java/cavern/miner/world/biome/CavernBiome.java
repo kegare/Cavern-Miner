@@ -49,6 +49,13 @@ public class CavernBiome extends Biome
 			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
 		}
 
+		probability = CavernConfig.INSTANCE.canyon.get().floatValue();
+
+		if (probability > 0.0F)
+		{
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN_CANYON.orElse(WorldCarver.CANYON), new ProbabilityConfig(probability)));
+		}
+
 		probability = CavernConfig.INSTANCE.extremeCave.get().floatValue();
 
 		if (probability > 0.0F)
