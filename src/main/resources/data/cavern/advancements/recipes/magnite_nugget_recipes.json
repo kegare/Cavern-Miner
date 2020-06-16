@@ -1,0 +1,22 @@
+{
+    "parent": "minecraft:recipes/root",
+    "criteria": {
+        "magnite_ingot": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+                "items": [
+                    {
+                        "item": "cavern:magnite_nugget"
+                    }
+                ]
+            }
+        }
+    },
+    "rewards": {
+        "recipes": [
+            "cavern:magnite_nugget",
+            "cavern:magnite_nugget_from_smelting",
+            "cavern:magnite_nugget_from_blasting"
+        ]
+    }
+}

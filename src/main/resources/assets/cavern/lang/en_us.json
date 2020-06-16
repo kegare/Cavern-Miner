@@ -27,8 +27,16 @@
 	"cavern.miner.gold": "Gold Miner",
 	"cavern.miner.aqua": "Aqua Miner",
 	"cavern.miner.diamond": "Diamond Miner",
-	"cavern.miner.promoted": "%s is now a %s.",
+	"cavern.miner.promoted": "%s is now the %s.",
 	"cavern.miner.record": "Mining Record",
 	"cavern.miner.score": "Mining Score",
-	"cavern.caver.no_sleep": "You are not tired."
+	"cavern.caver.no_sleep": "You are not tired.",
+	"advancements.cavern.root.title": "Cavern",
+	"advancements.cavern.root.description": "Enter the Cavern",
+	"advancements.cavern.iron_miner.title": "Iron Miner",
+	"advancements.cavern.iron_miner.description": "Become the Iron Miner",
+	"advancements.cavern.gold_miner.title": "Gold Miner",
+	"advancements.cavern.gold_miner.description": "Become the Gold Miner",
+	"advancements.cavern.diamond_miner.title": "Diamond Miner",
+	"advancements.cavern.diamond_miner.description": "Become the Diamond Miner"
 }

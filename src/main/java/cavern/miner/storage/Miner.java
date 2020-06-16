@@ -5,10 +5,13 @@ import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
 import cavern.miner.network.MinerUpdateMessage;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -70,6 +73,63 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
+	public Miner setRank(String value)
+	{
+		setRank(MinerRank.get(value, getRank()));
+
+		return this;
+	}
+
+	public Miner promoteRank(MinerRank.RankEntry value)
+	{
+		MinerRank.RankEntry prev = getRank();
+
+		setRank(value).setPoint(0);
+
+		if (prev != getRank() && player != null)
+		{
+			MinecraftServer server = player.getServer();
+
+			if (server != null)
+			{
+				TextComponent rankName = new TranslationTextComponent(getRank().getTranslationKey());
+				rankName.getStyle().setBold(true);
+
+				TextComponent message = new TranslationTextComponent("cavern.miner.promoted", player.getDisplayName(), rankName);
+				message.getStyle().setColor(TextFormatting.GRAY).setItalic(true);
+
+				server.getPlayerList().sendMessage(message);
+
+				ResourceLocation key = new ResourceLocation("cavern", getRank().getName().toLowerCase() + "_miner");
+				Advancement advancement = server.getAdvancementManager().getAdvancement(key);
+
+				if (advancement != null && player instanceof ServerPlayerEntity)
+				{
+					PlayerAdvancements advancements = ((ServerPlayerEntity)player).getAdvancements();
+
+					if (!advancements.getProgress(advancement).isDone())
+					{
+						for (String criterionKey : advancements.getProgress(advancement).getRemaningCriteria())
+						{
+							advancements.grantCriterion(advancement, criterionKey);
+						}
+					}
+				}
+			}
+
+			CaveSounds.MINER_RANKUP.ifPresent(o -> player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), o, SoundCategory.AMBIENT, 0.5F, 1.0F));
+		}
+
+		return this;
+	}
+
+	public Miner promoteRank(String value)
+	{
+		promoteRank(MinerRank.get(value, getRank()));
+
+		return this;
+	}
+
 	@OnlyIn(Dist.CLIENT)
 	public MinerRank.DisplayEntry getDisplayRank()
 	{
@@ -97,7 +157,6 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		setPoint(getPoint() + amount);
 
 		boolean positive = amount > 0;
-		boolean promoted = false;
 
 		if (positive)
 		{
@@ -105,37 +164,13 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 			if (!getRank().equals(next) && getPoint() >= next.getPhase())
 			{
-				setPoint(0);
-				setRank(next);
-
-				promoted = true;
+				promoteRank(next);
 			}
 		}
 
-		if (player != null)
+		if (positive && player != null && getPoint() % 100 == 0)
 		{
-			if (positive && getPoint() % 100 == 0)
-			{
-				player.giveExperiencePoints(player.xpBarCap() / 2);
-			}
-
-			if (promoted)
-			{
-				MinecraftServer server = player.getServer();
-
-				if (server != null)
-				{
-					TextComponent rankName = new TranslationTextComponent(getRank().getTranslationKey());
-					rankName.getStyle().setBold(true);
-
-					TextComponent message = new TranslationTextComponent("cavern.miner.promoted", player.getDisplayName(), rankName);
-					message.getStyle().setColor(TextFormatting.GRAY).setItalic(true);
-
-					server.getPlayerList().sendMessage(message);
-				}
-
-				CaveSounds.MINER_RANKUP.ifPresent(o -> player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), o, SoundCategory.AMBIENT, 0.5F, 1.0F));
-			}
+			player.giveExperiencePoints(player.xpBarCap() / 2);
 		}
 
 		return this;

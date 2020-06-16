@@ -41,6 +41,11 @@ public final class MinerRank
 
 	public static RankEntry get(String name)
 	{
+		return get(name, BEGINNER);
+	}
+
+	public static RankEntry get(String name, RankEntry nullDefault)
+	{
 		for (RankEntry entry : ENTRIES)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
@@ -49,7 +54,7 @@ public final class MinerRank
 			}
 		}
 
-		return BEGINNER;
+		return nullDefault;
 	}
 
 	public static RankEntry getNextEntry(RankEntry current)

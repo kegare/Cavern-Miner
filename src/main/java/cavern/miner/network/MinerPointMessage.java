@@ -33,7 +33,7 @@ public class MinerPointMessage
 		{
 			CavernMod.LOG.error("MinerPointMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
-			return new MinerPointMessage(0);
+			return new MinerPointMessage(-1);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class MinerPointMessage
 
 	public static void handle(final MinerPointMessage msg, final Supplier<NetworkEvent.Context> ctx)
 	{
-		if (msg.point != 0)
+		if (msg.point >= 0)
 		{
 			ctx.get().enqueueWork(() ->
 			{

@@ -1,5 +1,6 @@
 package cavern.miner.world.gen;
 
+import cavern.miner.config.CavernConfig;
 import net.minecraft.world.gen.GenerationSettings;
 
 public class CavernGenSettings extends GenerationSettings
@@ -18,6 +19,6 @@ public class CavernGenSettings extends GenerationSettings
 
 	public int getGroundHeight()
 	{
-		return 150;
+		return CavernConfig.INSTANCE.groundDecoration.get() ? 150 : 0;
 	}
 }
