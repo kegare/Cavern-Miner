@@ -10,6 +10,7 @@ import cavern.miner.world.spawner.WorldSpawnerType;
 import cavern.miner.world.vein.HugeCavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
@@ -20,7 +21,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class HugeCavernDimension extends CavernDimension
 {
-
 	public HugeCavernDimension(World world, DimensionType type)
 	{
 		super(world, type);
@@ -78,6 +78,6 @@ public class HugeCavernDimension extends CavernDimension
 	@Override
 	public float getFogDepth(Entity entity)
 	{
-		return 0.5F;
+		return MathHelper.clamp(1.0F - Math.abs(0.5F - ((world.getDayTime() % 24000L) / 24000.0F)), 0.0F, 0.8F);
 	}
 }
