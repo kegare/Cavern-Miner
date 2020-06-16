@@ -1,0 +1,26 @@
+{
+    "parent": "minecraft:recipes/root",
+    "criteria": {
+        "aquamarine": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+                "items": [
+                    {
+                        "item": "cavern:aquamarine"
+                    }
+                ]
+            }
+        }
+    },
+    "rewards": {
+        "recipes": [
+            "cavern:aquamarine",
+            "cavern:aquamarine_from_smelting",
+            "cavern:aquamarine_from_blasting",
+            "cavern:aquamarine_block",
+            "cavern:aquamarine_pickaxe",
+            "cavern:aquamarine_axe",
+            "cavern:aquamarine_shovel"
+        ]
+    }
+}

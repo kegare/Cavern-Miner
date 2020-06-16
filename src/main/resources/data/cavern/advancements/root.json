@@ -1,0 +1,31 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:mossy_cobblestone"
+        },
+        "title": {
+            "translate": "advancements.cavern.root.title"
+        },
+        "description": {
+            "translate": "advancements.cavern.root.description"
+        },
+        "background": "minecraft:textures/block/stone_bricks.png"
+    },
+    "criteria": {
+        "entered_cavern": {
+            "trigger": "minecraft:changed_dimension",
+            "conditions": {
+                "to": "cavern:cavern"
+            }
+        },
+        "entered_huge_cavern": {
+            "trigger": "minecraft:changed_dimension",
+            "conditions": {
+                "to": "cavern:huge_cavern"
+            }
+        }
+    },
+    "requirements": [
+        ["entered_cavern", "entered_huge_cavern"]
+    ]
+}

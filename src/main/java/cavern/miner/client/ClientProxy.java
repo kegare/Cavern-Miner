@@ -1,29 +1,58 @@
 package cavern.miner.client;
 
-import cavern.miner.core.CommonProxy;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import cavern.miner.client.gui.DownloadCaveTerrainScreen;
+import cavern.miner.client.gui.MinerRecordScreen;
+import cavern.miner.init.CaveCapabilities;
+import cavern.miner.storage.Miner;
+import cavern.miner.storage.MinerRecord;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class ClientProxy extends CommonProxy
+@OnlyIn(Dist.CLIENT)
+public class ClientProxy
 {
-	@Override
-	public String translate(String key)
+	public static PlayerEntity getPlayer()
 	{
-		return I18n.format(key);
+		Minecraft mc = Minecraft.getInstance();
+
+		return mc.player;
 	}
 
-	@Override
-	public String translateFormat(String key, Object... format)
+	public static void displayLoadingScreen()
 	{
-		return I18n.format(key, format);
+		Minecraft mc = Minecraft.getInstance();
+
+		mc.displayGuiScreen(new DownloadCaveTerrainScreen());
 	}
 
-	@Override
-	public boolean isSinglePlayer()
+	public static void closeLoadingScreen()
 	{
-		return FMLClientHandler.instance().getClient().isSingleplayer();
+		Minecraft mc = Minecraft.getInstance();
+
+		if (mc.currentScreen != null && mc.currentScreen instanceof DownloadCaveTerrainScreen)
+		{
+			DownloadCaveTerrainScreen loadScreen = (DownloadCaveTerrainScreen)mc.currentScreen;
+
+			loadScreen.setLoaded();
+
+			mc.displayGuiScreen(null);
+		}
+	}
+
+	public static void displayMinerRecordScreen()
+	{
+		Minecraft mc = Minecraft.getInstance();
+
+		if (mc.player != null)
+		{
+			MinerRecord record = mc.player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElse(null);
+
+			if (record != null)
+			{
+				mc.displayGuiScreen(new MinerRecordScreen(record));
+			}
+		}
 	}
 }

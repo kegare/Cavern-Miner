@@ -1,7 +1,6 @@
 {
     "parent": "cavern:block/cube_ore",
     "textures": {
-        "base": "blocks/stone",
-        "ore": "cavern:blocks/randomite_ore"
+        "ore": "cavern:block/randomite_ore"
     }
 }

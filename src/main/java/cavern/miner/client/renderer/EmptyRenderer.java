@@ -1,16 +1,16 @@
 package cavern.miner.client.renderer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.world.ClientWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.IRenderHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class EmptyRenderer extends IRenderHandler
+public class EmptyRenderer implements IRenderHandler
 {
 	public static final EmptyRenderer INSTANCE = new EmptyRenderer();
 
-    @SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
-	public void render(float partialTicks, WorldClient world, Minecraft mc) {}
+	public void render(int ticks, float partialTicks, ClientWorld world, Minecraft mc) {}
 }

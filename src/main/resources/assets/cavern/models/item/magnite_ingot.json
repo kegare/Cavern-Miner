@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "cavern:items/magnite_ingot"
+        "layer0": "cavern:item/magnite_ingot"
     }
 }

@@ -1,180 +1,78 @@
 package cavern.miner.config;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import cavern.miner.client.config.CaveConfigEntries;
-import cavern.miner.config.property.ConfigCaveborn;
-import cavern.miner.config.property.ConfigItems;
-import cavern.miner.core.CavernMod;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class GeneralConfig
 {
-	public static Configuration config;
+	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
-	public static boolean versionNotify;
+	public static final GeneralConfig INSTANCE = new GeneralConfig(BUILDER);
+	public static final ForgeConfigSpec SPEC = BUILDER.build();
 
-	public static ConfigCaveborn caveborn = new ConfigCaveborn();
-	public static ConfigItems cavebornBonusItems = new ConfigItems();
+	public final ForgeConfigSpec.IntValue findRadius;
+	public final ForgeConfigSpec.BooleanValue posCache;
+	public final ForgeConfigSpec.IntValue sleepWait;
 
-	public static int findPortalRange;
-	public static boolean portalCache;
-	public static boolean portalMenu;
+	public final ForgeConfigSpec.BooleanValue disableMiner;
 
-	public static int sleepWaitTime;
-	public static boolean sleepRefresh;
-
-	public static boolean generousRandomite;
-	public static ConfigItems randomiteBlacklist = new ConfigItems();
-
-	protected static final Side SIDE = FMLLaunchHandler.side();
-
-	public static void syncConfig()
+	public GeneralConfig(final ForgeConfigSpec.Builder builder)
 	{
-		String category = "general";
-		Property prop;
-		String comment;
-		List<String> propOrder = Lists.newArrayList();
+		String serverSide = "Note: If multiplayer, server-side only.";
 
-		if (config == null)
+		builder.push("caver");
+		findRadius = builder.comment("How far (in blocks) the cave portal must be found.", serverSide).defineInRange("find_radius", 32, 10, 256);
+		posCache = builder.comment("If cache and teleports the previous cave portal position.", serverSide).define("pos_cache", false);
+		sleepWait = builder.comment("How long (in seconds) the player must wait before sleeping in the caverns.", serverSide).defineInRange("sleep_wait", 180, 0, 100000);
+		builder.pop();
+
+		builder.push("miner");
+		disableMiner = builder.comment("If disable the miner status for all players.").define("disable_miner", false);
+		builder.pop();
+	}
+
+	public static final OreEntryConfig ORE_ENTRIES = new OreEntryConfig();
+	public static final MinerRankConfig MINER_RANKS = new MinerRankConfig();
+	public static final RandomiteDropConfig RANDOMITE_DROPS = new RandomiteDropConfig();
+	public static final TowerDungeonMobConfig TOWER_DUNGEON_MOBS = new TowerDungeonMobConfig();
+
+	public static void loadConfig()
+	{
+		ORE_ENTRIES.loadFromFile();
+
+		if (ORE_ENTRIES.getEntries().isEmpty())
 		{
-			config = Config.loadConfig(category);
+			ORE_ENTRIES.setDefault();
+			ORE_ENTRIES.saveToFile();
 		}
 
-		prop = config.get(category, "versionNotify", true);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, does not have to match client-side and server-side.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		versionNotify = prop.getBoolean(versionNotify);
+		ORE_ENTRIES.registerEntries();
 
-		prop = config.get(category, "caveborn", ConfigCaveborn.Type.DISABLED.ordinal());
-		prop.setMinValue(0).setMaxValue(ConfigCaveborn.Type.values().length - 1).setConfigEntryClass(CaveConfigEntries.cycleInteger);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [range: " + prop.getMinValue() + " ~ " + prop.getMaxValue() + ", default: " + prop.getDefault() + "]";
+		MINER_RANKS.loadFromFile();
 
-		int min = Integer.parseInt(prop.getMinValue());
-		int max = Integer.parseInt(prop.getMaxValue());
-
-		for (int i = min; i <= max; ++i)
+		if (MINER_RANKS.getEntries().isEmpty())
 		{
-			comment += Configuration.NEW_LINE + i + ": " + CavernMod.proxy.translate(prop.getLanguageKey() + "." + i);
-
-			if (i < max)
-			{
-				comment += ",";
-			}
+			MINER_RANKS.setDefault();
+			MINER_RANKS.saveToFile();
 		}
 
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		caveborn.setValue(prop.getInt(caveborn.getValue()));
+		MINER_RANKS.registerEntries();
 
-		NonNullList<ItemStack> items = NonNullList.create();
+		RANDOMITE_DROPS.loadFromFile();
 
-		items.add(new ItemStack(Items.STONE_PICKAXE));
-		items.add(new ItemStack(Items.STONE_SWORD));
-		items.add(new ItemStack(Blocks.TORCH));
-		items.add(new ItemStack(Items.BREAD));
+		if (RANDOMITE_DROPS.getEntries().isEmpty())
+		{
+			RANDOMITE_DROPS.setDefault();
+			RANDOMITE_DROPS.saveToFile();
+		}
 
-		prop = config.get(category, "cavebornBonusItems", cavebornBonusItems.createValues(items));
-		prop.setConfigEntryClass(CaveConfigEntries.selectBlocksAndItems);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		cavebornBonusItems.setValues(prop.getStringList());
+		RANDOMITE_DROPS.registerEntries();
 
-		prop = config.get(category, "findPortalRange", 32);
-		prop.setMinValue(10).setMaxValue(200);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		findPortalRange = prop.getInt(findPortalRange);
+		if (!TOWER_DUNGEON_MOBS.loadFromFile())
+		{
+			TOWER_DUNGEON_MOBS.setDefault();
+			TOWER_DUNGEON_MOBS.saveToFile();
+		}
 
-		prop = config.get(category, "portalCache", false);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		portalCache = prop.getBoolean(portalCache);
-
-		prop = config.get(category, "portalMenu", true);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		portalMenu = prop.getBoolean(portalMenu);
-
-		prop = config.get(category, "sleepWaitTime", 300);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		sleepWaitTime = prop.getInt(sleepWaitTime);
-
-		prop = config.get(category, "sleepRefresh", true);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		sleepRefresh = prop.getBoolean(sleepRefresh);
-
-		prop = config.get(category, "generousRandomite", false);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += " [default: " + prop.getDefault() + "]";
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		generousRandomite = prop.getBoolean(generousRandomite);
-
-		prop = config.get(category, "randomiteBlacklist", new String[] {Blocks.BEDROCK.getRegistryName().toString()});
-		prop.setConfigEntryClass(CaveConfigEntries.selectBlocksAndItems);
-		prop.setLanguageKey(Config.LANG_KEY + category + "." + prop.getName());
-		comment = CavernMod.proxy.translate(prop.getLanguageKey() + ".tooltip");
-		comment += Configuration.NEW_LINE;
-		comment += "Note: If multiplayer, server-side only.";
-		prop.setComment(comment);
-		propOrder.add(prop.getName());
-		randomiteBlacklist.setValues(prop.getStringList());
-
-		config.setCategoryPropertyOrder(category, propOrder);
-
-		Config.saveConfig(config);
+		TOWER_DUNGEON_MOBS.registerEntries();
 	}
 }

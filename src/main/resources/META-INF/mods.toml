@@ -1,0 +1,41 @@
+modLoader="javafml"
+loaderVersion="[31,)"
+showAsResourcePack=false
+
+[[mods]]
+modId="cavern"
+version="3.0.0-alpha"
+displayName="Cavern: Miner"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/cavern-miner"
+updateJSONURL="https://raw.githubusercontent.com/kegare/Cavern-Miner/master/cavern.json"
+logoFile="logo.png"
+credits=""
+authors="kegare"
+description='''
+Adds new cave dimension to make mining more fun!
+
+[Quick Guide]
+For go to Cavern, collect moss stones and an emerald.
+Build the portal frames of moss stone.
+Place an emerald into the portal frame.
+If go to Huge Cavern, place a diamond instead of emerald.
+
+[Miner]
+In the caverns, you can get points when mining ores.
+Miner rank will promote by accumulate points.
+Let's aim for the Diamond Miner!
+'''
+
+[[dependencies.cavern]]
+    modId="forge"
+    mandatory=true
+    versionRange="[31.2,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.cavern]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.15.2]"
+    ordering="NONE"
+    side="BOTH"

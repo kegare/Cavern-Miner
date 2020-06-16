@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "magnite_ingot",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "cavern:magnite_nugget"
+    }
+  },
+  "result": {
+    "item": "cavern:magnite_ingot"
+  }
+}

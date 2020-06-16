@@ -1,5 +1,5 @@
 {
     "variants": {
-        "normal": { "model": "cavern:magnite_ore" }
+        "": { "model": "cavern:block/magnite_ore" }
     }
 }
