@@ -4,9 +4,10 @@ showAsResourcePack=false
 
 [[mods]]
 modId="cavern"
-version="4.0.0-alpha"
+version="3.0.0-alpha"
 displayName="Cavern: Miner"
-displayURL="https://twitter.com/_kegare"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/cavern-miner"
+updateJSONURL="https://raw.githubusercontent.com/kegare/Cavern-Miner/master/cavern.json"
 logoFile="logo.png"
 credits=""
 authors="kegare"
@@ -21,14 +22,14 @@ If go to Huge Cavern, place a diamond instead of emerald.
 
 [Miner]
 In the caverns, you can get points when mining ores.
-Miner ranks will promote by accumulate points.
+Miner rank will promote by accumulate points.
 Let's aim for the Diamond Miner!
 '''
 
 [[dependencies.cavern]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[31.2,)"
     ordering="NONE"
     side="BOTH"
 

@@ -1,9 +1,7 @@
 {
   "homepage": "https://forum.civa.jp/viewtopic.php?f=3&t=457",
   "promos": {
-    "1.12.2-recommended": "3.0.0-alpha",
-    "1.12.2-latest": "3.0.0-alpha",
-    "1.15.2-recommended": "4.0.0-alpha",
-    "1.15.2-latest": "4.0.0-alpha"
+    "1.15.2-recommended": "3.0.0-alpha",
+    "1.15.2-latest": "3.0.0-alpha"
   }
 }

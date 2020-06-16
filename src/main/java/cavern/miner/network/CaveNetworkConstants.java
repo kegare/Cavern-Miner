@@ -8,7 +8,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 public class CaveNetworkConstants
 {
 	public static final String NET_MARKER = "CAVERN";
-	public static final int NET_VERSION = 4;
+	public static final int NET_VERSION = 3;
 	public static final String PROTOCOL_VERSION = NET_MARKER + NET_VERSION;
 
 	public static final SimpleChannel PLAY = createPlayChannel();
