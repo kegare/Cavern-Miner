@@ -38,7 +38,7 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 
 			for (Vein vein : provider.getVeins())
 			{
-				for (BlockPos genPos : getPositions(world, pos, rand, vein))
+				for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
 				{
 					if (genPos.equals(BlockPos.ZERO))
 					{
@@ -54,7 +54,7 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 
 			for (Vein vein : provider.getAutoEntries())
 			{
-				for (BlockPos genPos : getPositions(world, pos, rand, vein))
+				for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
 				{
 					if (genPos.equals(BlockPos.ZERO))
 					{
@@ -74,10 +74,12 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 		return false;
 	}
 
-	public Iterable<BlockPos> getPositions(IWorld world, BlockPos pos, Random random, Vein vein)
+	public Iterable<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, BlockPos pos, Random random, Vein vein)
 	{
 		return () -> new AbstractIterator<BlockPos>()
 		{
+			final int ground = generator.getGroundHeight();
+			final int worldHeight = world.getMaxHeight() - 1;
 			final int size = vein.getSize();
 			final int min = vein.getMinHeight() + size;
 			final int max = vein.getMaxHeight() - size;
@@ -100,7 +102,7 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 
 				targetY.clear();
 
-				for (int y = Math.max(min, 1); y <= Math.min(max, world.getMaxHeight() - 1); ++y)
+				for (int y = Math.max(min, 1); y <= Math.min(max, ground > 0 ? ground - 1 : worldHeight); ++y)
 				{
 					if (!world.isAirBlock(findPos.setPos(x, y, z)) && vein.isTargetBlock(world.getBlockState(findPos)))
 					{

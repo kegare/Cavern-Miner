@@ -5,6 +5,7 @@ import java.util.function.Function;
 
 import com.mojang.datafixers.Dynamic;
 
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 
 public class ExtremeCaveWorldCarver extends CavernWorldCarver
@@ -17,17 +18,17 @@ public class ExtremeCaveWorldCarver extends CavernWorldCarver
 	@Override
 	protected int func_222724_a()
 	{
-		return 10;
+		return 20;
 	}
 
 	@Override
 	protected float generateCaveRadius(Random rand)
 	{
-		float f = rand.nextFloat() * 10.0F + rand.nextFloat();
+		float f = rand.nextFloat() * 20.0F + rand.nextFloat();
 
-		if (rand.nextInt(5) == 0)
+		if (rand.nextInt(10) == 0)
 		{
-			f *= rand.nextFloat() * rand.nextFloat() * 2.0F + 1.0F;
+			f *= rand.nextFloat() * rand.nextFloat() * 1.5F + 1.0F;
 		}
 
 		return f;
@@ -36,12 +37,12 @@ public class ExtremeCaveWorldCarver extends CavernWorldCarver
 	@Override
 	protected double func_222725_b()
 	{
-		return 1.2D;
+		return 0.75D;
 	}
 
 	@Override
 	protected int generateCaveStartY(Random rand)
 	{
-		return 170 + rand.nextInt(5);
+		return MathHelper.floor(maxHeight * 0.75D) + rand.nextInt(rand.nextInt(5) + 5) + 5;
 	}
 }

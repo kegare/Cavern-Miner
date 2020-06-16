@@ -34,6 +34,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGenerator<T>
 {
+	private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
+	private static final BlockState DIRT = Blocks.DIRT.getDefaultState();
+	private static final BlockState GRASS_BLOCK = Blocks.GRASS_BLOCK.getDefaultState();
+
 	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, T settings)
 	{
 		super(world, biomeProvider, settings);
@@ -74,7 +78,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 				{
 					if (y <= floor + rand.nextInt(5))
 					{
-						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), Blocks.BEDROCK.getDefaultState(), false);
+						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), BEDROCK, false);
 					}
 				}
 			}
@@ -85,7 +89,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 				{
 					if (y >= roof - rand.nextInt(5))
 					{
-						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), Blocks.BEDROCK.getDefaultState(), false);
+						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), BEDROCK, false);
 					}
 				}
 			}
@@ -96,7 +100,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 				{
 					if (y >= ground - rand.nextInt(5))
 					{
-						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), Blocks.DIRT.getDefaultState(), false);
+						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), DIRT, false);
 					}
 				}
 			}
@@ -122,7 +126,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 
 				if (ground > 0 && y >= ground)
 				{
-					chunk.setBlockState(posCache, Blocks.DIRT.getDefaultState(), false);
+					chunk.setBlockState(posCache, DIRT, false);
 				}
 				else
 				{
@@ -157,9 +161,9 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 				BlockState stateHere = chunk.getBlockState(posHere.setPos(pos.getX(), y, pos.getZ()));
 				BlockState stateAbove = chunk.getBlockState(posAbove.setPos(posHere).move(Direction.UP));
 
-				if (stateHere.getBlock() == Blocks.DIRT && stateAbove.getBlock() == Blocks.CAVE_AIR)
+				if (stateHere.getBlock() == DIRT.getBlock() && stateAbove.isAir(chunk, posAbove))
 				{
-					chunk.setBlockState(posHere, Blocks.GRASS_BLOCK.getDefaultState(), false);
+					chunk.setBlockState(posHere, GRASS_BLOCK, false);
 				}
 			}
 		}

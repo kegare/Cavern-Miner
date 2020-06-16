@@ -1,4 +1,4 @@
-package cavern.miner.world.gen.feature;
+package cavern.miner.world.gen.placement;
 
 import java.util.Random;
 import java.util.function.Function;
@@ -13,9 +13,9 @@ import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.placement.ChanceRangeConfig;
 import net.minecraft.world.gen.placement.Placement;
 
-public class TowerDungeonPlacement extends Placement<ChanceRangeConfig>
+public class CenterChanceRange extends Placement<ChanceRangeConfig>
 {
-	public TowerDungeonPlacement(Function<Dynamic<?>, ? extends ChanceRangeConfig> factory)
+	public CenterChanceRange(Function<Dynamic<?>, ? extends ChanceRangeConfig> factory)
 	{
 		super(factory);
 	}

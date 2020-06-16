@@ -45,7 +45,7 @@ public class GroundTreeFeature extends Feature<CountConfig>
 
 		int max = generator.getMaxHeight() - 1;
 		int ground = generator.getGroundHeight();
-		int ySpread = max - ground - 10;
+		int groundHeight = max - ground - 10;
 		BlockPos blockPos = new BlockPos(pos.getX(), ground, pos.getZ());
 
 		int i = 0;
@@ -53,7 +53,7 @@ public class GroundTreeFeature extends Feature<CountConfig>
 
 		outside: for (int count = 0; count < config.count; ++count)
 		{
-			posCache.setPos(blockPos).move(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(ySpread + 1), rand.nextInt(8) - rand.nextInt(8));
+			posCache.setPos(blockPos).move(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(groundHeight + 1), rand.nextInt(8) - rand.nextInt(8));
 
 			if (posCache.getY() >= max)
 			{
@@ -62,7 +62,9 @@ public class GroundTreeFeature extends Feature<CountConfig>
 
 			if (world.isAirBlock(posCache) && state.isValidPosition(world, posCache))
 			{
+				int x = posCache.getX();
 				int y = posCache.getY();
+				int z = posCache.getZ();
 
 				for (int j = 0; j < 3; ++j)
 				{
@@ -72,7 +74,15 @@ public class GroundTreeFeature extends Feature<CountConfig>
 					}
 				}
 
-				tree.place(world, generator, posCache.setPos(posCache.getX(), y, posCache.getZ()), state, rand);
+				for (Direction facing : Direction.Plane.HORIZONTAL)
+				{
+					if (!world.isAirBlock(posCache.setPos(x, y, z).move(facing)))
+					{
+						continue outside;
+					}
+				}
+
+				tree.place(world, generator, posCache.setPos(x, y, z), state, rand);
 
 				++i;
 			}

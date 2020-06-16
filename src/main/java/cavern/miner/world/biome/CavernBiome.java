@@ -74,17 +74,25 @@ public class CavernBiome extends Biome
 		if (chance > 0.0F)
 		{
 			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES, o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG)
-				.withPlacement(CavePlacements.TOWER_DUNGEON.orElse(Placement.CHANCE_RANGE).configure(new ChanceRangeConfig(chance, 5, 0, 30)))));
+				.withPlacement(CavePlacements.CENTER_CHANCE_RANGE.orElse(Placement.CHANCE_RANGE).configure(new ChanceRangeConfig(chance, 5, 0, 30)))));
 		}
+
+		Placement<FrequencyConfig> place = CavePlacements.CENTER_NO_HEIGHT.orElse(Placement.COUNT_HEIGHT_64);
 
 		CaveFeatures.GROUND_PATCH.ifPresent(o ->
 		{
 			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-				o.withConfiguration(DefaultBiomeFeatures.GRASS_CONFIG).withPlacement(Placement.COUNT_HEIGHTMAP_DOUBLE.configure(new FrequencyConfig(20))));
+				o.withConfiguration(DefaultBiomeFeatures.GRASS_CONFIG).withPlacement(place.configure(new FrequencyConfig(20))));
+			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+				o.withConfiguration(DefaultBiomeFeatures.DEFAULT_FLOWER_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
+			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+				o.withConfiguration(DefaultBiomeFeatures.BROWN_MUSHROOM_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
+			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+				o.withConfiguration(DefaultBiomeFeatures.RED_MUSHROOM_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
 		});
 
 		CaveFeatures.GROUND_TREE.ifPresent(o -> addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-			o.withConfiguration(new CountConfig(32)).withPlacement(Placement.COUNT_HEIGHTMAP_DOUBLE.configure(new FrequencyConfig(10)))));
+			o.withConfiguration(new CountConfig(32)).withPlacement(place.configure(new FrequencyConfig(10)))));
 	}
 
 	protected void addFeatures()
