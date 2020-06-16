@@ -14,4 +14,4 @@ Minecraft mod. Adds new cave dimensions!
 
 ----
 ## Links
-* [Cavern: Miner](https://forum.civa.jp/viewtopic.php?f=3&t=457)
+* [Cavern: Miner](https://www.curseforge.com/minecraft/mc-mods/cavern-miner)
