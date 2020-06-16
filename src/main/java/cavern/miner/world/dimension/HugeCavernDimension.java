@@ -78,6 +78,6 @@ public class HugeCavernDimension extends CavernDimension
 	@Override
 	public float getFogDepth(Entity entity)
 	{
-		return 0.8F;
+		return 0.5F;
 	}
 }

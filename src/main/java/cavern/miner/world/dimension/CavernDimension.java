@@ -221,12 +221,22 @@ public class CavernDimension extends Dimension
 	@OnlyIn(Dist.CLIENT)
 	public float getFogDensity(Entity entity)
 	{
+		if (settings.getGroundHeight() > 0)
+		{
+			return ((float)entity.getPosY() / settings.getGroundHeight()) * 0.005F;
+		}
+
 		return 0.0F;
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public float getFogDepth(Entity entity)
 	{
+		if (settings.getGroundHeight() > 0)
+		{
+			return MathHelper.clamp(((float)entity.getPosY() / settings.getGroundHeight()) * 0.65F, 0.0F, 1.0F);
+		}
+
 		return 0.0F;
 	}
 
