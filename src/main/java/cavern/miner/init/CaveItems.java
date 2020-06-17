@@ -1,11 +1,14 @@
 package cavern.miner.init;
 
 import cavern.miner.item.CaveItemTier;
+import cavern.miner.item.CaveSpawnEggItem;
 import cavern.miner.item.CavernItemGroup;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ShovelItem;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.item.SwordItem;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -26,6 +29,9 @@ public final class CaveItems
 	public static final RegistryObject<PickaxeItem> AQUAMARINE_PICKAXE = REGISTRY.register("aquamarine_pickaxe", () -> new PickaxeItem(CaveItemTier.AQUAMARINE, 1, -2.4F, createProperties()));
 	public static final RegistryObject<AxeItem> AQUAMARINE_AXE = REGISTRY.register("aquamarine_axe", () -> new AxeItem(CaveItemTier.AQUAMARINE, 5.0F, -2.8F, createProperties()));
 	public static final RegistryObject<ShovelItem> AQUAMARINE_SHOVEL = REGISTRY.register("aquamarine_shovel", () -> new ShovelItem(CaveItemTier.AQUAMARINE, 1.5F, -2.8F, createProperties()));
+
+	public static final RegistryObject<SpawnEggItem> CAVENIC_SKELETON_SPAWN_EGG = REGISTRY.register("cavenic_skeleton_spawn_egg",
+		() -> new CaveSpawnEggItem<>(CaveEntities.CAVENIC_SKELETON, EntityType.SKELETON, 0xAAAAAA, 0xDDDDDD, createProperties()));
 
 	public static Item.Properties createProperties()
 	{

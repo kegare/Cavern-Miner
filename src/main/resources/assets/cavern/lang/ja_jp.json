@@ -17,6 +17,8 @@
 	"item.cavern.aquamarine_pickaxe": "アクアマリンのツルハシ",
 	"item.cavern.aquamarine_axe": "アクアマリンの斧",
 	"item.cavern.aquamarine_shovel": "アクアマリンのシャベル",
+	"item.cavern.cavenic_skeleton_spawn_egg": "ケイブニックスケルトンのスポーンエッグ",
+	"entity.cavern.cavenic_skeleton": "ケイブニックスケルトン",
 	"enchantment.cavern.vein_miner": "一括採掘",
 	"enchantment.cavern.area_miner": "範囲採掘",
 	"cavern.miner.beginner": "初心者",

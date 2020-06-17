@@ -4,7 +4,7 @@ showAsResourcePack=false
 
 [[mods]]
 modId="cavern"
-version="3.0.0-alpha"
+version="3.0.0-alpha2"
 displayName="Cavern: Miner"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/cavern-miner"
 updateJSONURL="https://raw.githubusercontent.com/kegare/Cavern-Miner/master/cavern.json"

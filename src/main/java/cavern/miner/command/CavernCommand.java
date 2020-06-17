@@ -11,14 +11,18 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRank;
 import cavern.miner.storage.MinerRank.RankEntry;
+import cavern.miner.storage.MinerRecord;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public final class CavernCommand
 {
@@ -26,7 +30,7 @@ public final class CavernCommand
 
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
-		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerMiner()));
+		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerMiner()).then(registerRecord()));
 	}
 
 	private static ArgumentBuilder<CommandSource, ?> registerMiner()
@@ -35,30 +39,44 @@ public final class CavernCommand
 			.then(Commands.argument("target", EntityArgument.player())
 				.then(Commands.literal("point")
 					.then(Commands.literal("add").then(Commands.argument("amount", IntegerArgumentType.integer())
-						.executes(o -> mapToZero(getMiner(o).addPoint(IntegerArgumentType.getInteger(o, "amount")).sendToClient()))))
+						.executes(ctx -> execute(ctx, o -> getMiner(o).addPoint(IntegerArgumentType.getInteger(o, "amount")).sendToClient()))))
 					.then(Commands.literal("set").then(Commands.argument("amount", IntegerArgumentType.integer(0))
-						.executes(o -> mapToZero(getMiner(o).setPoint(IntegerArgumentType.getInteger(o, "amount")).sendToClient()))))
+						.executes(ctx -> execute(ctx, o -> getMiner(o).setPoint(IntegerArgumentType.getInteger(o, "amount")).sendToClient()))))
 				)
 				.then(Commands.literal("rank")
 					.then(Commands.literal("set").then(Commands.argument("name", StringArgumentType.string())
 						.suggests((o, builder) -> ISuggestionProvider.suggest(MinerRank.getEntries().stream().map(RankEntry::getName), builder))
-						.executes(o -> mapToZero(getMiner(o).setRank(StringArgumentType.getString(o, "name")).sendToClient()))))
+						.executes(ctx -> execute(ctx, o -> getMiner(o).setRank(StringArgumentType.getString(o, "name")).sendToClient()))))
 					.then(Commands.literal("promote").then(Commands.argument("name", StringArgumentType.string())
-							.suggests((o, builder) -> ISuggestionProvider.suggest(MinerRank.getEntries().stream().map(RankEntry::getName), builder))
-							.executes(o -> mapToZero(getMiner(o).promoteRank(StringArgumentType.getString(o, "name")).sendToClient()))))
+						.suggests((o, builder) -> ISuggestionProvider.suggest(MinerRank.getEntries().stream().map(RankEntry::getName), builder))
+						.executes(ctx -> execute(ctx, o -> getMiner(o).promoteRank(StringArgumentType.getString(o, "name")).sendToClient()))))
 				)
 			);
 	}
 
-	private static int mapToZero(Object obj)
+	private static ArgumentBuilder<CommandSource, ?> registerRecord()
 	{
-		return 0;
+		return Commands.literal("record").requires(o -> o.getEntity() != null && o.getEntity() instanceof ServerPlayerEntity)
+			.executes(ctx -> execute(ctx, CavernCommand::displayMinerRecord));
+	}
+
+	private static int execute(CommandContext<CommandSource> context, CommandConsumer<CommandContext<CommandSource>> command) throws CommandSyntaxException
+	{
+		return command.run(context);
 	}
 
 	private static Miner getMiner(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
 		ServerPlayerEntity player = EntityArgument.getPlayer(context, "target");
 
-		return player.getCapability(CaveCapabilities.MINER).orElseThrow(() -> INVALID_MINER.create());
+		return player.getCapability(CaveCapabilities.MINER).orElseThrow(INVALID_MINER::create);
+	}
+
+	private static void displayMinerRecord(CommandContext<CommandSource> context) throws CommandSyntaxException
+	{
+		ServerPlayerEntity player = context.getSource().asPlayer();
+		MinerRecord record = player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElseThrow(INVALID_MINER::create);
+
+		CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new MinerRecordMessage(record));
 	}
 }

@@ -142,7 +142,7 @@ public class CavernDimension extends Dimension
 			return BlockPos.ZERO;
 		}
 
-		CavernPortalBlock portal = CaveDimensions.getPortalBlock(getType());
+		CavernPortalBlock portal = CaveDimensions.getPortalBlock(this);
 
 		if (portal != null)
 		{

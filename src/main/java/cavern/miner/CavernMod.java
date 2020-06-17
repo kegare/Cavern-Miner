@@ -14,6 +14,7 @@ import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.init.CaveEnchantments;
+import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CaveItems;
 import cavern.miner.init.CavePlacements;
@@ -50,6 +51,7 @@ public final class CavernMod
 
 		CaveBlocks.REGISTRY.register(modEventBus);
 		CaveItems.REGISTRY.register(modEventBus);
+		CaveEntities.REGISTRY.register(modEventBus);
 		CaveEnchantments.REGISTRY.register(modEventBus);
 		CaveBiomes.REGISTRY.register(modEventBus);
 		CaveDimensions.REGISTRY.register(modEventBus);
@@ -68,6 +70,8 @@ public final class CavernMod
 	{
 		VeinConfig.createExampleConfig();
 
+		CaveEntities.registerSpawnPlacements();
+
 		CaveBiomes.init();
 
 		CaveCapabilities.registerCapabilities();
@@ -78,6 +82,8 @@ public final class CavernMod
 	public void doClientStuff(final FMLClientSetupEvent event)
 	{
 		CaveBlocks.registerRenderType();
+
+		CaveEntities.registerRenderers();
 	}
 
 	@SubscribeEvent

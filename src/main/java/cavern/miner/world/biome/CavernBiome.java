@@ -3,6 +3,7 @@ package cavern.miner.world.biome;
 import java.util.Optional;
 
 import cavern.miner.config.CavernConfig;
+import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
@@ -28,7 +29,7 @@ public class CavernBiome extends Biome
 {
 	public CavernBiome()
 	{
-		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
+		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.AIR_CONFIG).precipitation(Biome.RainType.NONE)
 			.depth(0.125F).scale(0.05F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
 		this.addSpawns();
@@ -38,6 +39,7 @@ public class CavernBiome extends Biome
 	{
 		addCarvers();
 		addCaveFeatures();
+		addCaveSpawns();
 	}
 
 	protected void addCarvers()
@@ -119,6 +121,11 @@ public class CavernBiome extends Biome
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
+	}
+
+	protected void addCaveSpawns()
+	{
+		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(o, 5, 1, 1)));
 	}
 
 	public static Optional<CavernBiome> get(IWorld world)
