@@ -69,13 +69,13 @@ public final class CavernCommand
 	{
 		ServerPlayerEntity player = EntityArgument.getPlayer(context, "target");
 
-		return player.getCapability(CaveCapabilities.MINER).orElseThrow(() -> INVALID_MINER.create());
+		return player.getCapability(CaveCapabilities.MINER).orElseThrow(INVALID_MINER::create);
 	}
 
 	private static void displayMinerRecord(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
 		ServerPlayerEntity player = context.getSource().asPlayer();
-		MinerRecord record = player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElseThrow(() -> INVALID_MINER.create());
+		MinerRecord record = player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElseThrow(INVALID_MINER::create);
 
 		CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new MinerRecordMessage(record));
 	}

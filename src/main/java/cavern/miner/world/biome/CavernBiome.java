@@ -3,6 +3,7 @@ package cavern.miner.world.biome;
 import java.util.Optional;
 
 import cavern.miner.config.CavernConfig;
+import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
@@ -38,6 +39,7 @@ public class CavernBiome extends Biome
 	{
 		addCarvers();
 		addCaveFeatures();
+		addCaveSpawns();
 	}
 
 	protected void addCarvers()
@@ -119,6 +121,11 @@ public class CavernBiome extends Biome
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
 		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
+	}
+
+	protected void addCaveSpawns()
+	{
+		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(o, 15, 1, 1)));
 	}
 
 	public static Optional<CavernBiome> get(IWorld world)

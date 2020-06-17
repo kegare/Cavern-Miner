@@ -17,6 +17,8 @@
 	"item.cavern.aquamarine_pickaxe": "Aquamarine Pickaxe",
 	"item.cavern.aquamarine_axe": "Aquamarine Axe",
 	"item.cavern.aquamarine_shovel": "Aquamarine Shovel",
+	"item.cavern.cavenic_skeleton_spawn_egg": "Cavenic Skeleton Spawn Egg",
+	"entity.cavern.cavenic_skeleton": "Cavenic Skeleton",
 	"enchantment.cavern.vein_miner": "Vein Miner",
 	"enchantment.cavern.area_miner": "Area Miner",
 	"itemGroup.cavern": "Cavern: Miner",

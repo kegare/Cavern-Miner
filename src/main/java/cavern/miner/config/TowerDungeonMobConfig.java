@@ -22,6 +22,7 @@ import com.google.gson.JsonParseException;
 
 import cavern.miner.CavernMod;
 import cavern.miner.config.json.DungeonMobSerializer;
+import cavern.miner.init.CaveEntities;
 import cavern.miner.world.gen.feature.TowerDungeonSpawner;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.NonNullList;
@@ -194,5 +195,7 @@ public class TowerDungeonMobConfig
 		entries.add(new DungeonHooks.DungeonMob(50, EntityType.CAVE_SPIDER));
 		entries.add(new DungeonHooks.DungeonMob(20, EntityType.CREEPER));
 		entries.add(new DungeonHooks.DungeonMob(20, EntityType.ENDERMAN));
+
+		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> entries.add(new DungeonHooks.DungeonMob(20, o)));
 	}
 }
