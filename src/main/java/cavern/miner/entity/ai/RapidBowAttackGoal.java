@@ -37,7 +37,10 @@ public class RapidBowAttackGoal<T extends MonsterEntity & IRangedAttackMob> exte
 	}
 
 	@Override
-	public void setAttackCooldown(int time) {}
+	public void setAttackCooldown(int time)
+	{
+		attackCooldown = time;
+	}
 
 	@Override
 	public boolean shouldExecute()
@@ -63,7 +66,6 @@ public class RapidBowAttackGoal<T extends MonsterEntity & IRangedAttackMob> exte
 		super.startExecuting();
 
 		attacker.setAggroed(true);
-		attackCooldown = 20;
 	}
 
 	@Override

@@ -29,7 +29,7 @@ public class CavernBiome extends Biome
 {
 	public CavernBiome()
 	{
-		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.DEFAULT, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
+		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.AIR_CONFIG).precipitation(Biome.RainType.NONE)
 			.depth(0.125F).scale(0.05F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
 		this.addSpawns();
@@ -125,7 +125,7 @@ public class CavernBiome extends Biome
 
 	protected void addCaveSpawns()
 	{
-		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(o, 15, 1, 1)));
+		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(o, 5, 1, 1)));
 	}
 
 	public static Optional<CavernBiome> get(IWorld world)

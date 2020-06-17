@@ -70,6 +70,8 @@ public final class CavernMod
 	{
 		VeinConfig.createExampleConfig();
 
+		CaveEntities.registerSpawnPlacements();
+
 		CaveBiomes.init();
 
 		CaveCapabilities.registerCapabilities();

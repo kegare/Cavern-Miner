@@ -281,7 +281,7 @@ public class CavernPortalBlock extends Block
 
 		BlockState frame = world.getBlockState(blockpos);
 
-		if (!frame.isNormalCube(world, blockpos))
+		if (!getFrameBlocks().contains(frame))
 		{
 			frame = getFrameBlocks().getCachedList().get(0);
 		}

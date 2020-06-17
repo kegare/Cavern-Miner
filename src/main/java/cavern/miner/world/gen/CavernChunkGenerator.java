@@ -57,10 +57,10 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 
 		rand.setBaseChunkSeed(pos.x, pos.z);
 
-		makeBedrock(chunk, rand);
+		makeBorders(chunk, rand);
 	}
 
-	protected void makeBedrock(IChunk chunk, Random rand)
+	protected void makeBorders(IChunk chunk, Random rand)
 	{
 		BlockPos.Mutable posCache = new BlockPos.Mutable();
 		int xStart = chunk.getPos().getXStart();

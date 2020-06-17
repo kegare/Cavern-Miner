@@ -17,6 +17,7 @@ import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 
 public class CavenicSkeletonEntity extends AbstractSkeletonEntity
@@ -104,6 +105,8 @@ public class CavenicSkeletonEntity extends AbstractSkeletonEntity
 
 			if (stack.getItem() instanceof BowItem)
 			{
+				bowAttackGoal.setAttackCooldown(world.getDifficulty() != Difficulty.HARD ? 40 : 20);
+
 				goalSelector.addGoal(4, bowAttackGoal);
 			}
 			else

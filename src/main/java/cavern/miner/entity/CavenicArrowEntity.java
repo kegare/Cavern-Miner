@@ -23,13 +23,13 @@ public class CavenicArrowEntity extends ArrowEntity
 	}
 
 	@Override
-	public void tick()
+	protected void func_225516_i_()
 	{
-		if (inGround && timeInGround >= 100)
-		{
-			setNoClip(true);
-		}
+		super.func_225516_i_();
 
-		super.tick();
+		if (pickupStatus != PickupStatus.ALLOWED && timeInGround >= 100)
+		{
+			remove();
+		}
 	}
 }
