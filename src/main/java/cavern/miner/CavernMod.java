@@ -22,20 +22,29 @@ import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.init.CaveWorldCarvers;
 import cavern.miner.network.CaveNetworkConstants;
+import net.minecraft.command.ICommandSource;
 import net.minecraft.item.Item;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.VersionChecker;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 @Mod("cavern")
 public final class CavernMod
@@ -107,6 +116,30 @@ public final class CavernMod
 	@SubscribeEvent
 	public void onServerStarting(final FMLServerStartingEvent event)
 	{
+		sendVersionNotification(event.getServer());
+
 		CavernCommand.register(event.getCommandDispatcher());
+	}
+
+	public static IModInfo getModInfo()
+	{
+		return ModList.get().getModFileById("cavern").getMods().get(0);
+	}
+
+	public static void sendVersionNotification(ICommandSource source)
+	{
+		VersionChecker.CheckResult result = VersionChecker.getResult(getModInfo());
+
+		if (result.status.shouldDraw() && result.target != null)
+		{
+			ITextComponent version = new StringTextComponent(result.target.toString());
+			version.getStyle().setColor(TextFormatting.YELLOW);
+
+			ITextComponent message = new TranslationTextComponent("cavern.message.update_version");
+			message.appendText(" : ").appendSibling(version);
+			message.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, result.url));
+
+			source.sendMessage(message);
+		}
 	}
 }

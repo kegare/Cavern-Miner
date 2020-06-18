@@ -3,6 +3,7 @@ package cavern.miner.config.dimension;
 import java.io.File;
 
 import cavern.miner.config.CavernModConfig;
+import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.spawner.WorldSpawnerType;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -63,6 +64,7 @@ public class CavernConfig
 
 	public static final PortalConfig PORTAL = new PortalConfig(getConfigDir());
 	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
+	public static final MobSpawnConfig MOB_SPAWNS = new MobSpawnConfig(getConfigDir());
 
 	public static void loadConfig()
 	{
@@ -82,5 +84,13 @@ public class CavernConfig
 			VEINS.setDefault();
 			VEINS.saveToFile();
 		}
+
+		if (!MOB_SPAWNS.loadFromFile())
+		{
+			MOB_SPAWNS.setDefault();
+			MOB_SPAWNS.saveToFile();
+		}
+
+		CaveBiomes.CAVERN.ifPresent(MOB_SPAWNS::registerSpawns);
 	}
 }

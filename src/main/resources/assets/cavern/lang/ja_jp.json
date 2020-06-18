@@ -51,5 +51,6 @@
 	"advancements.cavern.mining_combo_500.title": "採掘を愛する者",
 	"advancements.cavern.mining_combo_500.description": "採掘を500コンボ続ける",
 	"advancements.cavern.god_miner.title": "採掘の神",
-	"advancements.cavern.god_miner.description": "採掘を極める"
+	"advancements.cavern.god_miner.description": "採掘を極める",
+	"cavern.message.update_version": "Cavern: Minerの新しいバージョンが利用できます"
 }
