@@ -128,6 +128,11 @@ public final class CavernMod
 
 	public static void sendVersionNotification(ICommandSource source)
 	{
+		if (!GeneralConfig.INSTANCE.updateNotification.get())
+		{
+			return;
+		}
+
 		VersionChecker.CheckResult result = VersionChecker.getResult(getModInfo());
 
 		if (result.status.shouldDraw() && result.target != null)

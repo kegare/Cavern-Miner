@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -141,7 +142,7 @@ public class MinerDisplayHandler
 
 		MinerCache cache = miner.getCache();
 		BlockState lastBlock = cache.getLastBlock();
-		long diffTime = System.currentTimeMillis() - cache.getLastTime();
+		long diffTime = Util.milliTime() - cache.getLastTime();
 
 		if (ClientConfig.INSTANCE.displayType.get() == DisplayType.ACTION)
 		{

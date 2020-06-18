@@ -9,6 +9,8 @@ public class GeneralConfig
 	public static final GeneralConfig INSTANCE = new GeneralConfig(BUILDER);
 	public static final ForgeConfigSpec SPEC = BUILDER.build();
 
+	public final ForgeConfigSpec.BooleanValue updateNotification;
+
 	public final ForgeConfigSpec.IntValue findRadius;
 	public final ForgeConfigSpec.BooleanValue posCache;
 	public final ForgeConfigSpec.IntValue sleepWait;
@@ -18,6 +20,10 @@ public class GeneralConfig
 	public GeneralConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
+
+		builder.push("general");
+		updateNotification = builder.comment("When true, notify as chat message if a new version is available.").define("update_notification", true);
+		builder.pop();
 
 		builder.push("caver");
 		findRadius = builder.comment("How far (in blocks) the cave portal must be found.", serverSide).defineInRange("find_radius", 32, 10, 256);
