@@ -57,18 +57,10 @@ public class CommonEventHandler
 			PlayerEntity player = event.getPlayer();
 			Direction face = ObjectUtils.defaultIfNull(event.getFace(), Direction.UP);
 			Hand hand = event.getHand();
-			ItemStack prevItem = stack.copy();
-			ItemUseContext context = new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos));
-			ActionResultType result = portal.asItem().onItemUse(context);
 
-			if (result == ActionResultType.SUCCESS)
+			if (portal.asItem().onItemUse(new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos))).isSuccess())
 			{
-				if (player.isCreative())
-				{
-					player.setHeldItem(hand, prevItem);
-				}
-
-				event.setCancellationResult(result);
+				event.setCancellationResult(ActionResultType.SUCCESS);
 				event.setCanceled(true);
 
 				break;
