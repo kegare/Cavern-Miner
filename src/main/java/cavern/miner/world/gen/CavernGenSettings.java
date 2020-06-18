@@ -1,6 +1,6 @@
 package cavern.miner.world.gen;
 
-import cavern.miner.config.CavernConfig;
+import cavern.miner.config.dimension.CavernConfig;
 import net.minecraft.world.gen.GenerationSettings;
 
 public class CavernGenSettings extends GenerationSettings

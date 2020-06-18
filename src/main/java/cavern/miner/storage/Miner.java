@@ -1,12 +1,11 @@
 package cavern.miner.storage;
 
 import cavern.miner.enchantment.MinerUnit;
+import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
 import cavern.miner.network.MinerUpdateMessage;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,7 +18,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 public class Miner implements INBTSerializable<CompoundNBT>
 {
@@ -36,7 +34,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	private MinerCache cache;
 	private MinerUnit unit;
 
-	private MinerUpdateMessage prevUpdate;
+	private MinerUpdateMessage lastUpdate;
 
 	public Miner(PlayerEntity player)
 	{
@@ -98,21 +96,11 @@ public class Miner implements INBTSerializable<CompoundNBT>
 				message.getStyle().setColor(TextFormatting.GRAY).setItalic(true);
 
 				server.getPlayerList().sendMessage(message);
+			}
 
-				Advancement advancement = getRank().getAdvancement(server);
-
-				if (advancement != null && player instanceof ServerPlayerEntity)
-				{
-					PlayerAdvancements advancements = ((ServerPlayerEntity)player).getAdvancements();
-
-					if (!advancements.getProgress(advancement).isDone())
-					{
-						for (String criterionKey : advancements.getProgress(advancement).getRemaningCriteria())
-						{
-							advancements.grantCriterion(advancement, criterionKey);
-						}
-					}
-				}
+			if (player instanceof ServerPlayerEntity)
+			{
+				CaveCriteriaTriggers.MINER_RANK.trigger((ServerPlayerEntity)player, getRank().getName());
 			}
 
 			CaveSounds.MINER_RANKUP.ifPresent(o -> player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), o, SoundCategory.AMBIENT, 0.5F, 1.0F));
@@ -178,17 +166,18 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	{
 		if (player != null && player instanceof ServerPlayerEntity)
 		{
-			PacketTarget target = PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player);
-
-			if (prevUpdate != null && getRank().equals(prevUpdate.getRank()))
+			if (lastUpdate != null && getRank().equals(lastUpdate.getRank()))
 			{
-				CaveNetworkConstants.PLAY.send(target, new MinerPointMessage(getPoint()));
+				if (getPoint() != lastUpdate.getPoint())
+				{
+					CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new MinerPointMessage(getPoint()));
+				}
 			}
 			else
 			{
-				prevUpdate = new MinerUpdateMessage(getPoint(), getRank());
+				lastUpdate = new MinerUpdateMessage(getPoint(), getRank());
 
-				CaveNetworkConstants.PLAY.send(target, prevUpdate);
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), lastUpdate);
 			}
 		}
 
@@ -249,7 +238,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	{
 		cache = null;
 		unit = null;
-		prevUpdate = null;
+		lastUpdate = null;
 
 		return this;
 	}

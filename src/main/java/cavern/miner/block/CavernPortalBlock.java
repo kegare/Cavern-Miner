@@ -4,8 +4,8 @@ import javax.annotation.Nullable;
 
 import com.google.common.cache.LoadingCache;
 
-import cavern.miner.config.CavernConfig;
 import cavern.miner.config.GeneralConfig;
+import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.network.CaveNetworkConstants;

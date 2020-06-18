@@ -31,6 +31,11 @@ public class MinerUpdateMessage
 		this(point, new MinerRank.DisplayEntry(rank));
 	}
 
+	public int getPoint()
+	{
+		return point;
+	}
+
 	@Nullable
 	public MinerRank.RankEntry getRank()
 	{

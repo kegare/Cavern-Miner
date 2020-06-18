@@ -3,6 +3,8 @@ package cavern.miner.config;
 import java.io.File;
 
 import cavern.miner.config.client.ClientConfig;
+import cavern.miner.config.dimension.CavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;

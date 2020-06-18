@@ -1,0 +1,22 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:fire_charge"
+        },
+        "title": {
+            "translate": "advancements.cavern.mining_combo_1.title"
+        },
+        "description": {
+            "translate": "advancements.cavern.mining_combo_1.description"
+        }
+    },
+    "parent": "cavern:mining_combo_0",
+    "criteria": {
+        "mining_combo": {
+            "trigger": "cavern:mining_combo",
+            "conditions": {
+                "count": 50
+            }
+        }
+    }
+}

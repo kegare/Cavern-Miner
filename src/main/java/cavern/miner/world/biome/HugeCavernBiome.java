@@ -1,6 +1,6 @@
 package cavern.miner.world.biome;
 
-import cavern.miner.config.HugeCavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CaveWorldCarvers;
 import net.minecraft.world.biome.DefaultBiomeFeatures;

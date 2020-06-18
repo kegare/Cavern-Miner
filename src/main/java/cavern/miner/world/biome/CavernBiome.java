@@ -2,14 +2,11 @@ package cavern.miner.world.biome;
 
 import java.util.Optional;
 
-import cavern.miner.config.CavernConfig;
-import cavern.miner.init.CaveEntities;
+import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
 import cavern.miner.world.dimension.CavernDimension;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
@@ -32,14 +29,12 @@ public class CavernBiome extends Biome
 		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.AIR_CONFIG).precipitation(Biome.RainType.NONE)
 			.depth(0.125F).scale(0.05F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
-		this.addSpawns();
 	}
 
 	public void init()
 	{
 		addCarvers();
 		addCaveFeatures();
-		addCaveSpawns();
 	}
 
 	protected void addCarvers()
@@ -108,24 +103,6 @@ public class CavernBiome extends Biome
 	{
 		DefaultBiomeFeatures.addLakes(this);
 		DefaultBiomeFeatures.addMonsterRooms(this);
-	}
-
-	protected void addSpawns()
-	{
-		addSpawn(EntityClassification.AMBIENT, new Biome.SpawnListEntry(EntityType.BAT, 20, 8, 8));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.SPIDER, 100, 4, 4));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.ZOMBIE, 95, 4, 4));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.ZOMBIE_VILLAGER, 15, 1, 1));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.SKELETON, 100, 4, 4));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.CREEPER, 100, 4, 4));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
-		addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
-	}
-
-	protected void addCaveSpawns()
-	{
-		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> addSpawn(EntityClassification.MONSTER, new Biome.SpawnListEntry(o, 5, 1, 1)));
 	}
 
 	public static Optional<CavernBiome> get(IWorld world)

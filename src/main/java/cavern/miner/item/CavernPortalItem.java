@@ -6,7 +6,6 @@ import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.SoundCategory;
@@ -26,24 +25,35 @@ public class CavernPortalItem extends BlockItem
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context)
 	{
-		BlockItemUseContext ctx = new BlockItemUseContext(context);
-		World world = ctx.getWorld();
-		BlockPos pos = ctx.getPos();
-
-		if (portalBlock.trySpawnPortal(world, pos))
+		if (!tryCreatePortal(new BlockItemUseContext(context)).isSuccess())
 		{
-			PlayerEntity player = ctx.getPlayer();
-			ItemStack stack = ctx.getItem();
-			BlockState state = world.getBlockState(pos);
-			SoundType soundType = state.getSoundType(world, pos, player);
-
-			world.playSound(player, pos, getPlaceSound(state, world, pos, player), SoundCategory.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
-
-			stack.shrink(1);
-
-			return ActionResultType.SUCCESS;
+			return ActionResultType.FAIL;
 		}
 
-		return ActionResultType.FAIL;
+		if (context.getPlayer() == null || !context.getPlayer().isCreative())
+		{
+			context.getItem().shrink(1);
+		}
+
+		return ActionResultType.SUCCESS;
+	}
+
+	public ActionResultType tryCreatePortal(BlockItemUseContext context)
+	{
+		World world = context.getWorld();
+		BlockPos pos = context.getPos();
+
+		if (!portalBlock.trySpawnPortal(world, pos))
+		{
+			return ActionResultType.FAIL;
+		}
+
+		PlayerEntity player = context.getPlayer();
+		BlockState state = world.getBlockState(pos);
+		SoundType soundType = state.getSoundType(world, pos, player);
+
+		world.playSound(player, pos, getPlaceSound(state, world, pos, player), SoundCategory.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+
+		return ActionResultType.SUCCESS;
 	}
 }

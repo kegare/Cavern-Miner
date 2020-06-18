@@ -1,6 +1,7 @@
 package cavern.miner.storage;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.util.Util;
 
 public class MinerCache
 {
@@ -21,14 +22,14 @@ public class MinerCache
 		return lastPoint;
 	}
 
-	public int getCombo()
-	{
-		return combo;
-	}
-
 	public long getLastTime()
 	{
 		return lastTime;
+	}
+
+	public int getCombo()
+	{
+		return combo;
 	}
 
 	public void put(BlockState state, int point)
@@ -36,7 +37,7 @@ public class MinerCache
 		lastBlock = state;
 		lastPoint = point;
 
-		lastTime = System.currentTimeMillis();
+		lastTime = Util.milliTime();
 
 		++combo;
 	}
@@ -48,7 +49,7 @@ public class MinerCache
 			return;
 		}
 
-		if (System.currentTimeMillis() - lastTime > 10000L)
+		if (Util.milliTime() - lastTime > 10000L)
 		{
 			combo = 0;
 		}

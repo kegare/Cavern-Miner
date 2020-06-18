@@ -56,7 +56,7 @@ public final class CaveBlocks
 	{
 		if (block instanceof CavernPortalBlock)
 		{
-			return new CavernPortalItem((CavernPortalBlock)block, new Item.Properties());
+			return new CavernPortalItem((CavernPortalBlock)block, new Item.Properties().maxStackSize(1));
 		}
 
 		return new BlockItem(block, CaveItems.createProperties());

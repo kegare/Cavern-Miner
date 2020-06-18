@@ -1,6 +1,6 @@
 package cavern.miner.block;
 
-import cavern.miner.config.HugeCavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.util.ItemStackTagList;

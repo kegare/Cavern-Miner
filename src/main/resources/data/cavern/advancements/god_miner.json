@@ -1,0 +1,32 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:golden_apple"
+        },
+        "title": {
+            "translate": "advancements.cavern.god_miner.title"
+        },
+        "description": {
+            "translate": "advancements.cavern.god_miner.description"
+        },
+        "frame": "challenge"
+    },
+    "parent": "cavern:diamond_miner",
+    "criteria": {
+        "miner_rank": {
+            "trigger": "cavern:miner_rank",
+            "conditions": {
+                "name": "diamond"
+            }
+        },
+        "mining_combo": {
+            "trigger": "cavern:mining_combo",
+            "conditions": {
+                "count": 1000
+            }
+        }
+    },
+    "requirements": [
+        ["miner_rank"], ["mining_combo"]
+    ]
+}
