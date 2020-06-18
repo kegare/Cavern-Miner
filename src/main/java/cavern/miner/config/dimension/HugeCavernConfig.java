@@ -1,7 +1,8 @@
-package cavern.miner.config;
+package cavern.miner.config.dimension;
 
 import java.io.File;
 
+import cavern.miner.config.CavernModConfig;
 import cavern.miner.world.spawner.WorldSpawnerType;
 import net.minecraft.block.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;

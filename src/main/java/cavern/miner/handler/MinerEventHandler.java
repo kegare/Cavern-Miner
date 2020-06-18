@@ -1,6 +1,7 @@
 package cavern.miner.handler;
 
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MiningInteractMessage;
 import cavern.miner.storage.Miner;
@@ -114,6 +115,8 @@ public class MinerEventHandler
 		miner.addPoint(point).sendToClient();
 		miner.getRecord().add(state);
 		miner.getCache().put(state, point);
+
+		CaveCriteriaTriggers.MINING_COMBO.trigger(player, miner.getCache().getCombo());
 
 		CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new MiningInteractMessage(state, point));
 	}

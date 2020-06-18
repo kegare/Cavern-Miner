@@ -21,6 +21,8 @@
 	"entity.cavern.cavenic_skeleton": "Cavenic Skeleton",
 	"enchantment.cavern.vein_miner": "Vein Miner",
 	"enchantment.cavern.area_miner": "Area Miner",
+	"biome.cavern.cavern": "Cavern",
+	"biome.cavern.huge_cavern": "Huge Cavern",
 	"itemGroup.cavern": "Cavern: Miner",
 	"cavern.miner.beginner": "Beginner",
 	"cavern.miner.stone": "Stone Miner",
@@ -40,5 +42,15 @@
 	"advancements.cavern.gold_miner.title": "Gold Miner",
 	"advancements.cavern.gold_miner.description": "Become the Gold Miner",
 	"advancements.cavern.diamond_miner.title": "Diamond Miner",
-	"advancements.cavern.diamond_miner.description": "Become the Diamond Miner"
+	"advancements.cavern.diamond_miner.description": "Become the Diamond Miner",
+	"advancements.cavern.mining_combo_30.title": "Mining Streak",
+	"advancements.cavern.mining_combo_30.description": "Hit a 30-ore combo",
+	"advancements.cavern.mining_combo_100.title": "Because it's there",
+	"advancements.cavern.mining_combo_100.description": "Hit a 100-ore combo",
+	"advancements.cavern.mining_combo_300.title": "Mining Addiction",
+	"advancements.cavern.mining_combo_300.description": "Hit a 300-ore combo",
+	"advancements.cavern.mining_combo_500.title": "Heavy Miner",
+	"advancements.cavern.mining_combo_500.description": "Hit a 500-ore combo",
+	"advancements.cavern.god_miner.title": "The God of Miner",
+	"advancements.cavern.god_miner.description": "Master of Mining"
 }

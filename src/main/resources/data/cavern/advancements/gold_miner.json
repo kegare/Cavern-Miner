@@ -13,7 +13,10 @@
     "parent": "cavern:iron_miner",
     "criteria": {
         "gold_miner": {
-            "trigger": "minecraft:impossible"
+            "trigger": "cavern:miner_rank",
+            "conditions": {
+                "name": "gold"
+            }
         }
     }
 }

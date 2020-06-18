@@ -1,4 +1,4 @@
-package cavern.miner.config;
+package cavern.miner.config.dimension;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

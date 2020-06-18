@@ -9,12 +9,15 @@
         "description": {
             "translate": "advancements.cavern.diamond_miner.description"
         },
-        "frame": "challenge"
+        "frame": "goal"
     },
     "parent": "cavern:gold_miner",
     "criteria": {
         "diamond_miner": {
-            "trigger": "minecraft:impossible"
+            "trigger": "cavern:miner_rank",
+            "conditions": {
+                "name": "diamond"
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 package cavern.miner.world.dimension;
 
-import cavern.miner.config.HugeCavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.gen.HugeCavernGenSettings;

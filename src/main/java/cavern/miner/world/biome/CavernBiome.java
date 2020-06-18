@@ -2,7 +2,7 @@ package cavern.miner.world.biome;
 
 import java.util.Optional;
 
-import cavern.miner.config.CavernConfig;
+import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;

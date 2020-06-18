@@ -2,7 +2,7 @@ package cavern.miner.world.vein;
 
 import com.google.common.collect.ImmutableList;
 
-import cavern.miner.config.CavernConfig;
+import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.util.BlockStateTagList;
 
 public class CavernVeinProvider extends VeinProvider

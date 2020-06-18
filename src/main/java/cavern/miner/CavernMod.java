@@ -4,14 +4,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import cavern.miner.command.CavernCommand;
-import cavern.miner.config.CavernConfig;
 import cavern.miner.config.CavernModConfig;
 import cavern.miner.config.GeneralConfig;
-import cavern.miner.config.HugeCavernConfig;
-import cavern.miner.config.VeinConfig;
+import cavern.miner.config.dimension.CavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
+import cavern.miner.config.dimension.VeinConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.init.CaveEnchantments;
 import cavern.miner.init.CaveEntities;
@@ -61,6 +62,8 @@ public final class CavernMod
 		CaveSounds.REGISTRY.register(modEventBus);
 
 		MinecraftForge.EVENT_BUS.register(this);
+
+		CaveCriteriaTriggers.registerTriggers();
 
 		LOG.debug("Loading network data for cavern net version: {}", CaveNetworkConstants.init());
 	}

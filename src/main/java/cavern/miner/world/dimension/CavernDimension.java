@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.client.renderer.EmptyRenderer;
-import cavern.miner.config.CavernConfig;
 import cavern.miner.config.GeneralConfig;
+import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;

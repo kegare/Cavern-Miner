@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.RegistryObject;
 
 public class CaveSpawnEggItem<T extends EntityType<?>> extends SpawnEggItem
@@ -27,11 +28,11 @@ public class CaveSpawnEggItem<T extends EntityType<?>> extends SpawnEggItem
 			return super.getType(nbt);
 		}
 
-		if (nbt != null && nbt.contains("EntityTag", 10))
+		if (nbt != null && nbt.contains("EntityTag", Constants.NBT.TAG_COMPOUND))
 		{
 			CompoundNBT tag = nbt.getCompound("EntityTag");
 
-			if (tag.contains("id", 8))
+			if (tag.contains("id", Constants.NBT.TAG_STRING))
 			{
 				return EntityType.byKey(tag.getString("id")).orElse(type);
 			}

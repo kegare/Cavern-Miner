@@ -1,0 +1,22 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:magma_cream"
+        },
+        "title": {
+            "translate": "advancements.cavern.mining_combo_300.title"
+        },
+        "description": {
+            "translate": "advancements.cavern.mining_combo_300.description"
+        }
+    },
+    "parent": "cavern:mining_combo_100",
+    "criteria": {
+        "mining_combo": {
+            "trigger": "cavern:mining_combo",
+            "conditions": {
+                "count": 300
+            }
+        }
+    }
+}

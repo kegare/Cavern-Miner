@@ -2,7 +2,7 @@ package cavern.miner.world.vein;
 
 import com.google.common.collect.ImmutableList;
 
-import cavern.miner.config.HugeCavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.BlockState;
 

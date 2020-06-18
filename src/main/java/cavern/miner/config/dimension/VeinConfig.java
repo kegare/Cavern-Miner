@@ -1,4 +1,4 @@
-package cavern.miner.config;
+package cavern.miner.config.dimension;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import cavern.miner.CavernMod;
+import cavern.miner.config.CavernModConfig;
 import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.config.json.VeinSerializer;
 import cavern.miner.util.BlockStateTagList;

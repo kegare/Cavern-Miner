@@ -9,13 +9,10 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import net.minecraft.advancements.Advancement;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -88,30 +85,18 @@ public final class MinerRank
 		private final String translationKey;
 		private final int phase;
 		private final ItemStack iconItem;
-		private final ResourceLocation advancementKey;
 
-		public RankEntry(String name, String key, int phase, ItemStack iconItem, @Nullable ResourceLocation advancement)
+		public RankEntry(String name, String key, int phase, ItemStack iconItem)
 		{
 			this.name = name;
 			this.translationKey = key;
 			this.phase = phase;
 			this.iconItem = iconItem;
-			this.advancementKey = advancement;
-		}
-
-		public RankEntry(String name, String key, int phase, ItemStack iconItem)
-		{
-			this(name, key, phase, iconItem, null);
-		}
-
-		public RankEntry(String name, int phase, ItemStack iconItem, @Nullable ResourceLocation advancement)
-		{
-			this(name, "cavern.miner." + name.toLowerCase(), phase, iconItem, advancement);
 		}
 
 		public RankEntry(String name, int phase, ItemStack iconItem)
 		{
-			this(name, phase, iconItem, null);
+			this(name, "cavern.miner." + name.toLowerCase(), phase, iconItem);
 		}
 
 		public String getName()
@@ -132,23 +117,6 @@ public final class MinerRank
 		public ItemStack getIconItem()
 		{
 			return iconItem;
-		}
-
-		@Nullable
-		public ResourceLocation getAdvancementKey()
-		{
-			return advancementKey;
-		}
-
-		@Nullable
-		public Advancement getAdvancement(@Nullable MinecraftServer server)
-		{
-			if (server == null || getAdvancementKey() == null)
-			{
-				return null;
-			}
-
-			return server.getAdvancementManager().getAdvancement(getAdvancementKey());
 		}
 
 		@Override

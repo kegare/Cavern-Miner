@@ -21,6 +21,8 @@
 	"entity.cavern.cavenic_skeleton": "ケイブニックスケルトン",
 	"enchantment.cavern.vein_miner": "一括採掘",
 	"enchantment.cavern.area_miner": "範囲採掘",
+	"biome.cavern.cavern": "大洞窟",
+	"biome.cavern.huge_cavern": "果てなき大洞窟",
 	"cavern.miner.beginner": "初心者",
 	"cavern.miner.stone": "石掘り",
 	"cavern.miner.iron": "鉄掘り",
@@ -39,5 +41,15 @@
 	"advancements.cavern.gold_miner.title": "金掘り",
 	"advancements.cavern.gold_miner.description": "金掘りになる",
 	"advancements.cavern.diamond_miner.title": "ダイヤモンド掘り",
-	"advancements.cavern.diamond_miner.description": "ダイヤモンド掘りになる"
+	"advancements.cavern.diamond_miner.description": "ダイヤモンド掘りになる",
+	"advancements.cavern.mining_combo_30.title": "採掘を続けて",
+	"advancements.cavern.mining_combo_30.description": "採掘を30コンボ続ける",
+	"advancements.cavern.mining_combo_100.title": "そこに鉱石があるから",
+	"advancements.cavern.mining_combo_100.description": "採掘を100コンボ続ける",
+	"advancements.cavern.mining_combo_300.title": "採掘中毒",
+	"advancements.cavern.mining_combo_300.description": "採掘を300コンボ続ける",
+	"advancements.cavern.mining_combo_500.title": "採掘を愛する者",
+	"advancements.cavern.mining_combo_500.description": "採掘を500コンボ続ける",
+	"advancements.cavern.god_miner.title": "採掘の神",
+	"advancements.cavern.god_miner.description": "採掘を極める"
 }

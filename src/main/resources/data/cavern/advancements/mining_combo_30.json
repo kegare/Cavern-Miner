@@ -1,0 +1,22 @@
+{
+    "display": {
+        "icon": {
+            "item": "minecraft:blaze_powder"
+        },
+        "title": {
+            "translate": "advancements.cavern.mining_combo_30.title"
+        },
+        "description": {
+            "translate": "advancements.cavern.mining_combo_30.description"
+        }
+    },
+    "parent": "cavern:root",
+    "criteria": {
+        "mining_combo": {
+            "trigger": "cavern:mining_combo",
+            "conditions": {
+                "count": 30
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 package cavern.miner.world.spawner;
 
-import cavern.miner.config.CavernConfig;
+import cavern.miner.config.dimension.CavernConfig;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.server.ServerWorld;
