@@ -4,18 +4,18 @@
             "item": "minecraft:magma_cream"
         },
         "title": {
-            "translate": "advancements.cavern.mining_combo_300.title"
+            "translate": "advancements.cavern.mining_combo_2.title"
         },
         "description": {
-            "translate": "advancements.cavern.mining_combo_300.description"
+            "translate": "advancements.cavern.mining_combo_2.description"
         }
     },
-    "parent": "cavern:mining_combo_100",
+    "parent": "cavern:mining_combo_1",
     "criteria": {
         "mining_combo": {
             "trigger": "cavern:mining_combo",
             "conditions": {
-                "count": 300
+                "count": 100
             }
         }
     }

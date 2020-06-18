@@ -4,19 +4,19 @@
             "item": "minecraft:golden_carrot"
         },
         "title": {
-            "translate": "advancements.cavern.mining_combo_500.title"
+            "translate": "advancements.cavern.mining_combo_3.title"
         },
         "description": {
-            "translate": "advancements.cavern.mining_combo_500.description"
+            "translate": "advancements.cavern.mining_combo_3.description"
         },
         "frame": "goal"
     },
-    "parent": "cavern:mining_combo_300",
+    "parent": "cavern:mining_combo_2",
     "criteria": {
         "mining_combo": {
             "trigger": "cavern:mining_combo",
             "conditions": {
-                "count": 500
+                "count": 300
             }
         }
     }

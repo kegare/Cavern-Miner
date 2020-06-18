@@ -1,21 +1,21 @@
 {
     "display": {
         "icon": {
-            "item": "minecraft:blaze_powder"
+            "item": "minecraft:fire_charge"
         },
         "title": {
-            "translate": "advancements.cavern.mining_combo_30.title"
+            "translate": "advancements.cavern.mining_combo_1.title"
         },
         "description": {
-            "translate": "advancements.cavern.mining_combo_30.description"
+            "translate": "advancements.cavern.mining_combo_1.description"
         }
     },
-    "parent": "cavern:root",
+    "parent": "cavern:mining_combo_0",
     "criteria": {
         "mining_combo": {
             "trigger": "cavern:mining_combo",
             "conditions": {
-                "count": 30
+                "count": 50
             }
         }
     }
