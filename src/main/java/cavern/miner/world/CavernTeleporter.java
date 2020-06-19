@@ -13,6 +13,7 @@ import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.TeleporterCache;
+import cavern.miner.world.dimension.CavernDimension;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.block.BlockState;
@@ -63,7 +64,7 @@ public class CavernTeleporter implements ITeleporter
 
 		if (GeneralConfig.INSTANCE.posCache.get())
 		{
-			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false);
+			placed = newEntity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false);
 		}
 
 		BlockPos pos = newEntity.getPosition();
@@ -73,13 +74,15 @@ public class CavernTeleporter implements ITeleporter
 			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false);
 		}
 
-		boolean isPlayer = newEntity instanceof ServerPlayerEntity;
+		boolean loading = false;
 
 		if (!placed)
 		{
-			if (isPlayer)
+			if (newEntity instanceof ServerPlayerEntity && destWorld.getDimension() instanceof CavernDimension)
 			{
 				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(0));
+
+				loading = true;
 			}
 
 			placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
@@ -90,7 +93,7 @@ public class CavernTeleporter implements ITeleporter
 			}
 		}
 
-		if (isPlayer)
+		if (loading)
 		{
 			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(1));
 		}

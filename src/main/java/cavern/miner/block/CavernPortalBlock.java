@@ -183,12 +183,11 @@ public class CavernPortalBlock extends Block
 		{
 			if (player instanceof ServerPlayerEntity)
 			{
-				ServerPlayerEntity serverPlayer = (ServerPlayerEntity)player;
-				MinerRecord record = serverPlayer.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElse(null);
+				MinerRecord record = player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElse(null);
 
 				if (record != null)
 				{
-					CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new MinerRecordMessage(record));
+					CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new MinerRecordMessage(record));
 				}
 			}
 		}
