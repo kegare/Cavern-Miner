@@ -24,7 +24,10 @@ public class ClientProxy
 	{
 		Minecraft mc = Minecraft.getInstance();
 
-		mc.displayGuiScreen(new DownloadCaveTerrainScreen());
+		if (mc.currentScreen == null || !(mc.currentScreen instanceof DownloadCaveTerrainScreen))
+		{
+			mc.displayGuiScreen(new DownloadCaveTerrainScreen());
+		}
 	}
 
 	public static void closeLoadingScreen()

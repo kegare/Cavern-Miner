@@ -59,25 +59,38 @@ public class CavernTeleporter implements ITeleporter
 	{
 		Entity newEntity = repositionEntity.apply(false);
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
+		boolean placed = false;
 
-		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false))
+		if (GeneralConfig.INSTANCE.posCache.get())
 		{
-			return newEntity;
+			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false);
 		}
 
 		BlockPos pos = newEntity.getPosition();
 
-		if (destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false))
+		if (!placed)
 		{
-			return newEntity;
+			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false);
 		}
 
-		if (!placeInPortal(destWorld, newEntity, yaw, radius, pos))
+		boolean isPlayer = newEntity instanceof ServerPlayerEntity;
+
+		if (!placed)
 		{
-			placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
+			if (isPlayer)
+			{
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(0));
+			}
+
+			placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
+
+			if (!placed)
+			{
+				placed = placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
+			}
 		}
 
-		if (destWorld.getServer().isSinglePlayer() && newEntity instanceof ServerPlayerEntity)
+		if (isPlayer)
 		{
 			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(1));
 		}
