@@ -319,6 +319,6 @@ public class CavernDimension extends Dimension
 	@Override
 	public int getSeaLevel()
 	{
-		return 10;
+		return 256;
 	}
 }

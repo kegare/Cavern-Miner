@@ -1,13 +1,9 @@
 package cavern.miner.world.biome;
 
-import java.util.Optional;
-
 import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
-import cavern.miner.world.dimension.CavernDimension;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStage;
@@ -27,7 +23,7 @@ public class CavernBiome extends Biome
 	public CavernBiome()
 	{
 		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.AIR_CONFIG).precipitation(Biome.RainType.NONE)
-			.depth(0.125F).scale(0.05F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
+			.depth(-1.0F).scale(0.0F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
 	}
 
@@ -104,20 +100,5 @@ public class CavernBiome extends Biome
 	{
 		DefaultBiomeFeatures.addLakes(this);
 		DefaultBiomeFeatures.addMonsterRooms(this);
-	}
-
-	public static Optional<CavernBiome> get(IWorld world)
-	{
-		if (world.getDimension() instanceof CavernDimension)
-		{
-			CavernDimension cavern = (CavernDimension)world.getDimension();
-
-			if (cavern.getBiome() instanceof CavernBiome)
-			{
-				return Optional.of((CavernBiome)cavern.getBiome());
-			}
-		}
-
-		return Optional.empty();
 	}
 }
