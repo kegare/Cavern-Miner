@@ -10,6 +10,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import cavern.miner.CavernMod;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerRecordMessage;
@@ -30,7 +31,12 @@ public final class CavernCommand
 
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
-		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerMiner()).then(registerRecord()));
+		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerReload()).then(registerMiner()).then(registerRecord()));
+	}
+
+	private static ArgumentBuilder<CommandSource, ?> registerReload()
+	{
+		return Commands.literal("reload").requires(o -> o.getServer().isSinglePlayer() || o.hasPermissionLevel(4)).executes(ctx -> execute(ctx, o -> CavernMod.loadConfigs()));
 	}
 
 	private static ArgumentBuilder<CommandSource, ?> registerMiner()
@@ -56,8 +62,7 @@ public final class CavernCommand
 
 	private static ArgumentBuilder<CommandSource, ?> registerRecord()
 	{
-		return Commands.literal("record").requires(o -> o.getEntity() != null && o.getEntity() instanceof ServerPlayerEntity)
-			.executes(ctx -> execute(ctx, CavernCommand::displayMinerRecord));
+		return Commands.literal("record").requires(o -> o.getEntity() != null && o.getEntity() instanceof ServerPlayerEntity).executes(ctx -> execute(ctx, CavernCommand::displayMinerRecord));
 	}
 
 	private static int execute(CommandContext<CommandSource> context, CommandConsumer<CommandContext<CommandSource>> command) throws CommandSyntaxException

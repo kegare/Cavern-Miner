@@ -112,7 +112,10 @@ public class MobSpawnConfig extends AbstractEntryConfig
 	{
 		for (Map.Entry<EntityClassification, List<Biome.SpawnListEntry>> entry : spawns.entrySet())
 		{
-			biome.getSpawns(entry.getKey()).addAll(entry.getValue());
+			List<Biome.SpawnListEntry> list = biome.getSpawns(entry.getKey());
+
+			list.clear();
+			list.addAll(entry.getValue());
 		}
 	}
 

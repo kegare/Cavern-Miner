@@ -27,6 +27,8 @@ public final class RandomiteDrop
 
 	public static void set(Collection<DropEntry> entries)
 	{
+		clear();
+
 		Iterator<DropEntry> iterator = entries.iterator();
 
 		while (iterator.hasNext())
@@ -47,6 +49,11 @@ public final class RandomiteDrop
 	public static DropEntry get()
 	{
 		return WeightedRandom.getRandomItem(RANDOM, ENTRIES);
+	}
+
+	public static void clear()
+	{
+		ENTRIES.clear();
 	}
 
 	public static ImmutableList<DropEntry> getEntries()

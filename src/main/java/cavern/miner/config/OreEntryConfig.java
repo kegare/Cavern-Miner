@@ -92,6 +92,8 @@ public class OreEntryConfig extends AbstractEntryConfig
 
 	public void registerEntries()
 	{
+		OreRegistry.clear();
+
 		for (OreRegistry.OreEntry entry : entries)
 		{
 			if (entry instanceof OreRegistry.BlockEntry)
