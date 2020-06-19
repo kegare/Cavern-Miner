@@ -77,7 +77,8 @@ public class CavernBiome extends Biome
 
 		if (chance > 0.0F)
 		{
-			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES, o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG)
+			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES,
+				o.withConfiguration(CavernConfig.TOWER_DUNGEON_MOBS.getConfig())
 				.withPlacement(CavePlacements.CENTER_CHANCE_RANGE.orElse(Placement.CHANCE_RANGE).configure(new ChanceRangeConfig(chance, 5, 0, 30)))));
 		}
 

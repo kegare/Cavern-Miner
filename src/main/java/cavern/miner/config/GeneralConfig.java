@@ -39,7 +39,6 @@ public class GeneralConfig
 	public static final OreEntryConfig ORE_ENTRIES = new OreEntryConfig();
 	public static final MinerRankConfig MINER_RANKS = new MinerRankConfig();
 	public static final RandomiteDropConfig RANDOMITE_DROPS = new RandomiteDropConfig();
-	public static final TowerDungeonMobConfig TOWER_DUNGEON_MOBS = new TowerDungeonMobConfig();
 
 	public static void loadConfig()
 	{
@@ -72,13 +71,5 @@ public class GeneralConfig
 		}
 
 		RANDOMITE_DROPS.registerEntries();
-
-		if (!TOWER_DUNGEON_MOBS.loadFromFile())
-		{
-			TOWER_DUNGEON_MOBS.setDefault();
-			TOWER_DUNGEON_MOBS.saveToFile();
-		}
-
-		TOWER_DUNGEON_MOBS.registerEntries();
 	}
 }

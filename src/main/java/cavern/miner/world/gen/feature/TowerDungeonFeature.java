@@ -15,27 +15,28 @@ import net.minecraft.tileentity.LockableLootTileEntity;
 import net.minecraft.tileentity.MobSpawnerTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
 import net.minecraft.world.storage.loot.LootTables;
+import net.minecraftforge.common.DungeonHooks;
 
-public class TowerDungeonFeature extends Feature<NoFeatureConfig>
+public class TowerDungeonFeature extends Feature<DungeonMobConfig>
 {
 	private int maxFloor;
 	private int roomSize;
 	private int roomHeight;
 
-	public TowerDungeonFeature(Function<Dynamic<?>, ? extends NoFeatureConfig> factory)
+	public TowerDungeonFeature(Function<Dynamic<?>, ? extends DungeonMobConfig> factory)
 	{
 		super(factory);
 	}
 
 	@Override
-	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config)
+	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, DungeonMobConfig config)
 	{
 		setDungeonSize(world, rand, pos);
 
@@ -51,7 +52,7 @@ public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 		setCeiling(world, rand, pos);
 		setLadders(world, rand, pos);
 		setChests(world, rand, pos);
-		setSpawners(world, rand, pos);
+		setSpawners(world, rand, pos, config);
 
 		return true;
 	}
@@ -231,7 +232,7 @@ public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 		}
 	}
 
-	protected void setSpawners(IWorld world, Random rand, BlockPos pos)
+	protected void setSpawners(IWorld world, Random rand, BlockPos pos, DungeonMobConfig config)
 	{
 		for (int i = 0; i < maxFloor; ++i)
 		{
@@ -244,7 +245,7 @@ public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 
 			if (tile != null && tile instanceof MobSpawnerTileEntity)
 			{
-				((MobSpawnerTileEntity)tile).getSpawnerBaseLogic().setEntityType(getRandomDungeonMob(rand, i + 1));
+				((MobSpawnerTileEntity)tile).getSpawnerBaseLogic().setEntityType(getRandomDungeonMob(rand, i + 1, config));
 			}
 			else
 			{
@@ -253,8 +254,8 @@ public class TowerDungeonFeature extends Feature<NoFeatureConfig>
 		}
 	}
 
-	private EntityType<?> getRandomDungeonMob(Random rand, int floor)
+	private EntityType<?> getRandomDungeonMob(Random rand, int floor, DungeonMobConfig config)
 	{
-		return TowerDungeonSpawner.get();
+		return config.getSpawns().isEmpty() ? DungeonHooks.getRandomDungeonMob(rand) : WeightedRandom.getRandomItem(rand, config.getSpawns()).type;
 	}
 }

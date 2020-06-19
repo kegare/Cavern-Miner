@@ -65,6 +65,7 @@ public class CavernConfig
 	public static final PortalConfig PORTAL = new PortalConfig(getConfigDir());
 	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
 	public static final MobSpawnConfig MOB_SPAWNS = new MobSpawnConfig(getConfigDir());
+	public static final TowerDungeonMobConfig TOWER_DUNGEON_MOBS = new TowerDungeonMobConfig(getConfigDir());
 
 	public static void loadConfig()
 	{
@@ -92,5 +93,11 @@ public class CavernConfig
 		}
 
 		CaveBiomes.CAVERN.ifPresent(MOB_SPAWNS::registerSpawns);
+
+		if (!TOWER_DUNGEON_MOBS.loadFromFile())
+		{
+			TOWER_DUNGEON_MOBS.setDefault();
+			TOWER_DUNGEON_MOBS.saveToFile();
+		}
 	}
 }

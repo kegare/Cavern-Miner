@@ -1,7 +1,7 @@
 package cavern.miner.init;
 
-import cavern.miner.advancements.MinerRankTrigger;
-import cavern.miner.advancements.MiningComboTrigger;
+import cavern.miner.advancement.MinerRankTrigger;
+import cavern.miner.advancement.MiningComboTrigger;
 import net.minecraft.advancements.CriteriaTriggers;
 
 public class CaveCriteriaTriggers
