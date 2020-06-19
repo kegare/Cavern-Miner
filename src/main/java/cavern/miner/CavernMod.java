@@ -107,7 +107,10 @@ public final class CavernMod
 	@SubscribeEvent
 	public void onLoaded(final FMLLoadCompleteEvent event)
 	{
-		loadConfigs();
+		GeneralConfig.loadConfig();
+
+		CavernConfig.loadConfig();
+		HugeCavernConfig.loadConfig();
 	}
 
 	@SubscribeEvent
@@ -121,14 +124,6 @@ public final class CavernMod
 	public static IModInfo getModInfo()
 	{
 		return ModList.get().getModFileById("cavern").getMods().get(0);
-	}
-
-	public static void loadConfigs()
-	{
-		GeneralConfig.loadConfig();
-
-		CavernConfig.loadConfig();
-		HugeCavernConfig.loadConfig();
 	}
 
 	public static void sendVersionNotification(ICommandSource source)

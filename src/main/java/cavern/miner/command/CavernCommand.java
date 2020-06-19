@@ -10,7 +10,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
-import cavern.miner.CavernMod;
+import cavern.miner.config.GeneralConfig;
+import cavern.miner.config.dimension.CavernConfig;
+import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerRecordMessage;
@@ -23,6 +25,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public final class CavernCommand
@@ -36,7 +39,7 @@ public final class CavernCommand
 
 	private static ArgumentBuilder<CommandSource, ?> registerReload()
 	{
-		return Commands.literal("reload").requires(o -> o.getServer().isSinglePlayer() || o.hasPermissionLevel(4)).executes(ctx -> execute(ctx, o -> CavernMod.loadConfigs()));
+		return Commands.literal("reload").requires(o -> o.getServer().isSinglePlayer() || o.hasPermissionLevel(4)).executes(ctx -> execute(ctx, CavernCommand::reloadConfig));
 	}
 
 	private static ArgumentBuilder<CommandSource, ?> registerMiner()
@@ -68,6 +71,16 @@ public final class CavernCommand
 	private static int execute(CommandContext<CommandSource> context, CommandConsumer<CommandContext<CommandSource>> command) throws CommandSyntaxException
 	{
 		return command.run(context);
+	}
+
+	private static void reloadConfig(CommandContext<CommandSource> context)
+	{
+		GeneralConfig.loadConfig();
+
+		CavernConfig.loadConfig();
+		HugeCavernConfig.loadConfig();
+
+		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.reload"), true);
 	}
 
 	private static Miner getMiner(CommandContext<CommandSource> context) throws CommandSyntaxException
