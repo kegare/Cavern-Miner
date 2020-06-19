@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.OreBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.AreaEffectCloudEntity;
@@ -18,10 +17,12 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
-public class CrackedStoneBlock extends OreBlock
+public class CrackedStoneBlock extends CaveOreBlock
 {
 	public CrackedStoneBlock(Block.Properties properties)
 	{
@@ -32,6 +33,12 @@ public class CrackedStoneBlock extends OreBlock
 	protected int getExperience(Random rand)
 	{
 		return 0;
+	}
+
+	@Override
+	public int getPoint(BlockState state, IWorldReader reader, BlockPos pos, int point)
+	{
+		return MathHelper.nextInt(RANDOM, point - 2, point + 2);
 	}
 
 	@Override

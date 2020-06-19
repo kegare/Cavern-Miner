@@ -1,5 +1,6 @@
 package cavern.miner.handler;
 
+import cavern.miner.block.CaveOreBlock;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.network.CaveNetworkConstants;
@@ -106,6 +107,11 @@ public class MinerEventHandler
 		}
 
 		int point = OrePointHelper.getPoint(OreRegistry.getEntry(state));
+
+		if (state.getBlock() instanceof CaveOreBlock)
+		{
+			point = ((CaveOreBlock)state.getBlock()).getPoint(state, world, pos, point);
+		}
 
 		if (point == 0)
 		{
