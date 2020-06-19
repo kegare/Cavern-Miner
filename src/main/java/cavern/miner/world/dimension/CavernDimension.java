@@ -42,6 +42,7 @@ import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.IRenderHandler;
 
 public class CavernDimension extends Dimension
 {
@@ -59,9 +60,6 @@ public class CavernDimension extends Dimension
 		this.settings = createGenerationSettings();
 		this.veinProvider = createVeinProvider();
 		this.caveMobSpawner = createCaveMobSpawner();
-		this.setSkyRenderer(EmptyRenderer.INSTANCE);
-		this.setCloudRenderer(EmptyRenderer.INSTANCE);
-		this.setWeatherRenderer(EmptyRenderer.INSTANCE);
 
 		float brightness = getLightBrightness();
 
@@ -197,49 +195,6 @@ public class CavernDimension extends Dimension
 		return false;
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public boolean isSkyColored()
-	{
-		return false;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public boolean doesXZShowFog(int x, int z)
-	{
-		return false;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public Vec3d getFogColor(float celestialAngle, float partialTicks)
-	{
-		return FOG_COLOR;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public float getFogDensity(Entity entity)
-	{
-		if (settings.getGroundHeight() > 0)
-		{
-			return ((float)entity.getPosY() / settings.getGroundHeight()) * 0.005F;
-		}
-
-		return 0.0F;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	public float getFogDepth(Entity entity)
-	{
-		if (settings.getGroundHeight() > 0)
-		{
-			return MathHelper.clamp(((float)entity.getPosY() / settings.getGroundHeight()) * 0.65F, 0.0F, 1.0F);
-		}
-
-		return 0.0F;
-	}
-
 	@Override
 	public boolean canRespawnHere()
 	{
@@ -320,5 +275,69 @@ public class CavernDimension extends Dimension
 	public int getSeaLevel()
 	{
 		return 256;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public boolean isSkyColored()
+	{
+		return false;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public IRenderHandler getSkyRenderer()
+	{
+		return EmptyRenderer.INSTANCE;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public IRenderHandler getCloudRenderer()
+	{
+		return EmptyRenderer.INSTANCE;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public IRenderHandler getWeatherRenderer()
+	{
+		return EmptyRenderer.INSTANCE;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public boolean doesXZShowFog(int x, int z)
+	{
+		return false;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public Vec3d getFogColor(float celestialAngle, float partialTicks)
+	{
+		return FOG_COLOR;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public float getFogDensity(Entity entity)
+	{
+		if (settings.getGroundHeight() > 0)
+		{
+			return ((float)entity.getPosY() / settings.getGroundHeight()) * 0.005F;
+		}
+
+		return 0.0F;
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	public float getFogDepth(Entity entity)
+	{
+		if (settings.getGroundHeight() > 0)
+		{
+			return MathHelper.clamp(((float)entity.getPosY() / settings.getGroundHeight()) * 0.65F, 0.0F, 1.0F);
+		}
+
+		return 0.0F;
 	}
 }

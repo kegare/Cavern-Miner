@@ -53,6 +53,7 @@ public final class CavernMod
 
 	public CavernMod()
 	{
+		CavernModConfig.check();
 		CavernModConfig.register(ModLoadingContext.get());
 
 		final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();

@@ -9,6 +9,8 @@ import javax.annotation.Nullable;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.TeleporterCache;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
@@ -17,6 +19,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +30,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CavernTeleporter implements ITeleporter
 {
@@ -71,6 +75,11 @@ public class CavernTeleporter implements ITeleporter
 		if (!placeInPortal(destWorld, newEntity, yaw, radius, pos))
 		{
 			placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
+		}
+
+		if (destWorld.getServer().isSinglePlayer() && newEntity instanceof ServerPlayerEntity)
+		{
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(1));
 		}
 
 		return newEntity;

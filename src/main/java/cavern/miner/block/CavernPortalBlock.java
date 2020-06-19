@@ -9,7 +9,6 @@ import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.network.CaveNetworkConstants;
-import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRecord;
@@ -291,14 +290,7 @@ public class CavernPortalBlock extends Block
 		double d1 = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
 		double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
 
-		entity = entity.changeDimension(destDim, new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(d1, d2, 0.0D), pattern.getForwards()));
-
-		if (entity != null && entity instanceof ServerPlayerEntity)
-		{
-			ServerPlayerEntity player = (ServerPlayerEntity)entity;
-
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new LoadingScreenMessage(1));
-		}
+		entity.changeDimension(destDim, new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(d1, d2, 0.0D), pattern.getForwards()));
 	}
 
 	public static BlockPattern.PatternHelper createPatternHelper(CavernPortalBlock portal, IWorld world, BlockPos pos)

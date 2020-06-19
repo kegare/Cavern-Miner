@@ -19,6 +19,11 @@ public class ClientEventHandler
 	{
 		Minecraft mc = Minecraft.getInstance();
 
+		if (!mc.isIntegratedServerRunning() || mc.world == null || mc.player == null)
+		{
+			return;
+		}
+
 		if (event.getGui() != null && event.getGui().getClass() == DownloadTerrainScreen.class)
 		{
 			if (mc.world.getDimension() instanceof CavernDimension && mc.player.timeUntilPortal > 0)
