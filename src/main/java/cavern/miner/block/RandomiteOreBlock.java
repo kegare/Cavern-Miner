@@ -7,15 +7,16 @@ import com.google.common.collect.Lists;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.OreBlock;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameters;
 
-public class RandomiteOreBlock extends OreBlock
+public class RandomiteOreBlock extends CaveOreBlock
 {
 	public RandomiteOreBlock(Block.Properties properties)
 	{
@@ -26,6 +27,12 @@ public class RandomiteOreBlock extends OreBlock
 	protected int getExperience(Random rand)
 	{
 		return MathHelper.nextInt(rand, 1, 3);
+	}
+
+	@Override
+	public int getPoint(BlockState state, IWorldReader reader, BlockPos pos, int point)
+	{
+		return MathHelper.nextInt(RANDOM, point - 1, point + 1);
 	}
 
 	@Override

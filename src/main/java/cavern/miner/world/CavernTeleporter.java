@@ -9,14 +9,18 @@ import javax.annotation.Nullable;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.TeleporterCache;
+import cavern.miner.world.dimension.CavernDimension;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -27,6 +31,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
+import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CavernTeleporter implements ITeleporter
 {
@@ -55,22 +60,44 @@ public class CavernTeleporter implements ITeleporter
 	{
 		Entity newEntity = repositionEntity.apply(false);
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
+		boolean placed = false;
 
-		if (GeneralConfig.INSTANCE.posCache.get() && entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false))
+		if (GeneralConfig.INSTANCE.posCache.get())
 		{
-			return newEntity;
+			placed = newEntity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false);
 		}
 
 		BlockPos pos = newEntity.getPosition();
 
-		if (destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false))
+		if (!placed)
 		{
-			return newEntity;
+			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false);
 		}
 
-		if (!placeInPortal(destWorld, newEntity, yaw, radius, pos))
+		boolean toCave = destWorld.getDimension() instanceof CavernDimension;
+		boolean isPlayer = newEntity instanceof ServerPlayerEntity;
+		boolean loading = false;
+
+		if (!placed)
 		{
-			placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
+			if (toCave && isPlayer)
+			{
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(LoadingScreenMessage.Stage.LOAD));
+
+				loading = true;
+			}
+
+			placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
+
+			if (!placed)
+			{
+				placed = placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
+			}
+		}
+
+		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
+		{
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(LoadingScreenMessage.Stage.DONE));
 		}
 
 		return newEntity;

@@ -5,6 +5,7 @@ import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
+import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.network.MinerUpdateMessage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -103,7 +104,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 				CaveCriteriaTriggers.MINER_RANK.trigger((ServerPlayerEntity)player, getRank().getName());
 			}
 
-			CaveSounds.MINER_RANKUP.ifPresent(o -> player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), o, SoundCategory.AMBIENT, 0.5F, 1.0F));
+			player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), CaveSounds.MINER_RANKUP.get(), SoundCategory.AMBIENT, 0.5F, 1.0F);
 		}
 
 		return this;
@@ -192,6 +193,14 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		}
 
 		return record;
+	}
+
+	public void displayRecord()
+	{
+		if (record != null && player != null && player instanceof ServerPlayerEntity)
+		{
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new MinerRecordMessage(record));
+		}
 	}
 
 	@Override

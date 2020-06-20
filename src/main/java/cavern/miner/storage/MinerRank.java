@@ -26,6 +26,8 @@ public final class MinerRank
 
 	public static void set(Collection<RankEntry> entries)
 	{
+		clear();
+
 		Iterator<RankEntry> iterator = entries.iterator();
 
 		while (iterator.hasNext())
@@ -72,6 +74,12 @@ public final class MinerRank
 		}
 
 		return current;
+	}
+
+	public static void clear()
+	{
+		ENTRIES.clear();
+		ENTRIES.add(BEGINNER);
 	}
 
 	public static ImmutableList<RankEntry> getEntries()

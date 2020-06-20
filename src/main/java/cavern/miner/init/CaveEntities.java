@@ -23,13 +23,13 @@ public class CaveEntities
 
 	public static void registerSpawnPlacements()
 	{
-		CAVENIC_SKELETON.ifPresent(o -> EntitySpawnPlacementRegistry.register(o,
-			EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::canMonsterSpawnInLight));
+		EntitySpawnPlacementRegistry.register(CAVENIC_SKELETON.get(), EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+			Heightmap.Type.MOTION_BLOCKING_NO_LEAVES, MonsterEntity::canMonsterSpawnInLight);
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public static void registerRenderers()
 	{
-		CAVENIC_SKELETON.ifPresent(o -> RenderingRegistry.registerEntityRenderingHandler(o, CavenicSkeletonRenderer::new));
+		RenderingRegistry.registerEntityRenderingHandler(CAVENIC_SKELETON.get(), CavenicSkeletonRenderer::new);
 	}
 }

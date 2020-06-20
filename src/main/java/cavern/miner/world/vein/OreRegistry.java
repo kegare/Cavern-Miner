@@ -46,6 +46,13 @@ public final class OreRegistry
 		TAG_ENTRIES.put(entry.getTag().getId(), entry);
 	}
 
+	public static void clear()
+	{
+		BLOCK_ENTRIES.clear();
+		BLOCK_STATE_ENTRIES.clear();
+		TAG_ENTRIES.clear();
+	}
+
 	public static OreEntry getEntry(Object obj)
 	{
 		return getEntry(obj, false);

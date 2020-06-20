@@ -53,5 +53,6 @@
 	"advancements.cavern.mining_combo_3.description": "Hit a 300-ore combo",
 	"advancements.cavern.god_miner.title": "The God of Miner",
 	"advancements.cavern.god_miner.description": "Master of Mining",
-	"cavern.message.update_version": "A new version of Cavern: Miner is available"
+	"cavern.message.update_version": "A new version of Cavern: Miner is available",
+	"cavern.message.reload": "Cavern: Miner json configuration files have been reloaded."
 }

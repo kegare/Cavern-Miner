@@ -1,4 +1,4 @@
-package cavern.miner.advancements;
+package cavern.miner.advancement;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;

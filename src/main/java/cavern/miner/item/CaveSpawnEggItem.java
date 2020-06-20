@@ -21,23 +21,16 @@ public class CaveSpawnEggItem<T extends EntityType<?>> extends SpawnEggItem
 	@Override
 	public EntityType<?> getType(@Nullable CompoundNBT nbt)
 	{
-		T type = entry.orElse(null);
-
-		if (type == null)
-		{
-			return super.getType(nbt);
-		}
-
 		if (nbt != null && nbt.contains("EntityTag", Constants.NBT.TAG_COMPOUND))
 		{
 			CompoundNBT tag = nbt.getCompound("EntityTag");
 
 			if (tag.contains("id", Constants.NBT.TAG_STRING))
 			{
-				return EntityType.byKey(tag.getString("id")).orElse(type);
+				return EntityType.byKey(tag.getString("id")).orElse(entry.get());
 			}
 		}
 
-		return type;
+		return entry.get();
 	}
 }

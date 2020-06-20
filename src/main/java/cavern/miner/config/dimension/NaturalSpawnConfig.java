@@ -3,7 +3,6 @@ package cavern.miner.config.dimension;
 import java.io.File;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -21,13 +20,13 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.biome.Biome;
 
-public class MobSpawnConfig extends AbstractEntryConfig
+public class NaturalSpawnConfig extends AbstractEntryConfig
 {
 	private final Map<EntityClassification, List<Biome.SpawnListEntry>> spawns = new HashMap<>();
 
-	public MobSpawnConfig(File dir)
+	public NaturalSpawnConfig(File dir)
 	{
-		super(new File(dir, "mob_spawns.json"));
+		super(new File(dir, "natural_spawns.json"));
 	}
 
 	public void setEntries(EntityClassification type, Collection<Biome.SpawnListEntry> entries)
@@ -112,7 +111,10 @@ public class MobSpawnConfig extends AbstractEntryConfig
 	{
 		for (Map.Entry<EntityClassification, List<Biome.SpawnListEntry>> entry : spawns.entrySet())
 		{
-			biome.getSpawns(entry.getKey()).addAll(entry.getValue());
+			List<Biome.SpawnListEntry> list = biome.getSpawns(entry.getKey());
+
+			list.clear();
+			list.addAll(entry.getValue());
 		}
 	}
 
@@ -120,20 +122,24 @@ public class MobSpawnConfig extends AbstractEntryConfig
 	{
 		spawns.clear();
 
-		List<Biome.SpawnListEntry> entries = new ArrayList<>();
+		List<Biome.SpawnListEntry> monsters = new ArrayList<>();
 
-		entries.add(new Biome.SpawnListEntry(EntityType.SPIDER, 100, 4, 4));
-		entries.add(new Biome.SpawnListEntry(EntityType.ZOMBIE, 95, 4, 4));
-		entries.add(new Biome.SpawnListEntry(EntityType.ZOMBIE_VILLAGER, 15, 1, 1));
-		entries.add(new Biome.SpawnListEntry(EntityType.SKELETON, 100, 4, 4));
-		entries.add(new Biome.SpawnListEntry(EntityType.CREEPER, 100, 4, 4));
-		entries.add(new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
-		entries.add(new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
-		entries.add(new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
+		monsters.add(new Biome.SpawnListEntry(EntityType.SPIDER, 100, 4, 4));
+		monsters.add(new Biome.SpawnListEntry(EntityType.ZOMBIE, 95, 4, 4));
+		monsters.add(new Biome.SpawnListEntry(EntityType.ZOMBIE_VILLAGER, 15, 1, 1));
+		monsters.add(new Biome.SpawnListEntry(EntityType.SKELETON, 100, 4, 4));
+		monsters.add(new Biome.SpawnListEntry(EntityType.CREEPER, 100, 4, 4));
+		monsters.add(new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
+		monsters.add(new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
+		monsters.add(new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
+		monsters.add(new Biome.SpawnListEntry(CaveEntities.CAVENIC_SKELETON.get(), 5, 1, 1));
 
-		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> entries.add(new Biome.SpawnListEntry(o, 5, 1, 1)));
+		spawns.put(EntityClassification.MONSTER, monsters);
 
-		spawns.put(EntityClassification.MONSTER, entries);
-		spawns.put(EntityClassification.AMBIENT, Arrays.asList(new Biome.SpawnListEntry(EntityType.BAT, 20, 8, 8)));
+		List<Biome.SpawnListEntry> ambients = new ArrayList<>();
+
+		ambients.add(new Biome.SpawnListEntry(EntityType.BAT, 20, 8, 8));
+
+		spawns.put(EntityClassification.AMBIENT, ambients);
 	}
 }

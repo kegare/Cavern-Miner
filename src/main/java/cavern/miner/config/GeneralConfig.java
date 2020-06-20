@@ -17,6 +17,10 @@ public class GeneralConfig
 
 	public final ForgeConfigSpec.BooleanValue disableMiner;
 
+	public final OreEntryConfig oreEntries = new OreEntryConfig();
+	public final MinerRankConfig minerRanks = new MinerRankConfig();
+	public final RandomiteDropConfig randomiteDrops = new RandomiteDropConfig();
+
 	public GeneralConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
@@ -36,49 +40,36 @@ public class GeneralConfig
 		builder.pop();
 	}
 
-	public static final OreEntryConfig ORE_ENTRIES = new OreEntryConfig();
-	public static final MinerRankConfig MINER_RANKS = new MinerRankConfig();
-	public static final RandomiteDropConfig RANDOMITE_DROPS = new RandomiteDropConfig();
-	public static final TowerDungeonMobConfig TOWER_DUNGEON_MOBS = new TowerDungeonMobConfig();
-
-	public static void loadConfig()
+	public void load()
 	{
-		ORE_ENTRIES.loadFromFile();
+		oreEntries.loadFromFile();
 
-		if (ORE_ENTRIES.getEntries().isEmpty())
+		if (oreEntries.getEntries().isEmpty())
 		{
-			ORE_ENTRIES.setDefault();
-			ORE_ENTRIES.saveToFile();
+			oreEntries.setDefault();
+			oreEntries.saveToFile();
 		}
 
-		ORE_ENTRIES.registerEntries();
+		oreEntries.registerEntries();
 
-		MINER_RANKS.loadFromFile();
+		minerRanks.loadFromFile();
 
-		if (MINER_RANKS.getEntries().isEmpty())
+		if (minerRanks.getEntries().isEmpty())
 		{
-			MINER_RANKS.setDefault();
-			MINER_RANKS.saveToFile();
+			minerRanks.setDefault();
+			minerRanks.saveToFile();
 		}
 
-		MINER_RANKS.registerEntries();
+		minerRanks.registerEntries();
 
-		RANDOMITE_DROPS.loadFromFile();
+		randomiteDrops.loadFromFile();
 
-		if (RANDOMITE_DROPS.getEntries().isEmpty())
+		if (randomiteDrops.getEntries().isEmpty())
 		{
-			RANDOMITE_DROPS.setDefault();
-			RANDOMITE_DROPS.saveToFile();
+			randomiteDrops.setDefault();
+			randomiteDrops.saveToFile();
 		}
 
-		RANDOMITE_DROPS.registerEntries();
-
-		if (!TOWER_DUNGEON_MOBS.loadFromFile())
-		{
-			TOWER_DUNGEON_MOBS.setDefault();
-			TOWER_DUNGEON_MOBS.saveToFile();
-		}
-
-		TOWER_DUNGEON_MOBS.registerEntries();
+		randomiteDrops.registerEntries();
 	}
 }

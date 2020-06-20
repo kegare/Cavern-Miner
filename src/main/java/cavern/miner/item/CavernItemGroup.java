@@ -1,7 +1,5 @@
 package cavern.miner.item;
 
-import java.util.Comparator;
-
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveEnchantments;
@@ -10,7 +8,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -21,7 +18,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.RegistryObject;
 
-public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
+public class CavernItemGroup extends ItemGroup
 {
 	public static final CavernItemGroup INSTANCE = new CavernItemGroup();
 
@@ -45,36 +42,33 @@ public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
 
 		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			portal.ifPresent(o ->
+			for (BlockState state : portal.get().getFrameBlocks())
 			{
-				for (BlockState state : o.getFrameBlocks())
+				Item item = state.getBlock().asItem();
+
+				if (item != null && item != Items.AIR)
 				{
-					Item item = state.getBlock().asItem();
+					ItemStackEntry entry = new ItemStackEntry(item);
 
-					if (item != null && item != Items.AIR)
+					if (!entries.contains(entry))
 					{
-						ItemStackEntry entry = new ItemStackEntry(item);
-
-						if (!entries.contains(entry))
-						{
-							entries.add(entry);
-						}
+						entries.add(entry);
 					}
 				}
+			}
 
-				for (ItemStack stack : o.getTriggerItems())
+			for (ItemStack stack : portal.get().getTriggerItems())
+			{
+				if (!stack.isEmpty())
 				{
-					if (!stack.isEmpty())
-					{
-						ItemStackEntry entry = new ItemStackEntry(stack);
+					ItemStackEntry entry = new ItemStackEntry(stack);
 
-						if (!entries.contains(entry))
-						{
-							entries.add(entry);
-						}
+					if (!entries.contains(entry))
+					{
+						entries.add(entry);
 					}
 				}
-			});
+			}
 		}
 
 		entries.forEach(o -> items.add(o.getItemStack()));
@@ -82,8 +76,6 @@ public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
 		NonNullList<ItemStack> list = NonNullList.create();
 
 		super.fill(list);
-
-		list.sort(this);
 
 		items.addAll(list);
 
@@ -100,11 +92,5 @@ public class CavernItemGroup extends ItemGroup implements Comparator<ItemStack>
 				}
 			});
 		}
-	}
-
-	@Override
-	public int compare(ItemStack o1, ItemStack o2)
-	{
-		return -Boolean.compare(o1.getItem() instanceof BlockItem, o2.getItem() instanceof BlockItem);
 	}
 }

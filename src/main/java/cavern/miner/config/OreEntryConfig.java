@@ -92,6 +92,8 @@ public class OreEntryConfig extends AbstractEntryConfig
 
 	public void registerEntries()
 	{
+		OreRegistry.clear();
+
 		for (OreRegistry.OreEntry entry : entries)
 		{
 			if (entry instanceof OreRegistry.BlockEntry)
@@ -127,6 +129,6 @@ public class OreEntryConfig extends AbstractEntryConfig
 		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_AQUAMARINE, VeinProvider.Rarity.AQUA, 2));
 		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_RANDOMITE, VeinProvider.Rarity.RANDOMITE, 2));
 
-		CaveBlocks.CRACKED_STONE.ifPresent(o -> entries.add(new OreRegistry.BlockEntry(o, VeinProvider.Rarity.RANDOMITE, 2)));
+		entries.add(new OreRegistry.BlockEntry(CaveBlocks.CRACKED_STONE.get(), VeinProvider.Rarity.RANDOMITE, 2));
 	}
 }

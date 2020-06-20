@@ -207,10 +207,9 @@ public class VeinConfig extends AbstractEntryConfig
 		veins.clear();
 
 		whitelist.clear();
-		whitelist.add(Tags.Blocks.ORES).add(Tags.Blocks.STONE).add(Blocks.DIRT).add(Blocks.GRAVEL);
+		whitelist.add(Tags.Blocks.ORES).add(Blocks.ANDESITE).add(Blocks.DIORITE).add(Blocks.GRANITE).add(Blocks.DIRT).add(Blocks.GRAVEL);
 
 		blacklist.clear();
-		blacklist.add(Blocks.STONE).add(Blocks.POLISHED_ANDESITE).add(Blocks.POLISHED_DIORITE).add(Blocks.POLISHED_GRANITE);
 		blacklist.add(Tags.Blocks.ORES_QUARTZ);
 	}
 

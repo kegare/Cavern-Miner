@@ -52,5 +52,6 @@
 	"advancements.cavern.mining_combo_3.description": "採掘を300コンボ続ける",
 	"advancements.cavern.god_miner.title": "採掘の神",
 	"advancements.cavern.god_miner.description": "採掘を極める",
-	"cavern.message.update_version": "Cavern: Minerの新しいバージョンが利用できます"
+	"cavern.message.update_version": "Cavern: Minerの新しいバージョンが利用できます",
+	"cavern.message.reload": "Cavern: Minerのjson設定ファイルがリロードされました"
 }

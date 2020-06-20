@@ -11,14 +11,12 @@ public final class CaveBiomes
 {
 	public static final DeferredRegister<Biome> REGISTRY = new DeferredRegister<>(ForgeRegistries.BIOMES, "cavern");
 
-	public static final RegistryObject<Biome> CAVERN = REGISTRY.register("cavern", CavernBiome::new);
-	public static final RegistryObject<Biome> HUGE_CAVERN = REGISTRY.register("huge_cavern", HugeCavernBiome::new);
+	public static final RegistryObject<CavernBiome> CAVERN = REGISTRY.register("cavern", CavernBiome::new);
+	public static final RegistryObject<CavernBiome> HUGE_CAVERN = REGISTRY.register("huge_cavern", HugeCavernBiome::new);
 
 	public static void init()
 	{
-		for (RegistryObject<Biome> biome : REGISTRY.getEntries())
-		{
-			biome.filter(o -> o instanceof CavernBiome).map(o -> (CavernBiome)o).ifPresent(CavernBiome::init);
-		}
+		CAVERN.get().init();
+		HUGE_CAVERN.get().init();
 	}
 }

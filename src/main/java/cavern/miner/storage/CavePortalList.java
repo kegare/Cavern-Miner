@@ -72,17 +72,14 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 
 		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			portal.ifPresent(o ->
+			ListNBT list = new ListNBT();
+
+			for (BlockPos pos : cavePortals.get(portal.get()))
 			{
-				ListNBT list = new ListNBT();
+				list.add(NBTUtil.writeBlockPos(pos));
+			}
 
-				for (BlockPos pos : cavePortals.get(o))
-				{
-					list.add(NBTUtil.writeBlockPos(pos));
-				}
-
-				nbt.put(portal.getId().toString(), list);
-			});
+			nbt.put(portal.getId().toString(), list);
 		}
 
 		return nbt;
@@ -93,15 +90,12 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 	{
 		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			portal.ifPresent(o ->
-			{
-				ListNBT list = nbt.getList(portal.getId().toString(), NBT.TAG_COMPOUND);
+			ListNBT list = nbt.getList(portal.getId().toString(), NBT.TAG_COMPOUND);
 
-				for (INBT entry : list)
-				{
-					cavePortals.put(o, NBTUtil.readBlockPos((CompoundNBT)entry));
-				}
-			});
+			for (INBT entry : list)
+			{
+				cavePortals.put(portal.get(), NBTUtil.readBlockPos((CompoundNBT)entry));
+			}
 		}
 	}
 }

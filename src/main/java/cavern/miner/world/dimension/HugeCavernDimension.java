@@ -13,7 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -29,7 +28,7 @@ public class HugeCavernDimension extends CavernDimension
 	@Override
 	public Biome getBiome()
 	{
-		return CaveBiomes.HUGE_CAVERN.orElse(Biomes.PLAINS);
+		return CaveBiomes.HUGE_CAVERN.get();
 	}
 
 	@Override

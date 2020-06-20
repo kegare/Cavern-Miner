@@ -71,9 +71,9 @@ public class Vein
 
 	public static class Properties
 	{
-		private static final BlockState[] TARGET_STONES = {Blocks.STONE.getDefaultState(), Blocks.ANDESITE.getDefaultState(), Blocks.DIORITE.getDefaultState(), Blocks.GRANITE.getDefaultState()};
+		private static final BlockState[] NATURAL_STONES = {Blocks.STONE.getDefaultState(), Blocks.ANDESITE.getDefaultState(), Blocks.DIORITE.getDefaultState(), Blocks.GRANITE.getDefaultState()};
 
-		private BlockState[] targetBlocks = TARGET_STONES;
+		private BlockState[] targetBlocks = NATURAL_STONES;
 		private int count = 10;
 		private int size = 5;
 		private int minHeight = 1;

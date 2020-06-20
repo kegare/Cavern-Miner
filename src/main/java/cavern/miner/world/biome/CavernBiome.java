@@ -1,18 +1,15 @@
 package cavern.miner.world.biome;
 
-import java.util.Optional;
-
 import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
-import cavern.miner.world.dimension.CavernDimension;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
-import net.minecraft.world.gen.carver.WorldCarver;
+import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
+import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.placement.ChanceRangeConfig;
@@ -26,8 +23,8 @@ public class CavernBiome extends Biome
 {
 	public CavernBiome()
 	{
-		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.AIR_CONFIG).precipitation(Biome.RainType.NONE)
-			.depth(0.125F).scale(0.05F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
+		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
+			.depth(-1.0F).scale(0.0F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
 	}
 
@@ -43,80 +40,64 @@ public class CavernBiome extends Biome
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN.get(), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.canyon.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN_CANYON.orElse(WorldCarver.CANYON), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN_CANYON.get(), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.extremeCave.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CAVE.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CAVE.get(), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.extremeCanyon.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CANYON.orElse(WorldCarver.CANYON), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CANYON.get(), new ProbabilityConfig(probability)));
 		}
 	}
 
 	protected void addCaveFeatures()
 	{
-		CaveFeatures.VEIN.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
-			o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG))));
+		addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
+			CaveFeatures.VEIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
 
 		float chance = CavernConfig.INSTANCE.towerDungeon.get().floatValue();
 
 		if (chance > 0.0F)
 		{
-			CaveFeatures.TOWER_DUNGEON.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES, o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG)
-				.withPlacement(CavePlacements.CENTER_CHANCE_RANGE.orElse(Placement.CHANCE_RANGE).configure(new ChanceRangeConfig(chance, 5, 0, 30)))));
+			addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES,
+				CaveFeatures.TOWER_DUNGEON.get().withConfiguration(CavernConfig.INSTANCE.towerDungeonMobs.getConfig())
+				.withPlacement(CavePlacements.CENTER_CHANCE_RANGE.get().configure(new ChanceRangeConfig(chance, 5, 0, 30))));
 		}
 
-		Placement<FrequencyConfig> place = CavePlacements.CENTER_NO_HEIGHT.orElse(Placement.COUNT_HEIGHT_64);
+		Placement<FrequencyConfig> place = CavePlacements.CENTER_NO_HEIGHT.get();
+		Feature<BlockClusterFeatureConfig> feature = CaveFeatures.GROUND_PATCH.get();
 
-		CaveFeatures.GROUND_PATCH.ifPresent(o ->
-		{
-			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-				o.withConfiguration(DefaultBiomeFeatures.GRASS_CONFIG).withPlacement(place.configure(new FrequencyConfig(20))));
-			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-				o.withConfiguration(DefaultBiomeFeatures.DEFAULT_FLOWER_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
-			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-				o.withConfiguration(DefaultBiomeFeatures.BROWN_MUSHROOM_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
-			addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-				o.withConfiguration(DefaultBiomeFeatures.RED_MUSHROOM_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
-		});
+		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+			feature.withConfiguration(DefaultBiomeFeatures.GRASS_CONFIG).withPlacement(place.configure(new FrequencyConfig(20))));
+		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+			feature.withConfiguration(DefaultBiomeFeatures.DEFAULT_FLOWER_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
+		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+			feature.withConfiguration(DefaultBiomeFeatures.BROWN_MUSHROOM_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
+		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+			feature.withConfiguration(DefaultBiomeFeatures.RED_MUSHROOM_CONFIG).withPlacement(place.configure(new FrequencyConfig(1))));
 
-		CaveFeatures.GROUND_TREE.ifPresent(o -> addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
-			o.withConfiguration(new CountConfig(32)).withPlacement(place.configure(new FrequencyConfig(10)))));
+		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
+			CaveFeatures.GROUND_TREE.get().withConfiguration(new CountConfig(32)).withPlacement(place.configure(new FrequencyConfig(10))));
 	}
 
 	protected void addFeatures()
 	{
 		DefaultBiomeFeatures.addLakes(this);
 		DefaultBiomeFeatures.addMonsterRooms(this);
-	}
-
-	public static Optional<CavernBiome> get(IWorld world)
-	{
-		if (world.getDimension() instanceof CavernDimension)
-		{
-			CavernDimension cavern = (CavernDimension)world.getDimension();
-
-			if (cavern.getBiome() instanceof CavernBiome)
-			{
-				return Optional.of((CavernBiome)cavern.getBiome());
-			}
-		}
-
-		return Optional.empty();
 	}
 }
