@@ -14,19 +14,15 @@ import cavern.miner.config.GeneralConfig;
 import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.network.CaveNetworkConstants;
-import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRank;
 import cavern.miner.storage.MinerRank.RankEntry;
-import cavern.miner.storage.MinerRecord;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 public final class CavernCommand
 {
@@ -75,10 +71,9 @@ public final class CavernCommand
 
 	private static void reloadConfig(CommandContext<CommandSource> context)
 	{
-		GeneralConfig.loadConfig();
-
-		CavernConfig.loadConfig();
-		HugeCavernConfig.loadConfig();
+		GeneralConfig.INSTANCE.load();
+		CavernConfig.INSTANCE.load();
+		HugeCavernConfig.INSTANCE.load();
 
 		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.reload"), true);
 	}
@@ -93,8 +88,7 @@ public final class CavernCommand
 	private static void displayMinerRecord(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
 		ServerPlayerEntity player = context.getSource().asPlayer();
-		MinerRecord record = player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElseThrow(INVALID_MINER::create);
 
-		CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> player), new MinerRecordMessage(record));
+		player.getCapability(CaveCapabilities.MINER).orElseThrow(INVALID_MINER::create).displayRecord();
 	}
 }

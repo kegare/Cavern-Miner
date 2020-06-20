@@ -20,7 +20,7 @@ public class MinerUnit
 	@Nullable
 	public MinerSnapshot getSnapshot(EnchantmentMiner miner, BlockPos pos, BlockState state)
 	{
-		return miner.createSnapshot(player.world, pos, state, player).checkForMining();
+		return player == null ? null : miner.createSnapshot(player.world, pos, state, player).checkForMining();
 	}
 
 	public boolean isBreaking()

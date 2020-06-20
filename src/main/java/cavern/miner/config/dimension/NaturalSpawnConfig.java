@@ -20,13 +20,13 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.world.biome.Biome;
 
-public class MobSpawnConfig extends AbstractEntryConfig
+public class NaturalSpawnConfig extends AbstractEntryConfig
 {
 	private final Map<EntityClassification, List<Biome.SpawnListEntry>> spawns = new HashMap<>();
 
-	public MobSpawnConfig(File dir)
+	public NaturalSpawnConfig(File dir)
 	{
-		super(new File(dir, "mob_spawns.json"));
+		super(new File(dir, "natural_spawns.json"));
 	}
 
 	public void setEntries(EntityClassification type, Collection<Biome.SpawnListEntry> entries)

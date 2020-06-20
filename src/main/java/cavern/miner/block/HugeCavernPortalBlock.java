@@ -22,12 +22,12 @@ public class HugeCavernPortalBlock extends CavernPortalBlock
 	@Override
 	public ItemStackTagList getTriggerItems()
 	{
-		return HugeCavernConfig.PORTAL.getTriggerItems();
+		return HugeCavernConfig.INSTANCE.portal.getTriggerItems();
 	}
 
 	@Override
 	public BlockStateTagList getFrameBlocks()
 	{
-		return HugeCavernConfig.PORTAL.getFrameBlocks();
+		return HugeCavernConfig.INSTANCE.portal.getFrameBlocks();
 	}
 }

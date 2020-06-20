@@ -5,6 +5,7 @@ import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
+import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.network.MinerUpdateMessage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -192,6 +193,14 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		}
 
 		return record;
+	}
+
+	public void displayRecord()
+	{
+		if (record != null && player != null && player instanceof ServerPlayerEntity)
+		{
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new MinerRecordMessage(record));
+		}
 	}
 
 	@Override

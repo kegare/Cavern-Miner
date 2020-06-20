@@ -8,10 +8,7 @@ import cavern.miner.config.GeneralConfig;
 import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
-import cavern.miner.network.CaveNetworkConstants;
-import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.storage.Miner;
-import cavern.miner.storage.MinerRecord;
 import cavern.miner.storage.TeleporterCache;
 import cavern.miner.util.BlockStateHelper;
 import cavern.miner.util.BlockStateTagList;
@@ -25,7 +22,6 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -49,7 +45,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
-import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CavernPortalBlock extends Block
 {
@@ -72,12 +67,12 @@ public class CavernPortalBlock extends Block
 
 	public ItemStackTagList getTriggerItems()
 	{
-		return CavernConfig.PORTAL.getTriggerItems();
+		return CavernConfig.INSTANCE.portal.getTriggerItems();
 	}
 
 	public BlockStateTagList getFrameBlocks()
 	{
-		return CavernConfig.PORTAL.getFrameBlocks();
+		return CavernConfig.INSTANCE.portal.getFrameBlocks();
 	}
 
 	@Override
@@ -181,15 +176,7 @@ public class CavernPortalBlock extends Block
 	{
 		if (!world.isRemote && world.getDimension() instanceof CavernDimension)
 		{
-			if (player instanceof ServerPlayerEntity)
-			{
-				MinerRecord record = player.getCapability(CaveCapabilities.MINER).map(Miner::getRecord).orElse(null);
-
-				if (record != null)
-				{
-					CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new MinerRecordMessage(record));
-				}
-			}
+			player.getCapability(CaveCapabilities.MINER).ifPresent(Miner::displayRecord);
 		}
 
 		return ActionResultType.PASS;

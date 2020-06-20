@@ -31,6 +31,11 @@ public class CavernConfig
 	public final ForgeConfigSpec.IntValue maxCount;
 	public final ForgeConfigSpec.IntValue safeDistance;
 
+	public final PortalConfig portal = new PortalConfig(getConfigDir());
+	public final VeinConfig veins = new VeinConfig(getConfigDir());
+	public final NaturalSpawnConfig naturalSpawns = new NaturalSpawnConfig(getConfigDir());
+	public final TowerDungeonMobConfig towerDungeonMobs = new TowerDungeonMobConfig(getConfigDir());
+
 	public CavernConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
@@ -57,47 +62,42 @@ public class CavernConfig
 		builder.pop();
 	}
 
+	public void load()
+	{
+		portal.loadFromFile();
+
+		if (portal.getTriggerItems().isEmpty() || portal.getFrameBlocks().isEmpty())
+		{
+			portal.getTriggerItems().clear();
+			portal.getTriggerItems().add(Tags.Items.GEMS_EMERALD);
+			portal.getFrameBlocks().clear();
+			portal.getFrameBlocks().add(Blocks.MOSSY_COBBLESTONE).add(Blocks.MOSSY_STONE_BRICKS);
+			portal.saveToFile();
+		}
+
+		if (!veins.loadFromFile())
+		{
+			veins.setDefault();
+			veins.saveToFile();
+		}
+
+		if (!naturalSpawns.loadFromFile())
+		{
+			naturalSpawns.setDefault();
+			naturalSpawns.saveToFile();
+		}
+
+		CaveBiomes.CAVERN.ifPresent(naturalSpawns::registerSpawns);
+
+		if (!towerDungeonMobs.loadFromFile())
+		{
+			towerDungeonMobs.setDefault();
+			towerDungeonMobs.saveToFile();
+		}
+	}
+
 	public static File getConfigDir()
 	{
 		return new File(CavernModConfig.getConfigDir(), "cavern");
-	}
-
-	public static final PortalConfig PORTAL = new PortalConfig(getConfigDir());
-	public static final VeinConfig VEINS = new VeinConfig(getConfigDir());
-	public static final MobSpawnConfig MOB_SPAWNS = new MobSpawnConfig(getConfigDir());
-	public static final TowerDungeonMobConfig TOWER_DUNGEON_MOBS = new TowerDungeonMobConfig(getConfigDir());
-
-	public static void loadConfig()
-	{
-		PORTAL.loadFromFile();
-
-		if (PORTAL.getTriggerItems().isEmpty() || PORTAL.getFrameBlocks().isEmpty())
-		{
-			PORTAL.getTriggerItems().clear();
-			PORTAL.getTriggerItems().add(Tags.Items.GEMS_EMERALD);
-			PORTAL.getFrameBlocks().clear();
-			PORTAL.getFrameBlocks().add(Blocks.MOSSY_COBBLESTONE).add(Blocks.MOSSY_STONE_BRICKS);
-			PORTAL.saveToFile();
-		}
-
-		if (!VEINS.loadFromFile())
-		{
-			VEINS.setDefault();
-			VEINS.saveToFile();
-		}
-
-		if (!MOB_SPAWNS.loadFromFile())
-		{
-			MOB_SPAWNS.setDefault();
-			MOB_SPAWNS.saveToFile();
-		}
-
-		CaveBiomes.CAVERN.ifPresent(MOB_SPAWNS::registerSpawns);
-
-		if (!TOWER_DUNGEON_MOBS.loadFromFile())
-		{
-			TOWER_DUNGEON_MOBS.setDefault();
-			TOWER_DUNGEON_MOBS.saveToFile();
-		}
 	}
 }

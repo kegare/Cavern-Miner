@@ -11,19 +11,19 @@ public class HugeCavernVeinProvider extends VeinProvider
 	@Override
 	public ImmutableList<Vein> getVeins()
 	{
-		return ImmutableList.copyOf(HugeCavernConfig.VEINS.getVeins());
+		return ImmutableList.copyOf(HugeCavernConfig.INSTANCE.veins.getVeins());
 	}
 
 	@Override
 	public BlockStateTagList getWhitelist()
 	{
-		return HugeCavernConfig.VEINS.getWhitelist();
+		return HugeCavernConfig.INSTANCE.veins.getWhitelist();
 	}
 
 	@Override
 	public BlockStateTagList getBlacklist()
 	{
-		return HugeCavernConfig.VEINS.getBlacklist();
+		return HugeCavernConfig.INSTANCE.veins.getBlacklist();
 	}
 
 	@Override
