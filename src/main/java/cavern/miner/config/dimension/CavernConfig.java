@@ -50,9 +50,9 @@ public class CavernConfig
 
 		builder.push("natural_spawn");
 		spawnerType = builder.comment("The spawner type of natural monsters spawn.", serverSide).defineEnum("spawner_type", WorldSpawnerType.CAVERN);
-		chunkRadius = builder.comment("How far (in chunks) monsters must spawn.", serverSide).defineInRange("chunk_radius", 6, 1, 10);
+		chunkRadius = builder.comment("How far (in chunks) monsters must spawn.", serverSide).defineInRange("chunk_radius", 5, 1, 10);
 		heightRadius = builder.comment("How high (in blocks) monsters must spawn.", serverSide).defineInRange("height_radius", 70, 10, 200);
-		maxCount = builder.comment("How many monsters must spawn.", serverSide).defineInRange("max_count", 50, 0, 5000);
+		maxCount = builder.comment("How many monsters must spawn.", serverSide).defineInRange("max_count", 70, 0, 5000);
 		safeDistance = builder.comment("How far (in blocks) monsters must not spawn from players.", serverSide).defineInRange("safe_distance", 16, 0, 100);
 		builder.pop();
 	}

@@ -23,7 +23,7 @@ public class CavernBiome extends Biome
 {
 	public CavernBiome()
 	{
-		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.AIR_CONFIG).precipitation(Biome.RainType.NONE)
+		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
 			.depth(-1.0F).scale(0.0F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
 		this.addFeatures();
 	}
