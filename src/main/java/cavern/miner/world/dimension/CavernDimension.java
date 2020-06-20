@@ -33,7 +33,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProviderType;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
@@ -74,7 +73,7 @@ public class CavernDimension extends Dimension
 
 	public Biome getBiome()
 	{
-		return CaveBiomes.CAVERN.orElse(Biomes.PLAINS);
+		return CaveBiomes.CAVERN.get();
 	}
 
 	@Override

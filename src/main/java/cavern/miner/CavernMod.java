@@ -23,7 +23,6 @@ import cavern.miner.init.CaveSounds;
 import cavern.miner.init.CaveWorldCarvers;
 import cavern.miner.network.CaveNetworkConstants;
 import net.minecraft.command.ICommandSource;
-import net.minecraft.item.Item;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -32,7 +31,6 @@ import net.minecraft.util.text.event.ClickEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -97,12 +95,6 @@ public final class CavernMod
 		CaveBlocks.registerRenderType();
 
 		CaveEntities.registerRenderers();
-	}
-
-	@SubscribeEvent
-	public void onItemsRegistry(final RegistryEvent.Register<Item> event)
-	{
-		CaveBlocks.registerBlockItems(CaveItems.REGISTRY);
 	}
 
 	@SubscribeEvent

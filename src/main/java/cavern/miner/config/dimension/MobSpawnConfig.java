@@ -132,8 +132,7 @@ public class MobSpawnConfig extends AbstractEntryConfig
 		monsters.add(new Biome.SpawnListEntry(EntityType.SLIME, 50, 4, 4));
 		monsters.add(new Biome.SpawnListEntry(EntityType.ENDERMAN, 10, 1, 4));
 		monsters.add(new Biome.SpawnListEntry(EntityType.WITCH, 5, 1, 1));
-
-		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> monsters.add(new Biome.SpawnListEntry(o, 5, 1, 1)));
+		monsters.add(new Biome.SpawnListEntry(CaveEntities.CAVENIC_SKELETON.get(), 5, 1, 1));
 
 		spawns.put(EntityClassification.MONSTER, monsters);
 

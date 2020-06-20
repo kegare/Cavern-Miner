@@ -34,8 +34,8 @@ public final class CaveDimensions
 	@SubscribeEvent
 	public static void registerDimensions(final RegisterDimensionsEvent event)
 	{
-		attachDimensionType("cavern", CAVERN.map(o -> DimensionManager.registerOrGetDimension(o.getRegistryName(), o, null, false)).orElse(null));
-		attachDimensionType("huge_cavern", HUGE_CAVERN.map(o -> DimensionManager.registerOrGetDimension(o.getRegistryName(), o, null, false)).orElse(null));
+		attachDimensionType("cavern", DimensionManager.registerOrGetDimension(CAVERN.getId(), CAVERN.get(), null, false));
+		attachDimensionType("huge_cavern", DimensionManager.registerOrGetDimension(HUGE_CAVERN.getId(), HUGE_CAVERN.get(), null, false));
 	}
 
 	private static void attachDimensionType(String name, DimensionType type)
@@ -79,11 +79,9 @@ public final class CaveDimensions
 	{
 		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			CavernPortalBlock portalBlock = portal.orElse(null);
-
-			if (portalBlock != null && portalBlock.getDimension() == dimension.getType())
+			if (portal.get().getDimension() == dimension.getType())
 			{
-				return portalBlock;
+				return portal.get();
 			}
 		}
 

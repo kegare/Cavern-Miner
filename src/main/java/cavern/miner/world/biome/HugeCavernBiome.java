@@ -6,7 +6,6 @@ import cavern.miner.init.CaveWorldCarvers;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
-import net.minecraft.world.gen.carver.WorldCarver;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.placement.IPlacementConfig;
@@ -26,15 +25,15 @@ public class HugeCavernBiome extends CavernBiome
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.HUGE_CAVE.orElse(WorldCarver.CAVE), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.HUGE_CAVE.get(), new ProbabilityConfig(probability)));
 		}
 	}
 
 	@Override
 	protected void addCaveFeatures()
 	{
-		CaveFeatures.VEIN.ifPresent(o -> addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
-			o.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG))));
+		addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
+			CaveFeatures.VEIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
 	}
 
 	@Override

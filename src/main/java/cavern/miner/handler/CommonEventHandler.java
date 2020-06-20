@@ -53,16 +53,9 @@ public class CommonEventHandler
 		BlockPos pos = event.getPos();
 		BlockState state = world.getBlockState(pos);
 
-		for (RegistryObject<CavernPortalBlock> entry : CaveBlocks.CAVE_PORTALS)
+		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			CavernPortalBlock portal = entry.orElse(null);
-
-			if (portal == null)
-			{
-				continue;
-			}
-
-			if (!portal.getTriggerItems().contains(stack) || !portal.getFrameBlocks().contains(state))
+			if (!portal.get().getTriggerItems().contains(stack) || !portal.get().getFrameBlocks().contains(state))
 			{
 				continue;
 			}
@@ -71,7 +64,7 @@ public class CommonEventHandler
 			Direction face = ObjectUtils.defaultIfNull(event.getFace(), Direction.UP);
 			Hand hand = event.getHand();
 
-			if (portal.asItem().onItemUse(new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos))).isSuccess())
+			if (portal.get().asItem().onItemUse(new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos))).isSuccess())
 			{
 				event.setCancellationResult(ActionResultType.SUCCESS);
 				event.setCanceled(true);

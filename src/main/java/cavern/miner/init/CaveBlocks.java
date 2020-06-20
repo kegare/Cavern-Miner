@@ -7,7 +7,6 @@ import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.block.CrackedStoneBlock;
 import cavern.miner.block.HugeCavernPortalBlock;
 import cavern.miner.block.RandomiteOreBlock;
-import cavern.miner.item.CavernPortalItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.OreBlock;
 import net.minecraft.block.SoundType;
@@ -15,8 +14,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -52,35 +49,17 @@ public final class CaveBlocks
 		return Block.Properties.create(Material.ROCK).hardnessAndResistance(3.0F, 3.0F);
 	}
 
-	private static BlockItem createBlockItem(Block block)
-	{
-		if (block instanceof CavernPortalBlock)
-		{
-			return new CavernPortalItem((CavernPortalBlock)block, new Item.Properties().maxStackSize(1));
-		}
-
-		return new BlockItem(block, CaveItems.createProperties());
-	}
-
-	public static void registerBlockItems(final DeferredRegister<Item> registry)
-	{
-		for (RegistryObject<Block> block : REGISTRY.getEntries())
-		{
-			block.ifPresent(o -> registry.register(block.getId().getPath(), () -> createBlockItem(o)));
-		}
-	}
-
 	@OnlyIn(Dist.CLIENT)
 	public static void registerRenderType()
 	{
 		for (RegistryObject<CavernPortalBlock> portal : CAVE_PORTALS)
 		{
-			portal.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getTranslucent()));
+			RenderTypeLookup.setRenderLayer(portal.get(), RenderType.getTranslucent());
 		}
 
-		MAGNITE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
-		AQUAMARINE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
-		RANDOMITE_ORE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
-		CRACKED_STONE.ifPresent(o -> RenderTypeLookup.setRenderLayer(o, RenderType.getCutoutMipped()));
+		RenderTypeLookup.setRenderLayer(MAGNITE_ORE.get(), RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(AQUAMARINE_ORE.get(), RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(RANDOMITE_ORE.get(), RenderType.getCutoutMipped());
+		RenderTypeLookup.setRenderLayer(CRACKED_STONE.get(), RenderType.getCutoutMipped());
 	}
 }

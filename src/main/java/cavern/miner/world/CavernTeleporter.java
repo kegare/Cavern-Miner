@@ -74,13 +74,15 @@ public class CavernTeleporter implements ITeleporter
 			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false);
 		}
 
+		boolean toCave = destWorld.getDimension() instanceof CavernDimension;
+		boolean isPlayer = newEntity instanceof ServerPlayerEntity;
 		boolean loading = false;
 
 		if (!placed)
 		{
-			if (newEntity instanceof ServerPlayerEntity && destWorld.getDimension() instanceof CavernDimension)
+			if (toCave && isPlayer)
 			{
-				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(0));
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(LoadingScreenMessage.Stage.LOAD));
 
 				loading = true;
 			}
@@ -93,9 +95,9 @@ public class CavernTeleporter implements ITeleporter
 			}
 		}
 
-		if (loading)
+		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
 		{
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(1));
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(LoadingScreenMessage.Stage.DONE));
 		}
 
 		return newEntity;

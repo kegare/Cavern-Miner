@@ -93,7 +93,6 @@ public class TowerDungeonMobConfig extends AbstractEntryConfig
 		list.add(new DungeonHooks.DungeonMob(50, EntityType.CAVE_SPIDER));
 		list.add(new DungeonHooks.DungeonMob(20, EntityType.CREEPER));
 		list.add(new DungeonHooks.DungeonMob(20, EntityType.ENDERMAN));
-
-		CaveEntities.CAVENIC_SKELETON.ifPresent(o -> list.add(new DungeonHooks.DungeonMob(20, o)));
+		list.add(new DungeonHooks.DungeonMob(20, CaveEntities.CAVENIC_SKELETON.get()));
 	}
 }
