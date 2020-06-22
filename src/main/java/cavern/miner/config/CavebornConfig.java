@@ -65,6 +65,7 @@ public class CavebornConfig extends AbstractEntryConfig
 		items.clear();
 		items.add(new ItemStack(Items.TORCH, 64));
 		items.add(new ItemStack(Items.BREAD, 32));
+		items.add(new ItemStack(Items.STICK, 16));
 		items.add(Items.STONE_SWORD);
 		items.add(Items.STONE_PICKAXE);
 		items.add(Items.STONE_AXE);

@@ -1,14 +1,13 @@
 package cavern.miner.handler;
 
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.Sets;
 
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
-import net.minecraft.block.Blocks;
+import cavern.miner.world.CavebornTeleporter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ItemEntity;
@@ -27,7 +26,7 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = "cavern")
 public class CavebornEventHandler
 {
-	private static final Set<String> FIRST_PLAYERS = Sets.newHashSet();
+	private static final Set<String> FIRST_PLAYERS = new HashSet<>();
 
 	@SubscribeEvent
 	public static void onPlayerLoading(final PlayerEvent.LoadFromFile event)
@@ -88,28 +87,18 @@ public class CavebornEventHandler
 
 		player.timeUntilPortal = 200;
 
-		Entity teleported = portal.createTeleporter(world, pos, player, null).placeEntity(player, world, world, player.rotationYaw, o -> player);
+		Entity teleported = new CavebornTeleporter().placeEntity(player, world, world, player.rotationYaw, o -> player);
 
 		pos = teleported.getPosition();
-
-		int x = pos.getX();
-		int y = pos.getY();
-		int z = pos.getZ();
-
-		for (BlockPos aroundPos : BlockPos.getAllInBoxMutable(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1))
-		{
-			if (world.getBlockState(aroundPos).getBlock() == portal)
-			{
-				world.setBlockState(aroundPos, Blocks.AIR.getDefaultState());
-
-				break;
-			}
-		}
 
 		if (teleported instanceof PlayerEntity)
 		{
 			((PlayerEntity)teleported).setSpawnPoint(pos, true, false, dim);
 		}
+
+		int x = pos.getX();
+		int y = pos.getY();
+		int z = pos.getZ();
 
 		for (ItemStack stack : GeneralConfig.INSTANCE.cavebornItems.getItems().getCachedList())
 		{
