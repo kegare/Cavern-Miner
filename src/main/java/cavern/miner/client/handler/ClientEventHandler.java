@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ClientEventHandler
 {
 	@SubscribeEvent
-	public static void onOpenGui(GuiOpenEvent event)
+	public static void onOpenGui(final GuiOpenEvent event)
 	{
 		Minecraft mc = Minecraft.getInstance();
 

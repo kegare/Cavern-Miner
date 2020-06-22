@@ -2,7 +2,6 @@ package cavern.miner.config;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.Collection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,16 +24,15 @@ public class OreEntryConfig extends AbstractEntryConfig
 		super(new File(CavernModConfig.getConfigDir(), "ore_entries.json"));
 	}
 
-	public boolean setEntries(Collection<OreRegistry.OreEntry> collection)
-	{
-		entries.clear();
-
-		return entries.addAll(collection);
-	}
-
 	public NonNullList<OreRegistry.OreEntry> getEntries()
 	{
 		return entries;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return entries.isEmpty();
 	}
 
 	@Override
@@ -90,8 +88,31 @@ public class OreEntryConfig extends AbstractEntryConfig
 		}
 	}
 
-	public void registerEntries()
+	@Override
+	public void setToDefault()
 	{
+		entries.clear();
+
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_COAL, VeinProvider.Rarity.COMMON, 1));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_IRON, VeinProvider.Rarity.COMMON, 1));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_GOLD, VeinProvider.Rarity.RARE, 2));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_REDSTONE, VeinProvider.Rarity.UNCOMMON, 2));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_LAPIS, VeinProvider.Rarity.RARE, 2));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_EMERALD, VeinProvider.Rarity.EMERALD, 3));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_DIAMOND, VeinProvider.Rarity.DIAMOND, 5));
+
+		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_MAGNITE, VeinProvider.Rarity.COMMON, 1));
+		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_AQUAMARINE, VeinProvider.Rarity.AQUA, 2));
+		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_RANDOMITE, VeinProvider.Rarity.RANDOMITE, 2));
+
+		entries.add(new OreRegistry.BlockEntry(CaveBlocks.CRACKED_STONE.get(), VeinProvider.Rarity.RANDOMITE, 2));
+	}
+
+	@Override
+	public void load()
+	{
+		super.load();
+
 		OreRegistry.clear();
 
 		for (OreRegistry.OreEntry entry : entries)
@@ -111,24 +132,5 @@ public class OreEntryConfig extends AbstractEntryConfig
 				OreRegistry.registerTag((OreRegistry.TagEntry)entry);
 			}
 		}
-	}
-
-	public void setDefault()
-	{
-		entries.clear();
-
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_COAL, VeinProvider.Rarity.COMMON, 1));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_IRON, VeinProvider.Rarity.COMMON, 1));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_GOLD, VeinProvider.Rarity.RARE, 2));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_REDSTONE, VeinProvider.Rarity.UNCOMMON, 2));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_LAPIS, VeinProvider.Rarity.RARE, 2));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_EMERALD, VeinProvider.Rarity.EMERALD, 3));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_DIAMOND, VeinProvider.Rarity.DIAMOND, 5));
-
-		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_MAGNITE, VeinProvider.Rarity.COMMON, 1));
-		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_AQUAMARINE, VeinProvider.Rarity.AQUA, 2));
-		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_RANDOMITE, VeinProvider.Rarity.RANDOMITE, 2));
-
-		entries.add(new OreRegistry.BlockEntry(CaveBlocks.CRACKED_STONE.get(), VeinProvider.Rarity.RANDOMITE, 2));
 	}
 }

@@ -30,6 +30,12 @@ public class TowerDungeonMobConfig extends AbstractEntryConfig
 	}
 
 	@Override
+	public boolean isEmpty()
+	{
+		return config.getSpawns().isEmpty();
+	}
+
+	@Override
 	public String toJson() throws JsonParseException
 	{
 		if (config.getSpawns().isEmpty())
@@ -82,7 +88,8 @@ public class TowerDungeonMobConfig extends AbstractEntryConfig
 		}
 	}
 
-	public void setDefault()
+	@Override
+	public void setToDefault()
 	{
 		List<DungeonHooks.DungeonMob> list = config.getSpawns();
 

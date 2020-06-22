@@ -1,5 +1,7 @@
 package cavern.miner.command;
 
+import java.util.Arrays;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -14,6 +16,7 @@ import cavern.miner.config.GeneralConfig;
 import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveDimensions;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.MinerRank;
 import cavern.miner.storage.MinerRank.RankEntry;
@@ -22,15 +25,27 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.dimension.DimensionType;
 
 public final class CavernCommand
 {
+	private static final SimpleCommandExceptionType INVALID_DIMENSION = new SimpleCommandExceptionType(new LiteralMessage("Invalid dimension"));
 	private static final SimpleCommandExceptionType INVALID_MINER = new SimpleCommandExceptionType(new LiteralMessage("Invalid miner"));
 
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
-		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerReload()).then(registerMiner()).then(registerRecord()));
+		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerRegenerate()).then(registerReload()).then(registerMiner()).then(registerRecord()));
+	}
+
+	private static ArgumentBuilder<CommandSource, ?> registerRegenerate()
+	{
+		return Commands.literal("regenerate").requires(o -> o.getServer().isSinglePlayer() || o.hasPermissionLevel(4))
+			.then(Commands.argument("name", StringArgumentType.string())
+				.suggests((ctx, builder) -> ISuggestionProvider.suggest(Arrays.asList("CAVERN", "HUGE_CAVERN"), builder))
+				.executes(ctx -> execute(ctx, CavernCommand::regenerateDimension))
+			);
 	}
 
 	private static ArgumentBuilder<CommandSource, ?> registerReload()
@@ -69,7 +84,36 @@ public final class CavernCommand
 		return command.run(context);
 	}
 
-	private static void reloadConfig(CommandContext<CommandSource> context)
+	private static void regenerateDimension(CommandContext<CommandSource> context) throws CommandSyntaxException
+	{
+		String name = StringArgumentType.getString(context, "name").toUpperCase();
+		DimensionType dim = null;
+
+		if (name.equals("CAVERN"))
+		{
+			dim = CaveDimensions.CAVERN_TYPE;
+		}
+		else if (name.equals("HUGE_CAVERN"))
+		{
+			dim = CaveDimensions.HUGE_CAVERN_TYPE;
+		}
+
+		if (dim == null)
+		{
+			throw INVALID_DIMENSION.create();
+		}
+
+		MinecraftServer server = context.getSource().getServer();
+
+		if (!DimensionRegeneration.regenerate(server, dim))
+		{
+			throw INVALID_DIMENSION.create();
+		}
+
+		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.regenerate").appendText(" : " + name), true);
+	}
+
+	private static void reloadConfig(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
 		GeneralConfig.INSTANCE.load();
 		CavernConfig.INSTANCE.load();

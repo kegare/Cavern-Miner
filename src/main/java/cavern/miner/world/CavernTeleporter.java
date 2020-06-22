@@ -58,7 +58,8 @@ public class CavernTeleporter implements ITeleporter
 	@Override
 	public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
 	{
-		Entity newEntity = repositionEntity.apply(false);
+		final Entity newEntity = repositionEntity.apply(false);
+
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
 		boolean placed = false;
 
@@ -67,11 +68,11 @@ public class CavernTeleporter implements ITeleporter
 			placed = newEntity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false);
 		}
 
-		BlockPos pos = newEntity.getPosition();
+		final BlockPos originPos = newEntity.getPosition();
 
 		if (!placed)
 		{
-			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, pos, o)).orElse(false);
+			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, originPos, o)).orElse(false);
 		}
 
 		boolean toCave = destWorld.getDimension() instanceof CavernDimension;
@@ -87,11 +88,16 @@ public class CavernTeleporter implements ITeleporter
 				loading = true;
 			}
 
-			placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
+			placed = placeInPortal(destWorld, newEntity, yaw, radius, originPos);
 
 			if (!placed)
 			{
-				placed = placeInPortal(destWorld, newEntity, yaw, radius, makePortal(destWorld, newEntity, radius));
+				BlockPos pos = makePortal(destWorld, newEntity, radius);
+
+				if (pos != null)
+				{
+					placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
+				}
 			}
 		}
 
@@ -218,7 +224,7 @@ public class CavernTeleporter implements ITeleporter
 			teleportDirection = Direction.NORTH;
 		}
 
-		BlockPattern.PatternHelper pattern = CavernPortalBlock.createPatternHelper(portalBlock, world, portalPos);
+		BlockPattern.PatternHelper pattern = portalBlock.createPatternHelper(world, portalPos);
 		BlockPattern.PortalInfo portalInfo = pattern.getPortalInfo(teleportDirection, portalPos, portalVec.y, entity.getMotion(), portalVec.x);
 
 		if (portalInfo == null)

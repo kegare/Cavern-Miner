@@ -16,7 +16,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class CaveEntities
 {
-	public static final DeferredRegister<EntityType<?>> REGISTRY = new DeferredRegister<>(ForgeRegistries.ENTITIES, "cavern");
+	public static final DeferredRegister<EntityType<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.ENTITIES, "cavern");
 
 	public static final RegistryObject<EntityType<CavenicSkeletonEntity>> CAVENIC_SKELETON = REGISTRY.register("cavenic_skeleton",
 		() -> EntityType.Builder.create(CavenicSkeletonEntity::new, EntityClassification.MONSTER).immuneToFire().size(0.6F, 2.2F).build("cavern:cavenic_skeleton"));

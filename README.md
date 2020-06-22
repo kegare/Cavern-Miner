@@ -3,7 +3,7 @@ Minecraft mod. Adds new cave dimensions!
 
 ----
 ## Requires
-* [Minecraft Forge](http://files.minecraftforge.net/) 31.2.8
+* [Minecraft Forge](http://files.minecraftforge.net/) 31.2.21
 
 ----
 ## License

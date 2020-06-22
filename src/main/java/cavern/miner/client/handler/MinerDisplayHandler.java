@@ -86,7 +86,7 @@ public class MinerDisplayHandler
 	}
 
 	@SubscribeEvent
-	public static void renderOverlay(RenderGameOverlayEvent.Post event)
+	public static void renderOverlay(final RenderGameOverlayEvent.Post event)
 	{
 		if (event.getType() != ElementType.HOTBAR)
 		{

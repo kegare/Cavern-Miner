@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public final class CaveBiomes
 {
-	public static final DeferredRegister<Biome> REGISTRY = new DeferredRegister<>(ForgeRegistries.BIOMES, "cavern");
+	public static final DeferredRegister<Biome> REGISTRY = DeferredRegister.create(ForgeRegistries.BIOMES, "cavern");
 
 	public static final RegistryObject<CavernBiome> CAVERN = REGISTRY.register("cavern", CavernBiome::new);
 	public static final RegistryObject<CavernBiome> HUGE_CAVERN = REGISTRY.register("huge_cavern", HugeCavernBiome::new);

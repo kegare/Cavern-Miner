@@ -7,9 +7,8 @@ import javax.annotation.Nullable;
 
 import cavern.miner.CavernMod;
 import cavern.miner.block.CavernPortalBlock;
-import cavern.miner.world.dimension.CavernDimension;
-import cavern.miner.world.dimension.HugeCavernDimension;
-import net.minecraft.world.dimension.Dimension;
+import cavern.miner.world.biome.CavernModDimension;
+import cavern.miner.world.biome.HugeCavernModDimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
@@ -23,10 +22,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 @Mod.EventBusSubscriber(modid = "cavern")
 public final class CaveDimensions
 {
-	public static final DeferredRegister<ModDimension> REGISTRY = new DeferredRegister<>(ForgeRegistries.MOD_DIMENSIONS, "cavern");
+	public static final DeferredRegister<ModDimension> REGISTRY = DeferredRegister.create(ForgeRegistries.MOD_DIMENSIONS, "cavern");
 
-	public static final RegistryObject<ModDimension> CAVERN = REGISTRY.register("cavern", () -> ModDimension.withFactory(CavernDimension::new));
-	public static final RegistryObject<ModDimension> HUGE_CAVERN = REGISTRY.register("huge_cavern", () -> ModDimension.withFactory(HugeCavernDimension::new));
+	public static final RegistryObject<ModDimension> CAVERN = REGISTRY.register("cavern", () -> new CavernModDimension());
+	public static final RegistryObject<ModDimension> HUGE_CAVERN = REGISTRY.register("huge_cavern", () -> new HugeCavernModDimension());
 
 	public static final DimensionType CAVERN_TYPE = null;
 	public static final DimensionType HUGE_CAVERN_TYPE = null;
@@ -75,11 +74,11 @@ public final class CaveDimensions
 	}
 
 	@Nullable
-	public static CavernPortalBlock getPortalBlock(Dimension dimension)
+	public static CavernPortalBlock getPortalBlock(DimensionType dimension)
 	{
 		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			if (portal.get().getDimension() == dimension.getType())
+			if (portal.get().getDimension() == dimension)
 			{
 				return portal.get();
 			}

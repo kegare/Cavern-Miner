@@ -2,7 +2,6 @@ package cavern.miner.config.dimension;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.Collection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,23 +39,9 @@ public class VeinConfig extends AbstractEntryConfig
 		super(new File(dir, name + "_veins.json"));
 	}
 
-	public boolean setVeins(Collection<Vein> entries)
-	{
-		veins.clear();
-
-		return veins.addAll(entries);
-	}
-
 	public NonNullList<Vein> getVeins()
 	{
 		return veins;
-	}
-
-	public boolean setWhitelist(BlockStateTagList entries)
-	{
-		whitelist.clear();
-
-		return whitelist.addEntries(entries.getEntryList()) && whitelist.addTags(entries.getTagList());
 	}
 
 	public BlockStateTagList getWhitelist()
@@ -64,16 +49,21 @@ public class VeinConfig extends AbstractEntryConfig
 		return whitelist;
 	}
 
-	public boolean setBlacklist(BlockStateTagList entries)
-	{
-		blacklist.clear();
-
-		return blacklist.addEntries(entries.getEntryList()) && blacklist.addTags(entries.getTagList());
-	}
-
 	public BlockStateTagList getBlacklist()
 	{
 		return blacklist;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return veins.isEmpty() || whitelist.isEmpty() || blacklist.isEmpty();
+	}
+
+	@Override
+	public boolean isAllowEmpty()
+	{
+		return true;
 	}
 
 	@Override
@@ -202,7 +192,8 @@ public class VeinConfig extends AbstractEntryConfig
 		}
 	}
 
-	public void setDefault()
+	@Override
+	public void setToDefault()
 	{
 		veins.clear();
 
@@ -217,7 +208,7 @@ public class VeinConfig extends AbstractEntryConfig
 	{
 		VeinConfig config = new VeinConfig(CavernModConfig.getConfigDir(), "example");
 
-		config.setDefault();
+		config.setToDefault();
 
 		config.getVeins().add(new Vein(Blocks.COAL_ORE.getDefaultState(), new Vein.Properties().count(20).size(10)));
 		config.getVeins().add(new Vein(Blocks.SAND.getDefaultState(), new Vein.Properties().target(Blocks.DIRT.getDefaultState()).count(30).size(15).min(30)));

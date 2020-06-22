@@ -12,6 +12,7 @@ import cavern.miner.config.json.BlockStateTagListSerializer;
 import cavern.miner.config.json.ItemStackTagListSerializer;
 import cavern.miner.util.BlockStateTagList;
 import cavern.miner.util.ItemStackTagList;
+import net.minecraft.block.Blocks;
 
 public class PortalConfig extends AbstractEntryConfig
 {
@@ -23,28 +24,20 @@ public class PortalConfig extends AbstractEntryConfig
 		super(new File(dir, "portal.json"));
 	}
 
-	public boolean setTriggerItems(ItemStackTagList entries)
-	{
-		triggerItems.clear();
-
-		return triggerItems.addEntries(entries.getEntryList()) && triggerItems.addTags(entries.getTagList());
-	}
-
 	public ItemStackTagList getTriggerItems()
 	{
 		return triggerItems;
 	}
 
-	public boolean setFrameBlocks(BlockStateTagList entries)
-	{
-		frameBlocks.clear();
-
-		return frameBlocks.addEntries(entries.getEntryList()) && frameBlocks.addTags(entries.getTagList());
-	}
-
 	public BlockStateTagList getFrameBlocks()
 	{
 		return frameBlocks;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return triggerItems.isEmpty() || frameBlocks.isEmpty();
 	}
 
 	@Override
@@ -100,5 +93,12 @@ public class PortalConfig extends AbstractEntryConfig
 				frameBlocks.addTags(list.getTagList());
 			}
 		}
+	}
+
+	@Override
+	public void setToDefault()
+	{
+		getFrameBlocks().clear();
+		getFrameBlocks().add(Blocks.MOSSY_COBBLESTONE).add(Blocks.MOSSY_STONE_BRICKS);
 	}
 }

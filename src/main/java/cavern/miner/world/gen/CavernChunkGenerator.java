@@ -137,9 +137,9 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 	}
 
 	@Override
-	public void func_225550_a_(BiomeManager manager, IChunk chunk, GenerationStage.Carving carving)
+	public void generateCarvers(BiomeManager manager, IChunk chunk, GenerationStage.Carving carving)
 	{
-		super.func_225550_a_(manager, chunk, carving);
+		super.generateCarvers(manager, chunk, carving);
 
 		int ground = getGroundHeight();
 

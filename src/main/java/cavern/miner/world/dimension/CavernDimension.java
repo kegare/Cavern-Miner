@@ -14,6 +14,7 @@ import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
+import cavern.miner.world.biome.CavernModDimension;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;
@@ -34,6 +35,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProviderType;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -42,6 +44,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.IRenderHandler;
+import net.minecraftforge.common.ModDimension;
 
 public class CavernDimension extends Dimension
 {
@@ -139,7 +142,7 @@ public class CavernDimension extends Dimension
 			return BlockPos.ZERO;
 		}
 
-		CavernPortalBlock portal = CaveDimensions.getPortalBlock(this);
+		CavernPortalBlock portal = CaveDimensions.getPortalBlock(getType());
 
 		if (portal != null)
 		{
@@ -187,6 +190,24 @@ public class CavernDimension extends Dimension
 
 	@Override
 	public void updateWeather(Runnable defaultLogic) {}
+
+	@Override
+	public long getSeed()
+	{
+		ModDimension modDim = getType().getModType();
+
+		if (modDim != null && modDim instanceof CavernModDimension)
+		{
+			long seed = ((CavernModDimension)modDim).getSeed();
+
+			if (seed != 0L)
+			{
+				return seed;
+			}
+		}
+
+		return super.getSeed();
+	}
 
 	@Override
 	public boolean isSurfaceWorld()
@@ -268,6 +289,18 @@ public class CavernDimension extends Dimension
 		}
 
 		return SleepResult.DENY;
+	}
+
+	@Override
+	public boolean canDoLightning(Chunk chunk)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean canDoRainSnowIce(Chunk chunk)
+	{
+		return false;
 	}
 
 	@Override

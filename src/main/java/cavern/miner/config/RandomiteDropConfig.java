@@ -2,7 +2,6 @@ package cavern.miner.config;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.Collection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -22,16 +21,15 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		super(new File(CavernModConfig.getConfigDir(), "randomite_drops.json"));
 	}
 
-	public boolean setEntries(Collection<RandomiteDrop.DropEntry> collection)
-	{
-		entries.clear();
-
-		return entries.addAll(collection);
-	}
-
 	public NonNullList<RandomiteDrop.DropEntry> getEntries()
 	{
 		return entries;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return entries.isEmpty();
 	}
 
 	@Override
@@ -87,12 +85,8 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		}
 	}
 
-	public void registerEntries()
-	{
-		RandomiteDrop.set(entries);
-	}
-
-	public void setDefault()
+	@Override
+	public void setToDefault()
 	{
 		entries.clear();
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.INGOTS, 20, 1, 3));
@@ -107,5 +101,13 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.SEEDS, 20, 3, 5));
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.CROPS, 20, 3, 5));
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.DYES, 10, 2, 5));
+	}
+
+	@Override
+	public void load()
+	{
+		super.load();
+
+		RandomiteDrop.set(entries);
 	}
 }

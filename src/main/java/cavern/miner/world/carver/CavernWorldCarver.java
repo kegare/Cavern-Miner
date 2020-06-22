@@ -41,9 +41,9 @@ public class CavernWorldCarver extends CaveWorldCarver
 	}
 
 	@Override
-	protected boolean func_225556_a_(IChunk chunk, Function<BlockPos, Biome> biomes, BitSet carvingMask, Random rand, BlockPos.Mutable posHere, BlockPos.Mutable posAbove, BlockPos.Mutable posBelow, int seaLevel, int chunkX, int chunkZ, int globalX, int globalZ, int x, int y, int z, AtomicBoolean foundSurface)
+	protected boolean carveBlock(IChunk chunk, Function<BlockPos, Biome> biomePos, BitSet carvingMask, Random rand, BlockPos.Mutable posHere, BlockPos.Mutable posAbove, BlockPos.Mutable posBelow, int seaLevel, int chunkX, int chunkZ, int x, int z, int relativeX, int y, int relativeZ, AtomicBoolean foundSurface)
 	{
-		int i = x | z << 4 | y << 8;
+		int i = relativeX | relativeZ << 4 | y << 8;
 
 		if (carvingMask.get(i))
 		{
@@ -52,7 +52,7 @@ public class CavernWorldCarver extends CaveWorldCarver
 		else
 		{
 			carvingMask.set(i);
-			posHere.setPos(globalX, y, globalZ);
+			posHere.setPos(x, y, z);
 
 			BlockState stateHere = chunk.getBlockState(posHere);
 			BlockState stateAbove = chunk.getBlockState(posAbove.setPos(posHere).move(Direction.UP));

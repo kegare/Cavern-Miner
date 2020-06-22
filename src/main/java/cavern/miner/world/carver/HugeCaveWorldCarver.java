@@ -15,6 +15,12 @@ public class HugeCaveWorldCarver extends CavernWorldCarver
 	}
 
 	@Override
+	public int func_222704_c()
+	{
+		return 1;
+	}
+
+	@Override
 	protected int func_222724_a()
 	{
 		return 5;
