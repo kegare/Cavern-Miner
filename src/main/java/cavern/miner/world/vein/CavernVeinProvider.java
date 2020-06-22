@@ -1,5 +1,7 @@
 package cavern.miner.world.vein;
 
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
 
 import cavern.miner.config.dimension.CavernConfig;
@@ -23,5 +25,11 @@ public class CavernVeinProvider extends VeinProvider
 	public BlockStateTagList getBlacklist()
 	{
 		return CavernConfig.INSTANCE.veins.getBlacklist();
+	}
+
+	@Override
+	public List<String> getBlacklistMods()
+	{
+		return CavernConfig.INSTANCE.veins.getBlacklistMods();
 	}
 }

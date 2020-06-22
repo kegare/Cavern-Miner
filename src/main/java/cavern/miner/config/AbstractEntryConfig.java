@@ -79,7 +79,7 @@ public abstract class AbstractEntryConfig
 				return true;
 			}
 		}
-		catch (IOException e)
+		catch (IOException | JsonParseException e)
 		{
 			CavernMod.LOG.error("Failed to load {}", file.getName(), e);
 		}
@@ -114,7 +114,7 @@ public abstract class AbstractEntryConfig
 				return true;
 			}
 		}
-		catch (IOException e)
+		catch (IOException | JsonParseException e)
 		{
 			CavernMod.LOG.error("Failed to save {}", file.getName(), e);
 		}

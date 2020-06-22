@@ -48,6 +48,12 @@ public class VeinProvider
 		return null;
 	}
 
+	@Nullable
+	public List<String> getBlacklistMods()
+	{
+		return null;
+	}
+
 	protected Rarity getOreRarity(BlockState state)
 	{
 		Rarity rarity = OreRegistry.getEntry(state).getRarity().orElse(null);
@@ -184,6 +190,11 @@ public class VeinProvider
 			}
 
 			Block block = state.getBlock();
+
+			if (getBlacklistMods() != null && getBlacklistMods().contains(block.getRegistryName().getNamespace()))
+			{
+				continue;
+			}
 
 			if (block.isIn(Tags.Blocks.ORES) || block instanceof OreBlock || block instanceof RedstoneOreBlock)
 			{
