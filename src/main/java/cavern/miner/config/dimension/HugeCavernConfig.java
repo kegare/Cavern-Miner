@@ -1,8 +1,10 @@
 package cavern.miner.config.dimension;
 
 import java.io.File;
+import java.util.Arrays;
 
 import cavern.miner.config.CavernModConfig;
+import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.spawner.WorldSpawnerType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.Tags;
@@ -37,7 +39,7 @@ public class HugeCavernConfig
 	};
 
 	public final VeinConfig veins = new VeinConfig(getConfigDir());
-	public final NaturalSpawnConfig naturalSpawns = new NaturalSpawnConfig(getConfigDir());
+	public final NaturalSpawnConfig naturalSpawns = new NaturalSpawnConfig(getConfigDir(), () -> Arrays.asList(CaveBiomes.HUGE_CAVERN.get()));
 
 	public HugeCavernConfig(final ForgeConfigSpec.Builder builder)
 	{
