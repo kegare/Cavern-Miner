@@ -10,6 +10,6 @@ public interface CommandConsumer<T>
 	{
 		accept(t);
 
-		return 0;
+		return 1;
 	}
 }
