@@ -26,23 +26,23 @@ public class CavernCanyonWorldCarver extends CanyonWorldCarver
 	}
 
 	@Override
-	public boolean func_225555_a_(IChunk chunk, Function<BlockPos, Biome> biomes, Random rand, int seaLevel, int chunkX, int chunkZ, int globalX, int globalZ, BitSet carvingMask, ProbabilityConfig config)
+	public boolean carveRegion(IChunk chunk, Function<BlockPos, Biome> biomePos, Random rand, int seaLevel, int chunkXOffset, int chunkZOffset, int chunkX, int chunkZ, BitSet carvingMask, ProbabilityConfig config)
 	{
 		int i = (func_222704_c() * 2 - 1) * 16;
-		double blockX = chunkX * 16 + rand.nextInt(16);
+		double blockX = chunkXOffset * 16 + rand.nextInt(16);
 		double blockY = rand.nextInt(rand.nextInt(rand.nextInt(80) + 8) + 70);
-		double blockZ = chunkZ * 16 + rand.nextInt(16);
+		double blockZ = chunkZOffset * 16 + rand.nextInt(16);
 		float leftRightRadian = rand.nextFloat() * ((float)Math.PI * 2.0F);
 		float upDownRadian = (rand.nextFloat() - 0.5F) * 2.0F / 8.0F;
 		float scale = (rand.nextFloat() * 2.0F + rand.nextFloat()) * 2.0F;
 		int targetY = i - rand.nextInt(i / 4);
 
-		genCanyon(chunk, biomes, rand.nextLong(), seaLevel, globalX, globalZ, blockX, blockY, blockZ, scale, leftRightRadian, upDownRadian, 0, targetY, 9.0D, carvingMask);
+		carveCanyon(chunk, biomePos, rand.nextLong(), seaLevel, chunkX, chunkZ, blockX, blockY, blockZ, scale, leftRightRadian, upDownRadian, 0, targetY, 9.0D, carvingMask);
 
 		return true;
 	}
 
-	protected void genCanyon(IChunk chunk, Function<BlockPos, Biome> biomes, long seed, int seaLevel, int globalX, int globalZ, double blockX, double blockY, double blockZ, float scale, float leftRightRadian, float upDownRadian, int startY, int targetY, double scaleHeight, BitSet carvingMask)
+	protected void carveCanyon(IChunk chunk, Function<BlockPos, Biome> biomePos, long seed, int seaLevel, int globalX, int globalZ, double blockX, double blockY, double blockZ, float scale, float leftRightRadian, float upDownRadian, int startY, int targetY, double scaleHeight, BitSet carvingMask)
 	{
 		Random random = new Random(seed);
 		float f = 1.0F;
@@ -86,15 +86,15 @@ public class CavernCanyonWorldCarver extends CanyonWorldCarver
 					return;
 				}
 
-				func_227208_a_(chunk, biomes, seed, seaLevel, globalX, globalZ, blockX, blockY, blockZ, roomWidth, roomHeight, carvingMask);
+				func_227208_a_(chunk, biomePos, seed, seaLevel, globalX, globalZ, blockX, blockY, blockZ, roomWidth, roomHeight, carvingMask);
 			}
 		}
 	}
 
 	@Override
-	protected boolean func_225556_a_(IChunk chunk, Function<BlockPos, Biome> biomes, BitSet carvingMask, Random rand, BlockPos.Mutable posHere, BlockPos.Mutable posAbove, BlockPos.Mutable posBelow, int seaLevel, int chunkX, int chunkZ, int globalX, int globalZ, int x, int y, int z, AtomicBoolean foundSurface)
+	protected boolean carveBlock(IChunk chunk, Function<BlockPos, Biome> biomePos, BitSet carvingMask, Random rand, BlockPos.Mutable posHere, BlockPos.Mutable posAbove, BlockPos.Mutable posBelow, int seaLevel, int chunkX, int chunkZ, int x, int z, int relativeX, int y, int relativeZ, AtomicBoolean foundSurface)
 	{
-		int i = x | z << 4 | y << 8;
+		int i = relativeX | relativeZ << 4 | y << 8;
 
 		if (carvingMask.get(i))
 		{
@@ -103,7 +103,7 @@ public class CavernCanyonWorldCarver extends CanyonWorldCarver
 		else
 		{
 			carvingMask.set(i);
-			posHere.setPos(globalX, y, globalZ);
+			posHere.setPos(x, y, z);
 
 			BlockState stateHere = chunk.getBlockState(posHere);
 			BlockState stateAbove = chunk.getBlockState(posAbove.setPos(posHere).move(Direction.UP));

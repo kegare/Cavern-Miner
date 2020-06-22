@@ -15,7 +15,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class CaveFeatures
 {
-	public static final DeferredRegister<Feature<?>> REGISTRY = new DeferredRegister<>(ForgeRegistries.FEATURES, "cavern");
+	public static final DeferredRegister<Feature<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.FEATURES, "cavern");
 
 	public static final RegistryObject<VeinFeature> VEIN = REGISTRY.register("vein", () -> new VeinFeature(NoFeatureConfig::deserialize));
 	public static final RegistryObject<TowerDungeonFeature> TOWER_DUNGEON = REGISTRY.register("tower_dungeon", () -> new TowerDungeonFeature(DungeonMobConfig::deserialize));

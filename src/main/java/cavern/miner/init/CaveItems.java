@@ -20,7 +20,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public final class CaveItems
 {
-	public static final DeferredRegister<Item> REGISTRY = new DeferredRegister<>(ForgeRegistries.ITEMS, "cavern");
+	public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, "cavern");
 
 	public static final RegistryObject<CavernPortalItem> CAVERN_PORTAL = REGISTRY.register("cavern_portal", () -> createPortalItem(CaveBlocks.CAVERN_PORTAL.get()));
 	public static final RegistryObject<CavernPortalItem> HUGE_CAVERN_PORTAL = REGISTRY.register("huge_cavern_portal", () -> createPortalItem(CaveBlocks.HUGE_CAVERN_PORTAL.get()));

@@ -23,7 +23,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public final class CaveBlocks
 {
-	public static final DeferredRegister<Block> REGISTRY = new DeferredRegister<>(ForgeRegistries.BLOCKS, "cavern");
+	public static final DeferredRegister<Block> REGISTRY = DeferredRegister.create(ForgeRegistries.BLOCKS, "cavern");
 
 	public static final RegistryObject<CavernPortalBlock> CAVERN_PORTAL = REGISTRY.register("cavern_portal", () -> new CavernPortalBlock(createPortalProperties()));
 	public static final RegistryObject<CavernPortalBlock> HUGE_CAVERN_PORTAL = REGISTRY.register("huge_cavern_portal", () -> new HugeCavernPortalBlock(createPortalProperties()));

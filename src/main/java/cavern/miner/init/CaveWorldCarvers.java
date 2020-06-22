@@ -13,7 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public final class CaveWorldCarvers
 {
-	public static final DeferredRegister<WorldCarver<?>> REGISTRY = new DeferredRegister<>(ForgeRegistries.WORLD_CARVERS, "cavern");
+	public static final DeferredRegister<WorldCarver<?>> REGISTRY = DeferredRegister.create(ForgeRegistries.WORLD_CARVERS, "cavern");
 
 	public static final RegistryObject<WorldCarver<ProbabilityConfig>> CAVERN = REGISTRY.register("cavern", () -> new CavernWorldCarver(ProbabilityConfig::deserialize, 256));
 	public static final RegistryObject<WorldCarver<ProbabilityConfig>> CAVERN_CANYON = REGISTRY.register("cavern_canyon", () -> new CavernCanyonWorldCarver(ProbabilityConfig::deserialize));

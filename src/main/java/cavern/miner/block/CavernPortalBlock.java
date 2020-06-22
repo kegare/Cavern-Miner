@@ -132,7 +132,7 @@ public class CavernPortalBlock extends Block
 	@Nullable
 	public Size isPortal(IWorld world, BlockPos pos)
 	{
-		Size sizeX = new Size(this, world, pos, Direction.Axis.X);
+		Size sizeX = new Size(world, pos, Direction.Axis.X);
 
 		if (sizeX.isValid() && sizeX.portalBlockCount == 0)
 		{
@@ -140,35 +140,26 @@ public class CavernPortalBlock extends Block
 		}
 		else
 		{
-			Size sizeZ = new Size(this, world, pos, Direction.Axis.Z);
+			Size sizeZ = new Size(world, pos, Direction.Axis.Z);
 
 			return sizeZ.isValid() && sizeZ.portalBlockCount == 0 ? sizeZ : null;
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public void neighborChanged(BlockState state, World world, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving)
+	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos)
 	{
-		Direction.Axis axis = state.get(AXIS);
+		Direction.Axis axis = facing.getAxis();
+		Direction.Axis stateAxis = state.get(AXIS);
+		boolean flag = stateAxis != axis && axis.isHorizontal();
 
-		if (axis == Direction.Axis.X)
+		if (!flag && facingState.getBlock() != this && !(new Size(worldIn, currentPos, stateAxis)).isAlreadyValid())
 		{
-			Size size = new Size(this, world, pos, Direction.Axis.X);
-
-			if (!size.isValid() || size.portalBlockCount < size.width * size.height)
-			{
-				world.setBlockState(pos, Blocks.AIR.getDefaultState());
-			}
+			return Blocks.AIR.getDefaultState();
 		}
-		else if (axis == Direction.Axis.Z)
-		{
-			Size size = new Size(this, world, pos, Direction.Axis.Z);
 
-			if (!size.isValid() || size.portalBlockCount < size.width * size.height)
-			{
-				world.setBlockState(pos, Blocks.AIR.getDefaultState());
-			}
-		}
+		return super.updatePostPlacement(state, facing, facingState, worldIn, currentPos, facingPos);
 	}
 
 	@Override
@@ -257,38 +248,48 @@ public class CavernPortalBlock extends Block
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));
 
-		BlockPos blockpos = pos;
+		BlockPos floorPos = pos;
 
-		while (world.getBlockState(blockpos).getBlock() == this)
+		while (world.getBlockState(floorPos).getBlock() == this)
 		{
-			blockpos = blockpos.down();
+			floorPos = floorPos.down();
 		}
 
-		BlockState frame = world.getBlockState(blockpos);
+		BlockState frame = world.getBlockState(floorPos);
 
 		if (!getFrameBlocks().contains(frame))
 		{
 			frame = getFrameBlocks().getCachedList().get(0);
 		}
 
-		BlockPattern.PatternHelper pattern = createPatternHelper(this, world, pos);
+		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)));
+	}
+
+	public CavernTeleporter createTeleporter(IWorld world, BlockPos pos, Entity entity, @Nullable BlockState frame)
+	{
+		if (frame == null || !getFrameBlocks().contains(frame))
+		{
+			frame = getFrameBlocks().getCachedList().get(0);
+		}
+
+		BlockPattern.PatternHelper pattern = createPatternHelper(world, pos);
 		double d0 = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
 		double d1 = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
 		double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
 
-		entity.changeDimension(destDim, new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(d1, d2, 0.0D), pattern.getForwards()));
+		return new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(d1, d2, 0.0D), pattern.getForwards());
 	}
 
-	public static BlockPattern.PatternHelper createPatternHelper(CavernPortalBlock portal, IWorld world, BlockPos pos)
+	public BlockPattern.PatternHelper createPatternHelper(IWorld world, BlockPos pos)
 	{
 		Direction.Axis axis = Direction.Axis.Z;
-		Size size = new Size(portal, world, pos, Direction.Axis.X);
+		Size size = new Size(world, pos, Direction.Axis.X);
 		LoadingCache<BlockPos, CachedBlockInfo> cache = BlockPattern.createLoadingCache(world, true);
 
 		if (!size.isValid())
 		{
 			axis = Direction.Axis.X;
-			size = new Size(portal, world, pos, Direction.Axis.Z);
+			size = new Size(world, pos, Direction.Axis.Z);
 		}
 
 		if (!size.isValid())
@@ -333,9 +334,8 @@ public class CavernPortalBlock extends Block
 		}
 	}
 
-	public static class Size
+	public class Size
 	{
-		private final CavernPortalBlock portalBlock;
 		private final IWorld world;
 		private final Direction.Axis axis;
 		private final Direction rightDir;
@@ -347,9 +347,8 @@ public class CavernPortalBlock extends Block
 		private int width;
 		private BlockState portalFrame;
 
-		public Size(CavernPortalBlock portal, IWorld world, BlockPos pos, Direction.Axis axis)
+		public Size(IWorld world, BlockPos pos, Direction.Axis axis)
 		{
-			this.portalBlock = portal;
 			this.world = world;
 			this.axis = axis;
 
@@ -429,7 +428,7 @@ public class CavernPortalBlock extends Block
 						break outside;
 					}
 
-					if (world.getBlockState(pos).getBlock() == portalBlock)
+					if (world.getBlockState(pos).getBlock() == CavernPortalBlock.this)
 					{
 						++portalBlockCount;
 					}
@@ -479,7 +478,7 @@ public class CavernPortalBlock extends Block
 		{
 			BlockState state = world.getBlockState(pos);
 
-			return state.isAir(world, pos) || state.getBlock() == portalBlock;
+			return state.isAir(world, pos) || state.getBlock() == CavernPortalBlock.this;
 		}
 
 		protected boolean isFrameBlock(BlockPos pos)
@@ -488,7 +487,7 @@ public class CavernPortalBlock extends Block
 
 			if (portalFrame == null)
 			{
-				if (portalBlock.getFrameBlocks().contains(state))
+				if (CavernPortalBlock.this.getFrameBlocks().contains(state))
 				{
 					portalFrame = state;
 				}
@@ -510,9 +509,19 @@ public class CavernPortalBlock extends Block
 
 				for (int j = 0; j < height; ++j)
 				{
-					world.setBlockState(pos.up(j), portalBlock.getDefaultState().with(AXIS, axis), 18);
+					world.setBlockState(pos.up(j), CavernPortalBlock.this.getDefaultState().with(AXIS, axis), 18);
 				}
 			}
+		}
+
+		public boolean isPortalAlreadyExisted()
+		{
+			return portalBlockCount >= width * height;
+		}
+
+		public boolean isAlreadyValid()
+		{
+			return isValid() && isPortalAlreadyExisted();
 		}
 	}
 }
