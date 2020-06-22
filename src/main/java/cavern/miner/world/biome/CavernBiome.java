@@ -32,6 +32,7 @@ public class CavernBiome extends Biome
 	{
 		addCarvers();
 		addCaveFeatures();
+		addSpawns();
 	}
 
 	protected void addCarvers()
@@ -99,5 +100,10 @@ public class CavernBiome extends Biome
 	{
 		DefaultBiomeFeatures.addLakes(this);
 		DefaultBiomeFeatures.addMonsterRooms(this);
+	}
+
+	protected void addSpawns()
+	{
+		CavernConfig.INSTANCE.naturalSpawns.setSpawns(this);
 	}
 }

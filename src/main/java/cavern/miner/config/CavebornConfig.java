@@ -32,6 +32,18 @@ public class CavebornConfig extends AbstractEntryConfig
 	}
 
 	@Override
+	public boolean isEmpty()
+	{
+		return items.isEmpty();
+	}
+
+	@Override
+	public boolean isAllowEmpty()
+	{
+		return true;
+	}
+
+	@Override
 	public String toJson() throws JsonParseException
 	{
 		if (items.isEmpty())
@@ -74,7 +86,8 @@ public class CavebornConfig extends AbstractEntryConfig
 		}
 	}
 
-	public void setDefault()
+	@Override
+	public void setToDefault()
 	{
 		items.clear();
 		items.add(new ItemStack(Items.TORCH, 64));

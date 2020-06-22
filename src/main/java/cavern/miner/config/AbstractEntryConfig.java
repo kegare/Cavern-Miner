@@ -45,6 +45,13 @@ public abstract class AbstractEntryConfig
 		return gson;
 	}
 
+	public abstract boolean isEmpty();
+
+	public boolean isAllowEmpty()
+	{
+		return false;
+	}
+
 	public boolean loadFromFile()
 	{
 		try
@@ -119,4 +126,15 @@ public abstract class AbstractEntryConfig
 	public abstract String toJson() throws JsonParseException;
 
 	public abstract void fromJson(Reader json) throws JsonParseException;
+
+	public void setToDefault() {}
+
+	public void load()
+	{
+		if (!loadFromFile() || (!isAllowEmpty() && isEmpty()))
+		{
+			setToDefault();
+			saveToFile();
+		}
+	}
 }

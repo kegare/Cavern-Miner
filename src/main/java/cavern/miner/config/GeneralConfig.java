@@ -45,40 +45,9 @@ public class GeneralConfig
 
 	public void load()
 	{
-		if (!cavebornItems.loadFromFile())
-		{
-			cavebornItems.setDefault();
-			cavebornItems.saveToFile();
-		}
-
-		oreEntries.loadFromFile();
-
-		if (oreEntries.getEntries().isEmpty())
-		{
-			oreEntries.setDefault();
-			oreEntries.saveToFile();
-		}
-
-		oreEntries.registerEntries();
-
-		minerRanks.loadFromFile();
-
-		if (minerRanks.getEntries().isEmpty())
-		{
-			minerRanks.setDefault();
-			minerRanks.saveToFile();
-		}
-
-		minerRanks.registerEntries();
-
-		randomiteDrops.loadFromFile();
-
-		if (randomiteDrops.getEntries().isEmpty())
-		{
-			randomiteDrops.setDefault();
-			randomiteDrops.saveToFile();
-		}
-
-		randomiteDrops.registerEntries();
+		cavebornItems.load();
+		oreEntries.load();
+		minerRanks.load();
+		randomiteDrops.load();
 	}
 }

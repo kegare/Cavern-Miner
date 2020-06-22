@@ -41,4 +41,10 @@ public class HugeCavernBiome extends CavernBiome
 	{
 		DefaultBiomeFeatures.addLakes(this);
 	}
+
+	@Override
+	protected void addSpawns()
+	{
+		HugeCavernConfig.INSTANCE.naturalSpawns.setSpawns(this);
+	}
 }

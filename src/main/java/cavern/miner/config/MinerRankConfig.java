@@ -2,7 +2,6 @@ package cavern.miner.config;
 
 import java.io.File;
 import java.io.Reader;
-import java.util.Collection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -24,16 +23,15 @@ public class MinerRankConfig extends AbstractEntryConfig
 		super(new File(CavernModConfig.getConfigDir(), "miner_ranks.json"));
 	}
 
-	public boolean setEntries(Collection<MinerRank.RankEntry> collection)
-	{
-		entries.clear();
-
-		return entries.addAll(collection);
-	}
-
 	public NonNullList<MinerRank.RankEntry> getEntries()
 	{
 		return entries;
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return entries.isEmpty();
 	}
 
 	@Override
@@ -86,12 +84,8 @@ public class MinerRankConfig extends AbstractEntryConfig
 		}
 	}
 
-	public void registerEntries()
-	{
-		MinerRank.set(entries);
-	}
-
-	public void setDefault()
+	@Override
+	public void setToDefault()
 	{
 		entries.clear();
 		entries.add(new MinerRank.RankEntry("STONE", 300, new ItemStack(Items.STONE_PICKAXE)));
@@ -100,5 +94,13 @@ public class MinerRankConfig extends AbstractEntryConfig
 		entries.add(new MinerRank.RankEntry("GOLD", 5000, new ItemStack(Items.GOLDEN_PICKAXE)));
 		entries.add(new MinerRank.RankEntry("AQUA", 10000, new ItemStack(CaveItems.AQUAMARINE_PICKAXE.get())));
 		entries.add(new MinerRank.RankEntry("DIAMOND", 50000, new ItemStack(Items.DIAMOND_PICKAXE)));
+	}
+
+	@Override
+	public void load()
+	{
+		super.load();
+
+		MinerRank.set(entries);
 	}
 }

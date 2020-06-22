@@ -3,9 +3,7 @@ package cavern.miner.config.dimension;
 import java.io.File;
 
 import cavern.miner.config.CavernModConfig;
-import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.spawner.WorldSpawnerType;
-import net.minecraft.block.Blocks;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.Tags;
 
@@ -31,7 +29,18 @@ public class CavernConfig
 	public final ForgeConfigSpec.IntValue maxCount;
 	public final ForgeConfigSpec.IntValue safeDistance;
 
-	public final PortalConfig portal = new PortalConfig(getConfigDir());
+	public final PortalConfig portal = new PortalConfig(getConfigDir())
+	{
+		@Override
+		public void setToDefault()
+		{
+			super.setToDefault();
+
+			getTriggerItems().clear();
+			getTriggerItems().add(Tags.Items.GEMS_EMERALD);
+		}
+	};
+
 	public final VeinConfig veins = new VeinConfig(getConfigDir());
 	public final NaturalSpawnConfig naturalSpawns = new NaturalSpawnConfig(getConfigDir());
 	public final TowerDungeonMobConfig towerDungeonMobs = new TowerDungeonMobConfig(getConfigDir());
@@ -64,36 +73,10 @@ public class CavernConfig
 
 	public void load()
 	{
-		portal.loadFromFile();
-
-		if (portal.getTriggerItems().isEmpty() || portal.getFrameBlocks().isEmpty())
-		{
-			portal.getTriggerItems().clear();
-			portal.getTriggerItems().add(Tags.Items.GEMS_EMERALD);
-			portal.getFrameBlocks().clear();
-			portal.getFrameBlocks().add(Blocks.MOSSY_COBBLESTONE).add(Blocks.MOSSY_STONE_BRICKS);
-			portal.saveToFile();
-		}
-
-		if (!veins.loadFromFile())
-		{
-			veins.setDefault();
-			veins.saveToFile();
-		}
-
-		if (!naturalSpawns.loadFromFile())
-		{
-			naturalSpawns.setDefault();
-			naturalSpawns.saveToFile();
-		}
-
-		CaveBiomes.CAVERN.ifPresent(naturalSpawns::registerSpawns);
-
-		if (!towerDungeonMobs.loadFromFile())
-		{
-			towerDungeonMobs.setDefault();
-			towerDungeonMobs.saveToFile();
-		}
+		portal.load();
+		veins.load();
+		naturalSpawns.load();
+		towerDungeonMobs.load();
 	}
 
 	public static File getConfigDir()
