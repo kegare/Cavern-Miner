@@ -6,26 +6,27 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
-import cavern.miner.config.json.ItemStackTagListSerializer;
+import cavern.miner.config.json.ItemStackSerializer;
 import cavern.miner.init.CaveDimensions;
-import cavern.miner.util.ItemStackTagList;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.dimension.DimensionType;
 
 public class CavebornConfig extends AbstractEntryConfig
 {
-	private final ItemStackTagList items = ItemStackTagList.create();
+	private final NonNullList<ItemStack> items = NonNullList.create();
 
 	public CavebornConfig()
 	{
 		super(new File(CavernModConfig.getConfigDir(), "caveborn_items.json"));
 	}
 
-	public ItemStackTagList getItems()
+	public NonNullList<ItemStack> getItems()
 	{
 		return items;
 	}
@@ -38,25 +39,38 @@ public class CavebornConfig extends AbstractEntryConfig
 			return null;
 		}
 
-		return getGson().toJson(ItemStackTagListSerializer.INSTANCE.serialize(items, items.getClass(), null));
+		JsonArray array = new JsonArray();
+
+		for (ItemStack stack : items)
+		{
+			JsonElement e = ItemStackSerializer.INSTANCE.serialize(stack, stack.getClass(), null);
+
+			if (e.isJsonNull() || e.toString().isEmpty())
+			{
+				continue;
+			}
+
+			array.add(e);
+		}
+
+		return getGson().toJson(array);
 	}
 
 	@Override
 	public void fromJson(Reader json) throws JsonParseException
 	{
-		JsonObject object = getGson().fromJson(json, JsonObject.class);
-		ItemStackTagList list = ItemStackTagListSerializer.INSTANCE.deserialize(object, object.getClass(), null);
+		JsonArray array = getGson().fromJson(json, JsonArray.class);
 
 		items.clear();
 
-		if (!list.getEntryList().isEmpty())
+		for (JsonElement e : array)
 		{
-			items.addEntries(list.getEntryList());
-		}
+			ItemStack stack = ItemStackSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 
-		if (!list.getTagList().isEmpty())
-		{
-			items.addTags(list.getTagList());
+			if (!stack.isEmpty())
+			{
+				items.add(stack);
+			}
 		}
 	}
 
@@ -66,10 +80,10 @@ public class CavebornConfig extends AbstractEntryConfig
 		items.add(new ItemStack(Items.TORCH, 64));
 		items.add(new ItemStack(Items.BREAD, 32));
 		items.add(new ItemStack(Items.STICK, 16));
-		items.add(Items.STONE_SWORD);
-		items.add(Items.STONE_PICKAXE);
-		items.add(Items.STONE_AXE);
-		items.add(Items.STONE_SHOVEL);
+		items.add(new ItemStack(Items.STONE_SWORD));
+		items.add(new ItemStack(Items.STONE_PICKAXE));
+		items.add(new ItemStack(Items.STONE_AXE));
+		items.add(new ItemStack(Items.STONE_SHOVEL));
 	}
 
 	public enum Type

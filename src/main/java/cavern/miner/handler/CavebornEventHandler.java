@@ -105,7 +105,7 @@ public class CavebornEventHandler
 		double posY = pos.getY() + 0.5D;
 		double posZ = pos.getZ() + 0.5D;
 
-		for (ItemStack stack : GeneralConfig.INSTANCE.cavebornItems.getItems().getCachedList())
+		for (ItemStack stack : GeneralConfig.INSTANCE.cavebornItems.getItems())
 		{
 			ItemEntity itemEntity = new ItemEntity(world, posX, posY, posZ, stack);
 
