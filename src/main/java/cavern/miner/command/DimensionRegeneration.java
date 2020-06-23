@@ -7,7 +7,7 @@ import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 
-import cavern.miner.world.biome.CavernModDimension;
+import cavern.miner.world.dimension.CavernModDimension;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;

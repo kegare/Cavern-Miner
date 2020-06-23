@@ -14,7 +14,6 @@ import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
-import cavern.miner.world.biome.CavernModDimension;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;

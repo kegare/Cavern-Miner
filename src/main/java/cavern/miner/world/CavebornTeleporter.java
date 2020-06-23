@@ -4,6 +4,7 @@ import java.util.function.Function;
 
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.LoadingScreenMessage;
+import cavern.miner.util.BlockPosHelper;
 import cavern.miner.world.dimension.CavernDimension;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -19,40 +20,22 @@ public class CavebornTeleporter implements ITeleporter
 	public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
 	{
 		Entity teleported = repositionEntity.apply(false);
-		int radius = 128;
-		int max = destWorld.getMaxHeight();
-		BlockPos originPos = teleported.getPosition();
-		BlockPos.Mutable findPos = new BlockPos.Mutable();
-		BlockPos resultPos = null;
 
-		outside: for (int i = 1; i < radius; ++i)
+		BlockPos resultPos = BlockPosHelper.findPos(destWorld, teleported.getPosition(), 128, pos ->
 		{
-			for (int j = -i; j <= i; ++j)
+			int x = pos.getX();
+			int y = pos.getY();
+			int z = pos.getZ();
+
+			if (destWorld.isAirBlock(pos) && destWorld.isAirBlock(pos.setPos(x, y + 1, z)))
 			{
-				for (int k = -i; k <= i; ++k)
-				{
-					if (Math.abs(j) < i && Math.abs(k) < i) continue;
+				BlockState state = destWorld.getBlockState(pos.setPos(x, y - 1, z));
 
-					int x = originPos.getX() + j;
-					int z = originPos.getZ() + k;
-
-					for (int y = max - 1; y > 1; --y)
-					{
-						if (destWorld.isAirBlock(findPos.setPos(x, y, z)) && destWorld.isAirBlock(findPos.setPos(x, y + 1, z)))
-						{
-							BlockState state = destWorld.getBlockState(findPos.setPos(x, y - 1, z));
-
-							if (state.isNormalCube(destWorld, findPos))
-							{
-								resultPos = findPos.setPos(x, y, z).toImmutable();
-
-								break outside;
-							}
-						}
-					}
-				}
+				return state.isNormalCube(destWorld, pos.setPos(x, y, z));
 			}
-		}
+
+			return false;
+		});
 
 		if (resultPos == null)
 		{

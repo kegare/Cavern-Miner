@@ -53,6 +53,6 @@
 	"advancements.cavern.god_miner.title": "採掘の神",
 	"advancements.cavern.god_miner.description": "採掘を極める",
 	"cavern.message.update_version": "Cavern: Minerの新しいバージョンが利用できます",
-	"cavern.message.regenerate": "ディメンションが正常に再生成されました",
+	"cavern.message.regenerate": "ディメンションを再生成しました",
 	"cavern.message.reload": "Cavern: Minerのjson設定ファイルがリロードされました"
 }

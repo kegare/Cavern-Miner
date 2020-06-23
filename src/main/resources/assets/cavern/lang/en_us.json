@@ -54,6 +54,6 @@
 	"advancements.cavern.god_miner.title": "The God of Miner",
 	"advancements.cavern.god_miner.description": "Master of Mining",
 	"cavern.message.update_version": "A new version of Cavern: Miner is available",
-	"cavern.message.regenerate": "The dimension has been successfully regenerated",
+	"cavern.message.regenerate": "Dimension regenerated",
 	"cavern.message.reload": "Cavern: Miner json configuration files have been reloaded."
 }

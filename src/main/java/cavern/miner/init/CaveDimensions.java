@@ -7,8 +7,8 @@ import javax.annotation.Nullable;
 
 import cavern.miner.CavernMod;
 import cavern.miner.block.CavernPortalBlock;
-import cavern.miner.world.biome.CavernModDimension;
-import cavern.miner.world.biome.HugeCavernModDimension;
+import cavern.miner.world.dimension.CavernModDimension;
+import cavern.miner.world.dimension.HugeCavernModDimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
