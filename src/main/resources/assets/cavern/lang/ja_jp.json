@@ -53,6 +53,10 @@
 	"advancements.cavern.god_miner.title": "採掘の神",
 	"advancements.cavern.god_miner.description": "採掘を極める",
 	"cavern.message.update_version": "Cavern: Minerの新しいバージョンが利用できます",
-	"cavern.message.regenerate": "ディメンションを再生成しました",
-	"cavern.message.reload": "Cavern: Minerのjson設定ファイルがリロードされました"
+	"cavern.message.regenerate.success": "ディメンションを再生成しました",
+	"cavern.message.regenerate.invalid": "無効なディメンションです",
+	"cavern.message.regenerate.error.player": "プレイヤーがまだディメンションに残っています",
+	"cavern.message.regenerate.error.folder": "ディメンションのセーブフォルダを検出できません",
+	"cavern.message.regenerate.error.unknown": "再生成中に不明なエラーが発生しました",
+	"cavern.message.reload": "Cavern: Minerのjson設定ファイルをリロードしました"
 }

@@ -1,6 +1,9 @@
 package cavern.miner.command;
 
+import java.io.File;
 import java.util.Arrays;
+
+import org.apache.commons.io.FileUtils;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.LiteralMessage;
@@ -28,10 +31,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.DimensionManager;
 
 public final class CavernCommand
 {
-	private static final SimpleCommandExceptionType INVALID_DIMENSION = new SimpleCommandExceptionType(new LiteralMessage("Invalid dimension"));
 	private static final SimpleCommandExceptionType INVALID_MINER = new SimpleCommandExceptionType(new LiteralMessage("Invalid miner"));
 
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
@@ -100,17 +104,47 @@ public final class CavernCommand
 
 		if (dim == null)
 		{
-			throw INVALID_DIMENSION.create();
+			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.invalid").appendText(" : " + name));
+
+			return;
 		}
 
 		MinecraftServer server = context.getSource().getServer();
+		ServerWorld world = DimensionManager.getWorld(server, dim, false, false);
 
-		if (!DimensionRegeneration.regenerate(server, dim))
+		if (world != null && !world.getPlayers().isEmpty())
 		{
-			throw INVALID_DIMENSION.create();
+			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.error.player").appendText(" : " + name));
+
+			return;
 		}
 
-		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.regenerate").appendText(" : " + name), true);
+		File folder = CaveDimensions.getSaveFolder(server, dim);
+
+		if (folder == null)
+		{
+			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.error.folder").appendText(" : " + name));
+
+			return;
+		}
+
+		DimensionManager.unloadWorld(world);
+		DimensionManager.unloadWorlds(server, false);
+
+		try
+		{
+			FileUtils.deleteDirectory(folder);
+		}
+		catch (Exception e)
+		{
+			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.error.unknown").appendText(" : " + name));
+
+			return;
+		}
+
+		DimensionManager.initWorld(server, dim);
+
+		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.regenerate.success").appendText(" : " + name), true);
 	}
 
 	private static void reloadConfig(CommandContext<CommandSource> context) throws CommandSyntaxException

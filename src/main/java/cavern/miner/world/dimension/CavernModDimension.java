@@ -2,36 +2,19 @@ package cavern.miner.world.dimension;
 
 import java.util.function.BiFunction;
 
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.FuzzedBiomeMagnifier;
+import net.minecraft.world.biome.IBiomeMagnifier;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.ModDimension;
 
 public class CavernModDimension extends ModDimension
 {
-	private long seed;
-
 	@Override
-	public void write(PacketBuffer buffer, boolean network)
+	public IBiomeMagnifier getMagnifier()
 	{
-		buffer.writeLong(seed);
-	}
-
-	@Override
-	public void read(PacketBuffer buffer, boolean network)
-	{
-		seed = buffer.readLong();
-	}
-
-	public long getSeed()
-	{
-		return seed;
-	}
-
-	public void setSeed(long value)
-	{
-		seed = value;
+		return FuzzedBiomeMagnifier.INSTANCE;
 	}
 
 	@Override

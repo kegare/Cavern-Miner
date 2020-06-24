@@ -1,7 +1,10 @@
 package cavern.miner.init;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.annotation.Nullable;
 
@@ -9,7 +12,9 @@ import cavern.miner.CavernMod;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.world.dimension.CavernModDimension;
 import cavern.miner.world.dimension.HugeCavernModDimension;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ModDimension;
 import net.minecraftforge.event.world.RegisterDimensionsEvent;
@@ -74,16 +79,47 @@ public final class CaveDimensions
 	}
 
 	@Nullable
-	public static CavernPortalBlock getPortalBlock(DimensionType dimension)
+	public static CavernPortalBlock getPortalBlock(DimensionType dim)
 	{
 		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
 		{
-			if (portal.get().getDimension() == dimension)
+			CavernPortalBlock block = portal.get();
+
+			if (block.getDimension() == dim)
 			{
-				return portal.get();
+				return block;
 			}
 		}
 
 		return null;
+	}
+
+	@Nullable
+	public static File getSaveFolder(MinecraftServer server, DimensionType dim)
+	{
+		Path base = Paths.get(".").toAbsolutePath().normalize();
+		Path directory = dim.getDirectory(base.toFile()).toPath().toAbsolutePath().normalize();
+
+		if (!directory.startsWith(base))
+		{
+			return null;
+		}
+
+		String folderName = base.relativize(directory).toString();
+		ServerWorld overworld = DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+
+		if (overworld == null)
+		{
+			return null;
+		}
+
+		File folder = new File(overworld.getSaveHandler().getWorldDirectory(), folderName);
+
+		if (!folder.exists())
+		{
+			return null;
+		}
+
+		return folder;
 	}
 }
