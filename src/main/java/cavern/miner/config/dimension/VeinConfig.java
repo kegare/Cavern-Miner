@@ -2,6 +2,8 @@ package cavern.miner.config.dimension;
 
 import java.io.File;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,6 +30,7 @@ public class VeinConfig extends AbstractEntryConfig
 
 	private final BlockStateTagList whitelist = BlockStateTagList.create();
 	private final BlockStateTagList blacklist = BlockStateTagList.create();
+	private final List<String> blacklistMods = new ArrayList<>();
 
 	public VeinConfig(File dir)
 	{
@@ -52,6 +55,11 @@ public class VeinConfig extends AbstractEntryConfig
 	public BlockStateTagList getBlacklist()
 	{
 		return blacklist;
+	}
+
+	public List<String> getBlacklistMods()
+	{
+		return blacklistMods;
 	}
 
 	@Override
@@ -90,7 +98,22 @@ public class VeinConfig extends AbstractEntryConfig
 		JsonObject o = new JsonObject();
 
 		o.add("whitelist", BlockStateTagListSerializer.INSTANCE.serialize(whitelist, BlockState.class, null));
-		o.add("blacklist", BlockStateTagListSerializer.INSTANCE.serialize(blacklist, BlockState.class, null));
+
+		JsonElement e = BlockStateTagListSerializer.INSTANCE.serialize(blacklist, BlockState.class, null);
+
+		if (e.isJsonObject())
+		{
+			array = new JsonArray();
+
+			for (String modid : blacklistMods)
+			{
+				array.add(modid);
+			}
+
+			e.getAsJsonObject().add("mods", array);
+		}
+
+		o.add("blacklist", e);
 
 		object.add("auto_entries", o);
 
@@ -187,6 +210,16 @@ public class VeinConfig extends AbstractEntryConfig
 				if (!entries.getTagList().isEmpty())
 				{
 					blacklist.addTags(entries.getTagList());
+				}
+
+				if (e.getAsJsonObject().has("mods"))
+				{
+					JsonArray array = e.getAsJsonObject().get("mods").getAsJsonArray();
+
+					for (JsonElement modid : array)
+					{
+						blacklistMods.add(modid.getAsString());
+					}
 				}
 			}
 		}

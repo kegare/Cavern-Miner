@@ -42,6 +42,11 @@ public class CommonEventHandler
 	@SubscribeEvent
 	public static void onRightClickBlock(final PlayerInteractEvent.RightClickBlock event)
 	{
+		if (event.getSide().isClient())
+		{
+			return;
+		}
+
 		ItemStack stack = event.getItemStack();
 
 		if (stack.isEmpty())

@@ -1,8 +1,7 @@
-package cavern.miner.world.biome;
+package cavern.miner.world.dimension;
 
 import java.util.function.BiFunction;
 
-import cavern.miner.world.dimension.HugeCavernDimension;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;

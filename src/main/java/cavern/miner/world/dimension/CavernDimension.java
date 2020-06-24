@@ -14,7 +14,6 @@ import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
-import cavern.miner.world.biome.CavernModDimension;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CaveMobSpawner;
@@ -44,7 +43,6 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.IRenderHandler;
-import net.minecraftforge.common.ModDimension;
 
 public class CavernDimension extends Dimension
 {
@@ -190,24 +188,6 @@ public class CavernDimension extends Dimension
 
 	@Override
 	public void updateWeather(Runnable defaultLogic) {}
-
-	@Override
-	public long getSeed()
-	{
-		ModDimension modDim = getType().getModType();
-
-		if (modDim != null && modDim instanceof CavernModDimension)
-		{
-			long seed = ((CavernModDimension)modDim).getSeed();
-
-			if (seed != 0L)
-			{
-				return seed;
-			}
-		}
-
-		return super.getSeed();
-	}
 
 	@Override
 	public boolean isSurfaceWorld()

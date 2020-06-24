@@ -1,4 +1,4 @@
-package cavern.miner.handler;
+package cavern.miner.storage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,16 +49,6 @@ public class PlacedCache
 			name = "Cache";
 		}
 
-		Pair<String, Dimension> key = Pair.of(name, dim);
-		PlacedCache cache = CACHES.get(key);
-
-		if (cache == null)
-		{
-			cache = new PlacedCache();
-
-			CACHES.put(key, cache);
-		}
-
-		return cache;
+		return CACHES.computeIfAbsent(Pair.of(name, dim), o -> new PlacedCache());
 	}
 }

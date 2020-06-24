@@ -13,9 +13,8 @@ import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.TeleporterCache;
+import cavern.miner.util.BlockPosHelper;
 import cavern.miner.world.dimension.CavernDimension;
-import it.unimi.dsi.fastutil.longs.LongArraySet;
-import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.pattern.BlockPattern;
@@ -24,12 +23,10 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -152,52 +149,7 @@ public class CavernTeleporter implements ITeleporter
 		}
 		else
 		{
-			int min = 1;
-			int max = world.getActualHeight() - 1;
-			BlockPos.Mutable findPos = new BlockPos.Mutable(checkPos);
-			LongSet findChunks = new LongArraySet();
-
-			findChunks.add(ChunkPos.asLong(checkPos.getX() >> 4, checkPos.getZ() >> 4));
-
-			outside: for (int r = 1; r <= radius; ++r)
-			{
-				for (int i = -r; i <= r; ++i)
-				{
-					for (int j = -r; j <= r; ++j)
-					{
-						if (Math.abs(i) < r && Math.abs(j) < r) continue;
-
-						int x = checkPos.getX() + i;
-						int z = checkPos.getZ() + j;
-						ChunkPos chunkPos = new ChunkPos(findPos.setPos(x, 0, z));
-
-						if (findChunks.add(chunkPos.asLong()))
-						{
-							world.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 1, findPos);
-						}
-
-						for (int y = checkPos.getY(); y < max; ++y)
-						{
-							if (world.getBlockState(findPos.setPos(x, y, z)).getBlock() == portalBlock)
-							{
-								pos = findPos.toImmutable();
-
-								break outside;
-							}
-						}
-
-						for (int y = checkPos.getY(); y > min; --y)
-						{
-							if (world.getBlockState(findPos.setPos(x, y, z)).getBlock() == portalBlock)
-							{
-								pos = findPos.toImmutable();
-
-								break outside;
-							}
-						}
-					}
-				}
-			}
+			pos = BlockPosHelper.findPos(world, checkPos, radius, o -> world.getBlockState(o).getBlock() == portalBlock);
 
 			if (pos == null)
 			{
@@ -264,21 +216,39 @@ public class CavernTeleporter implements ITeleporter
 					if (Math.abs(rx) < r && Math.abs(rz) < r) continue;
 
 					int px = originX + rx;
-					int pz = originZ + rz;
-					double xSize = px + 0.5D - entity.getPosX();
-					double zSize = pz + 0.5D - entity.getPosZ();
-
 					int py = min;
+					int pz = originZ + rz;
 
-					while (py < max && !world.isAirBlock(pos.setPos(px, py, pz)))
+					finder: while (true)
 					{
-						++py;
+						for (py = originY; py <= max; ++py)
+						{
+							if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+							{
+								break finder;
+							}
+						}
+
+						for (py = originY; py >= min; --py)
+						{
+							if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+							{
+								break finder;
+							}
+						}
+
+						py = 0;
+
+						break;
 					}
 
-					if (py >= max)
+					if (py < min || py > max)
 					{
 						continue;
 					}
+
+					double xSize = px + 0.5D - entity.getPosX();
+					double zSize = pz + 0.5D - entity.getPosZ();
 
 					outside: for (int k = j; k < j + 4; ++k)
 					{
@@ -343,21 +313,39 @@ public class CavernTeleporter implements ITeleporter
 						if (Math.abs(rx) < r && Math.abs(rz) < r) continue;
 
 						int px = originX + rx;
-						int pz = originZ + rz;
-						double xSize = px + 0.5D - entity.getPosX();
-						double zSize = pz + 0.5D - entity.getPosZ();
-
 						int py = min;
+						int pz = originZ + rz;
 
-						while (py < max && !world.isAirBlock(pos.setPos(px, py, pz)))
+						finder: while (true)
 						{
-							++py;
+							for (py = originY; py <= max; ++py)
+							{
+								if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+								{
+									break finder;
+								}
+							}
+
+							for (py = originY; py >= min; --py)
+							{
+								if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+								{
+									break finder;
+								}
+							}
+
+							py = 0;
+
+							break;
 						}
 
-						if (py >= max)
+						if (py < min || py > max)
 						{
 							continue;
 						}
+
+						double xSize = px + 0.5D - entity.getPosX();
+						double zSize = pz + 0.5D - entity.getPosZ();
 
 						outside: for (int k = j; k < j + 2; ++k)
 						{

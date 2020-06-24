@@ -54,6 +54,10 @@
 	"advancements.cavern.god_miner.title": "The God of Miner",
 	"advancements.cavern.god_miner.description": "Master of Mining",
 	"cavern.message.update_version": "A new version of Cavern: Miner is available",
-	"cavern.message.regenerate": "The dimension has been successfully regenerated",
-	"cavern.message.reload": "Cavern: Miner json configuration files have been reloaded."
+	"cavern.message.regenerate.success": "Dimension regenerated",
+	"cavern.message.regenerate.invalid": "Invalid dimension",
+	"cavern.message.regenerate.error.player": "Player is still in the dimension",
+	"cavern.message.regenerate.error.folder": "Cannot detect the dimension save folder",
+	"cavern.message.regenerate.error.unknown": "An unknown error occurred during regeneration",
+	"cavern.message.reload": "Cavern: Miner json config files reloaded."
 }
