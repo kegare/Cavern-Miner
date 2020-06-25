@@ -124,12 +124,13 @@ public final class CavernMod
 
 		if (result.status.shouldDraw() && result.target != null)
 		{
-			ITextComponent version = new StringTextComponent(result.target.toString());
-			version.getStyle().setColor(TextFormatting.YELLOW);
+			ITextComponent version = new StringTextComponent(result.target.toString()).applyTextStyle(TextFormatting.YELLOW);
+			ITextComponent message = new TranslationTextComponent("cavern.message.update_version").appendText(" : ").appendSibling(version);
 
-			ITextComponent message = new TranslationTextComponent("cavern.message.update_version");
-			message.appendText(" : ").appendSibling(version);
-			message.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, result.url));
+			if (result.url != null)
+			{
+				message.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, result.url));
+			}
 
 			source.sendMessage(message);
 		}
