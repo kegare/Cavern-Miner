@@ -14,6 +14,7 @@ public class ClientConfig
 	public final ForgeConfigSpec.BooleanValue showRank;
 
 	public final ForgeConfigSpec.BooleanValue caveFog;
+	public final ForgeConfigSpec.BooleanValue caveMusic;
 
 	public ClientConfig(final ForgeConfigSpec.Builder builder)
 	{
@@ -25,6 +26,7 @@ public class ClientConfig
 
 		builder.push("dimension");
 		caveFog = builder.comment("When true, render the cave fog.").define("cave_fog", true);
+		caveMusic = builder.comment("When true, play the original music for caverns.").define("cave_music", true);
 		builder.pop();
 	}
 }

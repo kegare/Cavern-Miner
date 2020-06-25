@@ -68,7 +68,7 @@ public final class CavernMod
 		CavePlacements.REGISTRY.register(modEventBus);
 		CaveSounds.REGISTRY.register(modEventBus);
 
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(this::doServerStuff);
 
 		CaveCriteriaTriggers.registerTriggers();
 
@@ -101,7 +101,7 @@ public final class CavernMod
 	}
 
 	@SubscribeEvent
-	public void onServerStarting(final FMLServerStartingEvent event)
+	public void doServerStuff(final FMLServerStartingEvent event)
 	{
 		sendVersionNotification(event.getServer());
 
@@ -124,12 +124,13 @@ public final class CavernMod
 
 		if (result.status.shouldDraw() && result.target != null)
 		{
-			ITextComponent version = new StringTextComponent(result.target.toString());
-			version.getStyle().setColor(TextFormatting.YELLOW);
+			ITextComponent version = new StringTextComponent(result.target.toString()).applyTextStyle(TextFormatting.YELLOW);
+			ITextComponent message = new TranslationTextComponent("cavern.message.update_version").appendText(" : ").appendSibling(version);
 
-			ITextComponent message = new TranslationTextComponent("cavern.message.update_version");
-			message.appendText(" : ").appendSibling(version);
-			message.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, result.url));
+			if (result.url != null)
+			{
+				message.getStyle().setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, result.url));
+			}
 
 			source.sendMessage(message);
 		}

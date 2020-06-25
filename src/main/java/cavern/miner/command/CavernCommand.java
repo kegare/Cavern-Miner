@@ -6,7 +6,6 @@ import java.util.Arrays;
 import org.apache.commons.io.FileUtils;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.LiteralMessage;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.ArgumentBuilder;
@@ -36,7 +35,7 @@ import net.minecraftforge.common.DimensionManager;
 
 public final class CavernCommand
 {
-	private static final SimpleCommandExceptionType INVALID_MINER = new SimpleCommandExceptionType(new LiteralMessage("Invalid miner"));
+	private static final SimpleCommandExceptionType INVALID_MINER = new SimpleCommandExceptionType(new TranslationTextComponent("cavern.message.miner.invalid"));
 
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{

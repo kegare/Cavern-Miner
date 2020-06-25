@@ -59,5 +59,6 @@
 	"cavern.message.regenerate.error.player": "Player is still in the dimension",
 	"cavern.message.regenerate.error.folder": "Cannot detect the dimension save folder",
 	"cavern.message.regenerate.error.unknown": "An unknown error occurred during regeneration",
-	"cavern.message.reload": "Cavern: Miner json config files reloaded."
+	"cavern.message.reload": "Cavern: Miner json config files reloaded.",
+	"cavern.message.miner.invalid": "Cannot access the specified miner status provider."
 }

@@ -58,5 +58,6 @@
 	"cavern.message.regenerate.error.player": "プレイヤーがまだディメンションに残っています",
 	"cavern.message.regenerate.error.folder": "ディメンションのセーブフォルダを検出できません",
 	"cavern.message.regenerate.error.unknown": "再生成中に不明なエラーが発生しました",
-	"cavern.message.reload": "Cavern: Minerのjson設定ファイルをリロードしました"
+	"cavern.message.reload": "Cavern: Minerのjson設定ファイルをリロードしました",
+	"cavern.message.miner.invalid": "指定されたプレイヤーの炭鉱夫ステータスにアクセスできません。"
 }

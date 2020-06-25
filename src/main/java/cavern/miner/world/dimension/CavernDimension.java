@@ -12,6 +12,7 @@ import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
+import cavern.miner.init.CaveSounds;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
 import cavern.miner.world.gen.CavernChunkGenerator;
@@ -25,6 +26,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -287,6 +289,11 @@ public class CavernDimension extends Dimension
 	public int getSeaLevel()
 	{
 		return 256;
+	}
+
+	public SoundEvent getMusic()
+	{
+		return CaveSounds.MUSIC_CAVERN.get();
 	}
 
 	@OnlyIn(Dist.CLIENT)

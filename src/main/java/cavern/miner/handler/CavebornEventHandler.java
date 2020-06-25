@@ -8,7 +8,6 @@ import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.util.BlockPosHelper;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -119,9 +118,7 @@ public class CavebornEventHandler
 
 			if (world.isAirBlock(pos) && world.isAirBlock(pos.setPos(x, y + 1, z)))
 			{
-				BlockState state = world.getBlockState(pos.setPos(x, y - 1, z));
-
-				return state.isNormalCube(world, pos.setPos(x, y, z));
+				return world.getBlockState(pos.setPos(x, y - 1, z)).isSolid();
 			}
 
 			return false;
@@ -132,11 +129,7 @@ public class CavebornEventHandler
 			return false;
 		}
 
-		double posX = resultPos.getX() + 0.5D;
-		double posY = resultPos.getY();
-		double posZ = resultPos.getZ() + 0.5D;
-
-		entity.moveForced(posX, posY, posZ);
+		entity.moveForced(resultPos.getX() + 0.5D, resultPos.getY(), resultPos.getZ() + 0.5D);
 
 		return true;
 	}

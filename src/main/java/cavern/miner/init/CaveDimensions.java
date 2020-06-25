@@ -81,13 +81,11 @@ public final class CaveDimensions
 	@Nullable
 	public static CavernPortalBlock getPortalBlock(DimensionType dim)
 	{
-		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
+		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
-			CavernPortalBlock block = portal.get();
-
-			if (block.getDimension() == dim)
+			if (portal.getDimension() == dim)
 			{
-				return block;
+				return portal;
 			}
 		}
 

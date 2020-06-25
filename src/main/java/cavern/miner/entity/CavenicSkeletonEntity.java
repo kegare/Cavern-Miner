@@ -1,6 +1,9 @@
 package cavern.miner.entity;
 
+import javax.annotation.Nullable;
+
 import cavern.miner.entity.ai.RapidBowAttackGoal;
+import cavern.miner.init.CaveItems;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Pose;
@@ -10,13 +13,13 @@ import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
 import net.minecraft.entity.monster.AbstractSkeletonEntity;
 import net.minecraft.entity.projectile.AbstractArrowEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
 
@@ -88,6 +91,22 @@ public class CavenicSkeletonEntity extends AbstractSkeletonEntity
 		return SoundEvents.ENTITY_SKELETON_STEP;
 	}
 
+	@Nullable
+	protected Hand getBowHand()
+	{
+		if (getHeldItemMainhand().getItem() instanceof BowItem)
+		{
+			return Hand.MAIN_HAND;
+		}
+
+		if (getHeldItemOffhand().getItem() instanceof BowItem)
+		{
+			return Hand.OFF_HAND;
+		}
+
+		return null;
+	}
+
 	@Override
 	public void setCombatTask()
 	{
@@ -101,9 +120,7 @@ public class CavenicSkeletonEntity extends AbstractSkeletonEntity
 			goalSelector.removeGoal(meleeAttackGoal);
 			goalSelector.removeGoal(bowAttackGoal);
 
-			ItemStack stack = getHeldItem(ProjectileHelper.getHandWith(this, Items.BOW));
-
-			if (stack.getItem() instanceof BowItem)
+			if (getBowHand() != null)
 			{
 				bowAttackGoal.setAttackCooldown(world.getDifficulty() != Difficulty.HARD ? 40 : 20);
 
@@ -144,5 +161,11 @@ public class CavenicSkeletonEntity extends AbstractSkeletonEntity
 	public int getMaxSpawnedInChunk()
 	{
 		return 1;
+	}
+
+	@Override
+	public ItemStack getPickedResult(RayTraceResult target)
+	{
+		return new ItemStack(CaveItems.CAVENIC_SKELETON_SPAWN_EGG.get());
 	}
 }

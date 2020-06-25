@@ -2,14 +2,15 @@ package cavern.miner.entity.ai;
 
 import java.util.EnumSet;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.RangedBowAttackGoal;
 import net.minecraft.entity.monster.MonsterEntity;
-import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.item.BowItem;
-import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
 
 public class RapidBowAttackGoal<T extends MonsterEntity & IRangedAttackMob> extends RangedBowAttackGoal<T>
 {
@@ -48,10 +49,26 @@ public class RapidBowAttackGoal<T extends MonsterEntity & IRangedAttackMob> exte
 		return attacker.getAttackTarget() != null && isBowInMainhand();
 	}
 
+	@Nullable
+	protected Hand getBowHand()
+	{
+		if (attacker.getHeldItemMainhand().getItem() instanceof BowItem)
+		{
+			return Hand.MAIN_HAND;
+		}
+
+		if (attacker.getHeldItemOffhand().getItem() instanceof BowItem)
+		{
+			return Hand.OFF_HAND;
+		}
+
+		return null;
+	}
+
 	@Override
 	protected boolean isBowInMainhand()
 	{
-		return attacker.getHeldItemMainhand().getItem() instanceof BowItem || attacker.getHeldItemOffhand().getItem() instanceof BowItem;
+		return getBowHand() != null;
 	}
 
 	@Override
@@ -172,7 +189,12 @@ public class RapidBowAttackGoal<T extends MonsterEntity & IRangedAttackMob> exte
 			}
 			else if (seeTime >= -20)
 			{
-				attacker.setActiveHand(ProjectileHelper.getHandWith(attacker, Items.BOW));
+				Hand hand = getBowHand();
+
+				if (hand != null)
+				{
+					attacker.setActiveHand(hand);
+				}
 
 				attackTime = 0;
 			}
