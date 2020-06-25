@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
+import cavern.miner.handler.CavebornEventHandler;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.LoadingScreenMessage;
@@ -89,13 +90,18 @@ public class CavernTeleporter implements ITeleporter
 
 			if (!placed)
 			{
-				BlockPos pos = makePortal(destWorld, newEntity, radius);
+				BlockPos pos = makePortal(destWorld, originPos, radius);
 
 				if (pos != null)
 				{
 					placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
 				}
 			}
+		}
+
+		if (!placed)
+		{
+			placed = CavebornEventHandler.placeEntity(destWorld, originPos, newEntity);
 		}
 
 		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
@@ -192,16 +198,13 @@ public class CavernTeleporter implements ITeleporter
 	}
 
 	@Nullable
-	public BlockPos makePortal(ServerWorld world, Entity entity, int radius)
+	public BlockPos makePortal(ServerWorld world, BlockPos originPos, int radius)
 	{
-		int originX = MathHelper.floor(entity.getPosX());
-		int originY = MathHelper.floor(entity.getPosY());
-		int originZ = MathHelper.floor(entity.getPosZ());
 		int min = 10;
 		int max = world.getActualHeight() - 10;
-		int x = originX;
-		int y = originY;
-		int z = originZ;
+		int x = originPos.getX();
+		int y = originPos.getY();
+		int z = originPos.getZ();
 		int i = 0;
 		int j = world.rand.nextInt(4);
 		BlockPos.Mutable pos = new BlockPos.Mutable();
@@ -215,23 +218,23 @@ public class CavernTeleporter implements ITeleporter
 				{
 					if (Math.abs(rx) < r && Math.abs(rz) < r) continue;
 
-					int px = originX + rx;
+					int px = originPos.getX() + rx;
 					int py = min;
-					int pz = originZ + rz;
+					int pz = originPos.getZ() + rz;
 
 					finder: while (true)
 					{
-						for (py = originY; py <= max; ++py)
+						for (py = originPos.getY(); py <= max; ++py)
 						{
-							if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+							if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
 							{
 								break finder;
 							}
 						}
 
-						for (py = originY; py >= min; --py)
+						for (py = originPos.getY(); py >= min; --py)
 						{
-							if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+							if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
 							{
 								break finder;
 							}
@@ -247,18 +250,17 @@ public class CavernTeleporter implements ITeleporter
 						continue;
 					}
 
-					double xSize = px + 0.5D - entity.getPosX();
-					double zSize = pz + 0.5D - entity.getPosZ();
+					double dist = originPos.distanceSq(px, py, pz, true);
 
 					outside: for (int k = j; k < j + 4; ++k)
 					{
 						int i1 = k % 2;
-						int j1 = 1 - i1;
+						int i2 = 1 - i1;
 
 						if (k % 4 >= 2)
 						{
 							i1 = -i1;
-							j1 = -j1;
+							i2 = -i2;
 						}
 
 						for (int size1 = 0; size1 < 3; ++size1)
@@ -267,11 +269,7 @@ public class CavernTeleporter implements ITeleporter
 							{
 								for (int height = -1; height < 4; ++height)
 								{
-									int checkX = px + (size2 - 1) * i1 + size1 * j1;
-									int checkY = py + height;
-									int checkZ = pz + (size2 - 1) * j1 - size1 * i1;
-
-									pos.setPos(checkX, checkY, checkZ);
+									pos.setPos(px + (size2 - 1) * i1 + size1 * i2, py + height, pz + (size2 - 1) * i2 - size1 * i1);
 
 									if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 									{
@@ -281,12 +279,9 @@ public class CavernTeleporter implements ITeleporter
 							}
 						}
 
-						double ySize = py + 0.5D - entity.getPosY();
-						double size = xSize * xSize + ySize * ySize + zSize * zSize;
-
-						if (portalDist < 0.0D || size < portalDist)
+						if (portalDist < 0.0D || dist < portalDist)
 						{
-							portalDist = size;
+							portalDist = dist;
 							x = px;
 							y = py;
 							z = pz;
@@ -312,23 +307,23 @@ public class CavernTeleporter implements ITeleporter
 					{
 						if (Math.abs(rx) < r && Math.abs(rz) < r) continue;
 
-						int px = originX + rx;
+						int px = originPos.getX() + rx;
 						int py = min;
-						int pz = originZ + rz;
+						int pz = originPos.getZ() + rz;
 
 						finder: while (true)
 						{
-							for (py = originY; py <= max; ++py)
+							for (py = originPos.getY(); py <= max; ++py)
 							{
-								if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+								if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
 								{
 									break finder;
 								}
 							}
 
-							for (py = originY; py >= min; --py)
+							for (py = originPos.getY(); py >= min; --py)
 							{
-								if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isNormalCube(world, pos))
+								if (world.isAirBlock(pos.setPos(px, py, pz)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
 								{
 									break finder;
 								}
@@ -344,23 +339,18 @@ public class CavernTeleporter implements ITeleporter
 							continue;
 						}
 
-						double xSize = px + 0.5D - entity.getPosX();
-						double zSize = pz + 0.5D - entity.getPosZ();
+						double dist = originPos.distanceSq(px, py, pz, true);
 
 						outside: for (int k = j; k < j + 2; ++k)
 						{
 							int i1 = k % 2;
-							int j1 = 1 - i1;
+							int i2 = 1 - i1;
 
 							for (int width = 0; width < 4; ++width)
 							{
 								for (int height = -1; height < 4; ++height)
 								{
-									int px1 = px + (width - 1) * i1;
-									int py1 = py + height;
-									int pz1 = pz + (width - 1) * j1;
-
-									pos.setPos(px1, py1, pz1);
+									pos.setPos(px + (width - 1) * i1, py + height, pz + (width - 1) * i2);
 
 									if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 									{
@@ -369,12 +359,9 @@ public class CavernTeleporter implements ITeleporter
 								}
 							}
 
-							double ySize = py + 0.5D - entity.getPosY();
-							double size = xSize * xSize + ySize * ySize + zSize * zSize;
-
-							if (portalDist < 0.0D || size < portalDist)
+							if (portalDist < 0.0D || dist < portalDist)
 							{
-								portalDist = size;
+								portalDist = dist;
 								x = px;
 								y = py;
 								z = pz;
@@ -391,22 +378,18 @@ public class CavernTeleporter implements ITeleporter
 			}
 		}
 
-		int x1 = x;
-		int y1 = y;
-		int z1 = z;
 		int i1 = i % 2;
-		int j1 = 1 - i1;
+		int i2 = 1 - i1;
 
 		if (i % 4 >= 2)
 		{
 			i1 = -i1;
-			j1 = -j1;
+			i2 = -i2;
 		}
 
 		if (portalDist < 0.0D)
 		{
 			y = MathHelper.clamp(y, min, max);
-			y1 = y;
 
 			for (int size1 = -1; size1 <= 1; ++size1)
 			{
@@ -414,12 +397,7 @@ public class CavernTeleporter implements ITeleporter
 				{
 					for (int height = -1; height < 3; ++height)
 					{
-						int blockX = x1 + (size2 - 1) * i1 + size1 * j1;
-						int blockY = y1 + height;
-						int blockZ = z1 + (size2 - 1) * j1 - size1 * i1;
-						boolean flag = height < 0;
-
-						world.setBlockState(pos.setPos(blockX, blockY, blockZ), flag ? portalFrameBlock : Blocks.AIR.getDefaultState());
+						world.setBlockState(pos.setPos(x + (size2 - 1) * i1 + size1 * i2, y + height, z + (size2 - 1) * i2 - size1 * i1), height < 0 ? portalFrameBlock : Blocks.AIR.getDefaultState());
 					}
 				}
 			}
@@ -431,7 +409,7 @@ public class CavernTeleporter implements ITeleporter
 			{
 				if (width == -1 || width == 2 || height == -1 || height == 3)
 				{
-					pos.setPos(x1 + width * i1, y1 + height, z1 + width * j1);
+					pos.setPos(x + width * i1, y + height, z + width * i2);
 
 					world.setBlockState(pos, portalFrameBlock);
 				}
@@ -445,7 +423,7 @@ public class CavernTeleporter implements ITeleporter
 		{
 			for (int height = 0; height < 3; ++height)
 			{
-				world.setBlockState(pos.setPos(x1 + width * i1, y1 + height, z1 + width * j1), portalState, 18);
+				world.setBlockState(pos.setPos(x + width * i1, y + height, z + width * i2), portalState, 18);
 
 				if (width == 1 && height == 0)
 				{

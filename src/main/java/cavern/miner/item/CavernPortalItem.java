@@ -52,7 +52,7 @@ public class CavernPortalItem extends BlockItem
 		BlockState state = world.getBlockState(pos);
 		SoundType soundType = state.getSoundType(world, pos, player);
 
-		world.playSound(player, pos, getPlaceSound(state, world, pos, player), SoundCategory.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
+		world.playSound(null, pos, getPlaceSound(state, world, pos, player), SoundCategory.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
 
 		return ActionResultType.SUCCESS;
 	}

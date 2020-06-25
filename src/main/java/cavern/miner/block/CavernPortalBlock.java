@@ -132,18 +132,16 @@ public class CavernPortalBlock extends Block
 	@Nullable
 	public Size isPortal(IWorld world, BlockPos pos)
 	{
-		Size sizeX = new Size(world, pos, Direction.Axis.X);
+		Size size = new Size(world, pos, Direction.Axis.X);
 
-		if (sizeX.isValid() && sizeX.portalBlockCount == 0)
+		if (size.isValid() && size.portalBlockCount == 0)
 		{
-			return sizeX;
+			return size;
 		}
-		else
-		{
-			Size sizeZ = new Size(world, pos, Direction.Axis.Z);
 
-			return sizeZ.isValid() && sizeZ.portalBlockCount == 0 ? sizeZ : null;
-		}
+		size = new Size(world, pos, Direction.Axis.Z);
+
+		return size.isValid() && size.portalBlockCount == 0 ? size : null;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -181,21 +179,21 @@ public class CavernPortalBlock extends Block
 			return;
 		}
 
-		if (!entity.isAlive() || entity.isCrouching() || entity.isPassenger() || entity.isBeingRidden() || !entity.isNonBoss() || entity instanceof IProjectile)
+		if (!entity.isAlive() || entity.isPassenger() || entity.isBeingRidden() || !entity.isNonBoss() || entity instanceof IProjectile)
 		{
 			return;
 		}
 
-		int cd = Math.max(entity.getPortalCooldown(), 50);
+		int cooldown = Math.max(entity.getPortalCooldown(), 50);
 
 		if (entity.timeUntilPortal > 0)
 		{
-			entity.timeUntilPortal = cd;
+			entity.timeUntilPortal = cooldown;
 
 			return;
 		}
 
-		entity.timeUntilPortal = cd;
+		entity.timeUntilPortal = cooldown;
 
 		if (world.isRemote)
 		{
@@ -255,13 +253,6 @@ public class CavernPortalBlock extends Block
 			floorPos = floorPos.down();
 		}
 
-		BlockState frame = world.getBlockState(floorPos);
-
-		if (!getFrameBlocks().contains(frame))
-		{
-			frame = getFrameBlocks().getCachedList().get(0);
-		}
-
 		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)));
 	}
 
@@ -273,11 +264,11 @@ public class CavernPortalBlock extends Block
 		}
 
 		BlockPattern.PatternHelper pattern = createPatternHelper(world, pos);
-		double d0 = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
-		double d1 = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - pattern.getWidth()));
-		double d2 = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
+		double d = pattern.getForwards().getAxis() == Direction.Axis.X ? (double)pattern.getFrontTopLeft().getZ() : (double)pattern.getFrontTopLeft().getX();
+		double horizontalOffset = Math.abs(MathHelper.pct((pattern.getForwards().getAxis() == Direction.Axis.X ? entity.getPosZ() : entity.getPosX()) - (pattern.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 1 : 0), d, d - pattern.getWidth()));
+		double verticalOffset = MathHelper.pct(entity.getPosY() - 1.0D, pattern.getFrontTopLeft().getY(), pattern.getFrontTopLeft().getY() - pattern.getHeight());
 
-		return new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(d1, d2, 0.0D), pattern.getForwards());
+		return new CavernTeleporter(this, frame).setPortalInfo(new Vec3d(horizontalOffset, verticalOffset, 0.0D), pattern.getForwards());
 	}
 
 	public BlockPattern.PatternHelper createPatternHelper(IWorld world, BlockPos pos)
@@ -363,7 +354,7 @@ public class CavernPortalBlock extends Block
 				this.rightDir = Direction.SOUTH;
 			}
 
-			for (BlockPos blockpos = pos; pos.getY() > blockpos.getY() - 21 && pos.getY() > 0 && isEmptyBlock(pos.down()); pos = pos.down())
+			for (BlockPos blockPos = pos; pos.getY() > blockPos.getY() - 21 && pos.getY() > 0 && isEmptyBlock(pos.down()); pos = pos.down())
 			{
 				;
 			}
