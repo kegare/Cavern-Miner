@@ -22,7 +22,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent.BreakSpeed;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = "cavern")
@@ -58,9 +57,9 @@ public class CommonEventHandler
 		BlockPos pos = event.getPos();
 		BlockState state = world.getBlockState(pos);
 
-		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
+		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
-			if (!portal.get().getTriggerItems().contains(stack) || !portal.get().getFrameBlocks().contains(state))
+			if (!portal.getTriggerItems().contains(stack) || !portal.getFrameBlocks().contains(state))
 			{
 				continue;
 			}
@@ -69,7 +68,7 @@ public class CommonEventHandler
 			Direction face = ObjectUtils.defaultIfNull(event.getFace(), Direction.UP);
 			Hand hand = event.getHand();
 
-			if (portal.get().asItem().onItemUse(new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos))).isSuccess())
+			if (portal.asItem().onItemUse(new ItemUseContext(player, hand, BlockRayTraceResult.createMiss(new Vec3d(pos.offset(face)), face, pos))).isSuccess())
 			{
 				event.setCancellationResult(ActionResultType.SUCCESS);
 				event.setCanceled(true);

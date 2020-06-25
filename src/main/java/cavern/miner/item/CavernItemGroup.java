@@ -40,9 +40,9 @@ public class CavernItemGroup extends ItemGroup
 	{
 		NonNullList<ItemStackEntry> entries = NonNullList.create();
 
-		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
+		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
-			for (BlockState state : portal.get().getFrameBlocks())
+			for (BlockState state : portal.getFrameBlocks())
 			{
 				Item item = state.getBlock().asItem();
 
@@ -57,7 +57,7 @@ public class CavernItemGroup extends ItemGroup
 				}
 			}
 
-			for (ItemStack stack : portal.get().getTriggerItems())
+			for (ItemStack stack : portal.getTriggerItems())
 			{
 				if (!stack.isEmpty())
 				{

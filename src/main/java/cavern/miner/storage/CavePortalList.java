@@ -14,7 +14,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.RegistryObject;
 
 public class CavePortalList implements INBTSerializable<CompoundNBT>
 {
@@ -70,16 +69,16 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 	{
 		CompoundNBT nbt = new CompoundNBT();
 
-		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
+		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
 			ListNBT list = new ListNBT();
 
-			for (BlockPos pos : cavePortals.get(portal.get()))
+			for (BlockPos pos : cavePortals.get(portal))
 			{
 				list.add(NBTUtil.writeBlockPos(pos));
 			}
 
-			nbt.put(portal.getId().toString(), list);
+			nbt.put(portal.getRegistryName().toString(), list);
 		}
 
 		return nbt;
@@ -88,13 +87,13 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 	@Override
 	public void deserializeNBT(CompoundNBT nbt)
 	{
-		for (RegistryObject<CavernPortalBlock> portal : CaveBlocks.CAVE_PORTALS)
+		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
-			ListNBT list = nbt.getList(portal.getId().toString(), NBT.TAG_COMPOUND);
+			ListNBT list = nbt.getList(portal.getRegistryName().toString(), NBT.TAG_COMPOUND);
 
 			for (INBT entry : list)
 			{
-				cavePortals.put(portal.get(), NBTUtil.readBlockPos((CompoundNBT)entry));
+				cavePortals.put(portal, NBTUtil.readBlockPos((CompoundNBT)entry));
 			}
 		}
 	}
