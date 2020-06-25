@@ -68,7 +68,7 @@ public final class CavernMod
 		CavePlacements.REGISTRY.register(modEventBus);
 		CaveSounds.REGISTRY.register(modEventBus);
 
-		MinecraftForge.EVENT_BUS.register(this);
+		MinecraftForge.EVENT_BUS.addListener(this::doServerStuff);
 
 		CaveCriteriaTriggers.registerTriggers();
 
@@ -101,7 +101,7 @@ public final class CavernMod
 	}
 
 	@SubscribeEvent
-	public void onServerStarting(final FMLServerStartingEvent event)
+	public void doServerStuff(final FMLServerStartingEvent event)
 	{
 		sendVersionNotification(event.getServer());
 
