@@ -2,87 +2,71 @@ package cavern.miner.world.gen.feature;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.Dynamic;
 import com.mojang.datafixers.types.DynamicOps;
 
-import cavern.miner.CavernMod;
-import cavern.miner.config.json.DungeonMobSerializer;
+import net.minecraft.entity.EntityType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraftforge.common.DungeonHooks;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class DungeonMobConfig implements IFeatureConfig
 {
 	private final List<DungeonHooks.DungeonMob> spawns = new ArrayList<>();
-	private final Gson gson = new Gson();
 
 	public List<DungeonHooks.DungeonMob> getSpawns()
 	{
 		return spawns;
 	}
 
-	private <T> Stream<T> toJsonStream(DynamicOps<T> ops)
-	{
-		return spawns.stream().map(o ->
-		{
-			try
-			{
-				JsonElement e = DungeonMobSerializer.INSTANCE.serialize(o, o.getClass(), null);
-
-				if (e.isJsonNull() || e.toString().isEmpty())
-				{
-					return ops.empty();
-				}
-
-				return ops.createString(gson.toJson(e));
-			}
-			catch (JsonParseException e)
-			{
-				CavernMod.LOG.warn("Failed to serialize dungeon mob entry", e);
-
-				return ops.empty();
-			}
-		});
-	}
-
 	@Override
 	public <T> Dynamic<T> serialize(DynamicOps<T> ops)
 	{
-		return new Dynamic<>(ops, spawns.isEmpty() ? ops.emptyList() : ops.createList(toJsonStream(ops)));
+		ImmutableMap.Builder<T, T> builder = ImmutableMap.builder();
+
+		for (DungeonHooks.DungeonMob entry : spawns)
+		{
+			builder.put(ops.createString(entry.type.getRegistryName().toString()), ops.createInt(entry.itemWeight));
+		}
+
+		return new Dynamic<>(ops, ops.createMap(builder.build()));
 	}
 
 	public static <T> DungeonMobConfig deserialize(Dynamic<T> data)
 	{
-		DungeonMobConfig result = new DungeonMobConfig();
-		List<String> entries = data.asList(o -> o.asString(""));
+		DungeonMobConfig config = new DungeonMobConfig();
+		Map<String, Integer> map = data.asMap(o -> o.asString(""), o -> o.asInt(0));
 
-		for (String json : entries)
+		for (Map.Entry<String, Integer> entry : map.entrySet())
 		{
-			try
-			{
-				if (json.isEmpty())
-				{
-					continue;
-				}
+			String key = entry.getKey();
 
-				JsonElement e = result.gson.fromJson(json, JsonElement.class);
-				DungeonHooks.DungeonMob entry = DungeonMobSerializer.INSTANCE.deserialize(e, e.getClass(), null);
-
-				if (entry != null)
-				{
-					result.spawns.add(entry);
-				}
-			}
-			catch (JsonParseException e)
+			if (key.isEmpty())
 			{
-				CavernMod.LOG.warn("Failed to deserialize dungeon mob entry", e);
+				continue;
 			}
+
+			EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(key));
+
+			if (entityType == null)
+			{
+				continue;
+			}
+
+			int weight = entry.getValue();
+
+			if (weight <= 0)
+			{
+				continue;
+			}
+
+			config.spawns.add(new DungeonHooks.DungeonMob(weight, entityType));
 		}
 
-		return result;
+		return config;
 	}
 }

@@ -176,7 +176,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		int xStart = centerX << 4;
 		int zStart = centerZ << 4;
 		BlockPos pos = new BlockPos(xStart, 0, zStart);
-		Biome biome = this.getBiome(region.getBiomeManager(), pos.add(8, 8, 8));
+		Biome biome = getBiome(region.getBiomeManager(), pos.add(8, 8, 8));
 		SharedSeedRandom rand = new SharedSeedRandom();
 		long seed = rand.setDecorationSeed(region.getSeed(), xStart, zStart);
 

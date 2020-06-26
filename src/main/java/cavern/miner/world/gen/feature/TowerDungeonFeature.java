@@ -40,10 +40,17 @@ public class TowerDungeonFeature extends Feature<DungeonMobConfig>
 	{
 		setDungeonSize(world, rand, pos);
 
-		while (pos.getY() > 1 && world.isAirBlock(pos))
+		BlockPos.Mutable checkPos = new BlockPos.Mutable(pos);
+
+		while (checkPos.getY() > 1)
 		{
-			pos = pos.down();
+			if (!world.isAirBlock(checkPos.move(Direction.DOWN)))
+			{
+				break;
+			}
 		}
+
+		pos = checkPos.toImmutable();
 
 		setAirs(world, rand, pos);
 		setWalls(world, rand, pos);
