@@ -1,7 +1,5 @@
 package cavern.miner.enchantment;
 
-import java.util.TreeSet;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Direction;
@@ -28,8 +26,6 @@ public class AreaMinerSnapshot extends MinerSnapshot
 	@Override
 	public MinerSnapshot checkForMining()
 	{
-		miningTargets = new TreeSet<>(this);
-
 		switch (Direction.getFacingDirections(miner)[0].getAxis())
 		{
 			case X:

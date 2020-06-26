@@ -1,9 +1,7 @@
 package cavern.miner.enchantment;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
-
-import com.google.common.collect.Lists;
 
 import cavern.miner.util.BlockStateHelper;
 import net.minecraft.block.BlockState;
@@ -32,7 +30,6 @@ public class VeinMinerSnapshot extends MinerSnapshot
 	public MinerSnapshot checkForMining()
 	{
 		checkPos = originPos;
-		miningTargets = new TreeSet<>(this);
 
 		checkChain();
 
@@ -40,7 +37,7 @@ public class VeinMinerSnapshot extends MinerSnapshot
 
 		if (miningTargets.size() > limit)
 		{
-			List<BlockPos> list = Lists.newArrayListWithCapacity(limit);
+			List<BlockPos> list = new ArrayList<>(limit);
 
 			for (BlockPos pos : miningTargets)
 			{

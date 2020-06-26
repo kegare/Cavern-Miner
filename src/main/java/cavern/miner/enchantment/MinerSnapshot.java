@@ -1,12 +1,11 @@
 package cavern.miner.enchantment;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.ObjectUtils;
+import com.google.common.collect.Sets;
 
 import cavern.miner.util.BlockStateHelper;
 import net.minecraft.block.BlockState;
@@ -22,12 +21,11 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 	protected final World world;
 	protected final BlockPos originPos;
 	protected final BlockState originState;
+	protected final LivingEntity miner;
 
-	protected LivingEntity miner;
+	protected final Set<BlockPos> miningTargets = Sets.newTreeSet(this);
 
-	protected Set<BlockPos> miningTargets;
-
-	public MinerSnapshot(EnchantmentMiner ench, World world, BlockPos pos, BlockState state, LivingEntity entity)
+	public MinerSnapshot(EnchantmentMiner ench, World world, BlockPos pos, BlockState state, @Nullable LivingEntity entity)
 	{
 		this.enchMiner = ench;
 		this.world = world;
@@ -72,14 +70,9 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 		return Math.max(EnchantmentHelper.getEnchantmentLevel(enchMiner, getHeldItem()), 1);
 	}
 
-	public boolean isChecked()
-	{
-		return miningTargets != null;
-	}
-
 	public boolean isEmpty()
 	{
-		return miningTargets == null || miningTargets.isEmpty();
+		return miningTargets.isEmpty();
 	}
 
 	public boolean equals(World worldIn, BlockPos pos)
@@ -99,18 +92,13 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 
 	public Set<BlockPos> getTargets()
 	{
-		return ObjectUtils.defaultIfNull(miningTargets, Collections.emptySet());
+		return miningTargets;
 	}
 
 	public abstract MinerSnapshot checkForMining();
 
 	public boolean offer(BlockPos pos)
 	{
-		if (miningTargets == null)
-		{
-			return false;
-		}
-
 		if (validTarget(pos) && !miningTargets.contains(pos))
 		{
 			return miningTargets.add(pos);

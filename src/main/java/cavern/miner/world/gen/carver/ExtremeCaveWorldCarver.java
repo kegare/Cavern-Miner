@@ -1,4 +1,4 @@
-package cavern.miner.world.carver;
+package cavern.miner.world.gen.carver;
 
 import java.util.Random;
 import java.util.function.Function;

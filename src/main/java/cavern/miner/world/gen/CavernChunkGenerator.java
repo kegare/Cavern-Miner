@@ -27,7 +27,7 @@ import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.Heightmap.Type;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -35,8 +35,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGenerator<T>
 {
 	private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
-	private static final BlockState DIRT = Blocks.DIRT.getDefaultState();
-	private static final BlockState GRASS_BLOCK = Blocks.GRASS_BLOCK.getDefaultState();
 
 	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, T settings)
 	{
@@ -100,7 +98,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 				{
 					if (y >= ground - rand.nextInt(5))
 					{
-						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), DIRT, false);
+						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), settings.getGroundUnderBlock(), false);
 					}
 				}
 			}
@@ -126,7 +124,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 
 				if (ground > 0 && y >= ground)
 				{
-					chunk.setBlockState(posCache, DIRT, false);
+					chunk.setBlockState(posCache, settings.getGroundUnderBlock(), false);
 				}
 				else
 				{
@@ -152,7 +150,8 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		BlockPos.Mutable posAbove = new BlockPos.Mutable();
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
-		int roof = getSettings().getBedrockRoofHeight() - 1;
+		T settings = getSettings();
+		int roof = settings.getBedrockRoofHeight() - 1;
 
 		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
 		{
@@ -161,9 +160,9 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 				BlockState stateHere = chunk.getBlockState(posHere.setPos(pos.getX(), y, pos.getZ()));
 				BlockState stateAbove = chunk.getBlockState(posAbove.setPos(posHere).move(Direction.UP));
 
-				if (stateHere.getBlock() == DIRT.getBlock() && stateAbove.isAir(chunk, posAbove))
+				if (stateHere.getBlock() == settings.getGroundUnderBlock().getBlock() && stateAbove.isAir(chunk, posAbove))
 				{
-					chunk.setBlockState(posHere, GRASS_BLOCK, false);
+					chunk.setBlockState(posHere, settings.getGroundTopBlock(), false);
 				}
 			}
 		}
@@ -174,8 +173,8 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 	{
 		int centerX = region.getMainChunkX();
 		int centerZ = region.getMainChunkZ();
-		int xStart = centerX * 16;
-		int zStart = centerZ * 16;
+		int xStart = centerX << 4;
+		int zStart = centerZ << 4;
 		BlockPos pos = new BlockPos(xStart, 0, zStart);
 		Biome biome = this.getBiome(region.getBiomeManager(), pos.add(8, 8, 8));
 		SharedSeedRandom rand = new SharedSeedRandom();
@@ -210,7 +209,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 	}
 
 	@Override
-	public int func_222529_a(int x, int z, Type heightmapType)
+	public int func_222529_a(int x, int z, Heightmap.Type heightmapType)
 	{
 		return 0;
 	}

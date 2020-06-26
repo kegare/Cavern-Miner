@@ -4,6 +4,8 @@ import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.AbstractIterator;
 import com.mojang.datafixers.Dynamic;
 
@@ -28,50 +30,62 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 		super(factory);
 	}
 
-	@Override
-	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config)
+	@Nullable
+	public VeinProvider getVeinProvider(IWorld world)
 	{
 		if (world.getDimension() instanceof CavernDimension)
 		{
-			VeinProvider provider = ((CavernDimension)world.getDimension()).getVeinProvider();
-			boolean result = false;
-
-			for (Vein vein : provider.getVeins())
-			{
-				for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
-				{
-					if (genPos.equals(BlockPos.ZERO))
-					{
-						continue;
-					}
-
-					if (placeVein(world, rand, genPos, vein))
-					{
-						result = true;
-					}
-				}
-			}
-
-			for (Vein vein : provider.getAutoEntries())
-			{
-				for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
-				{
-					if (genPos.equals(BlockPos.ZERO))
-					{
-						continue;
-					}
-
-					if (placeVein(world, rand, genPos, vein))
-					{
-						result = true;
-					}
-				}
-			}
-
-			return result;
+			return ((CavernDimension)world.getDimension()).getVeinProvider();
 		}
 
-		return false;
+		return null;
+	}
+
+	@Override
+	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config)
+	{
+		VeinProvider provider = getVeinProvider(world);
+
+		if (provider == null)
+		{
+			return false;
+		}
+
+		boolean result = false;
+
+		for (Vein vein : provider.getVeins())
+		{
+			for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
+			{
+				if (genPos.equals(BlockPos.ZERO))
+				{
+					continue;
+				}
+
+				if (placeVein(world, rand, genPos, vein))
+				{
+					result = true;
+				}
+			}
+		}
+
+		for (Vein vein : provider.getAutoEntries())
+		{
+			for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
+			{
+				if (genPos.equals(BlockPos.ZERO))
+				{
+					continue;
+				}
+
+				if (placeVein(world, rand, genPos, vein))
+				{
+					result = true;
+				}
+			}
+		}
+
+		return result;
 	}
 
 	public Iterable<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, BlockPos pos, Random random, Vein vein)
