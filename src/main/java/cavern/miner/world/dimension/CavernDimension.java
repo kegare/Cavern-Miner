@@ -9,16 +9,16 @@ import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.client.renderer.EmptyRenderer;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.config.dimension.CavernConfig;
-import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveChunkGeneratorTypes;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.init.CaveSounds;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
-import cavern.miner.world.spawner.NaturalSpawner;
 import cavern.miner.world.spawner.CavernNaturalSpawner;
+import cavern.miner.world.spawner.NaturalSpawner;
 import cavern.miner.world.spawner.NaturalSpawnerType;
 import cavern.miner.world.vein.CavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
@@ -34,12 +34,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.provider.BiomeProviderType;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.ChunkGeneratorType;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -50,54 +50,36 @@ public class CavernDimension extends Dimension
 {
 	private static final Vec3d FOG_COLOR = new Vec3d(0.01D, 0.01D, 0.01D);
 
-	protected final CavernGenSettings settings;
-	protected final VeinProvider veinProvider;
-	protected final NaturalSpawner naturalSpawner;
+	private final NaturalSpawner naturalSpawner;
 
-	protected final float[] lightBrightnessTable = new float[16];
+	private final float[] lightBrightnessTable;
 
 	public CavernDimension(World world, DimensionType type)
 	{
 		super(world, type, 0);
-		this.settings = createGenerationSettings();
-		this.veinProvider = createVeinProvider();
 		this.naturalSpawner = createNaturalSpawner();
-
-		float brightness = getLightBrightness();
-
-		for (int i = 0; i <= 15; ++i)
-		{
-			float f = i / 15.0F;
-			float f1 = f / (4.0F - 3.0F * f);
-
-			this.lightBrightnessTable[i] = MathHelper.lerp(brightness, f1, 1.0F);
-		}
+		this.lightBrightnessTable = createLightBrightnessTable();
 	}
 
-	public Biome getBiome()
+	protected ChunkGeneratorType<CavernGenSettings, CavernChunkGenerator> getGeneratorType()
 	{
-		return CaveBiomes.CAVERN.get();
+		return CaveChunkGeneratorTypes.CAVERN.get();
 	}
 
 	@Override
 	public ChunkGenerator<? extends GenerationSettings> createChunkGenerator()
 	{
-		return new CavernChunkGenerator<>(world, BiomeProviderType.FIXED.create(BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(getBiome())), settings);
+		ChunkGeneratorType<CavernGenSettings, CavernChunkGenerator> type = getGeneratorType();
+		CavernGenSettings settings = type.createSettings();
+
+		settings.setVeinProvider(createVeinProvider());
+
+		return type.create(world, BiomeProviderType.FIXED.create(BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(settings.getDefaultBiome())), settings);
 	}
 
-	public CavernGenSettings createGenerationSettings()
-	{
-		return new CavernGenSettings();
-	}
-
-	public VeinProvider createVeinProvider()
+	protected VeinProvider createVeinProvider()
 	{
 		return new CavernVeinProvider();
-	}
-
-	public VeinProvider getVeinProvider()
-	{
-		return veinProvider;
 	}
 
 	public NaturalSpawnerType getSpawnerType()
@@ -106,7 +88,7 @@ public class CavernDimension extends Dimension
 	}
 
 	@Nullable
-	public NaturalSpawner createNaturalSpawner()
+	protected NaturalSpawner createNaturalSpawner()
 	{
 		if (world instanceof ServerWorld)
 		{
@@ -119,6 +101,22 @@ public class CavernDimension extends Dimension
 	public Optional<NaturalSpawner> getNaturalSpawner()
 	{
 		return Optional.ofNullable(naturalSpawner);
+	}
+
+	protected float[] createLightBrightnessTable()
+	{
+		float[] table = new float[16];
+		float brightness = getLightBrightness();
+
+		for (int i = 0; i < table.length; ++i)
+		{
+			float f = i / 15.0F;
+			float f1 = f / (4.0F - 3.0F * f);
+
+			table[i] = MathHelper.lerp(brightness, f1, 1.0F);
+		}
+
+		return table;
 	}
 
 	public float getLightBrightness()
@@ -341,22 +339,12 @@ public class CavernDimension extends Dimension
 	@OnlyIn(Dist.CLIENT)
 	public float getFogDensity(Entity entity)
 	{
-		if (settings.getGroundHeight() > 0)
-		{
-			return ((float)entity.getPosY() / settings.getGroundHeight()) * 0.005F;
-		}
-
-		return 0.0F;
+		return ((float)entity.getPosY() / (getActualHeight() * 0.5F)) * 0.005F;
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public float getFogDepth(Entity entity)
 	{
-		if (settings.getGroundHeight() > 0)
-		{
-			return MathHelper.clamp(((float)entity.getPosY() / settings.getGroundHeight()) * 0.65F, 0.0F, 1.0F);
-		}
-
-		return 0.0F;
+		return MathHelper.clamp(((float)entity.getPosY() / (getActualHeight() * 0.5F)) * 0.65F, 0.0F, 0.8F);
 	}
 }

@@ -90,7 +90,7 @@ public final class CavernCommand
 	private static void regenerateDimension(CommandContext<CommandSource> context) throws CommandSyntaxException
 	{
 		String name = StringArgumentType.getString(context, "name").toUpperCase();
-		DimensionType dim = null;
+		DimensionType dim;
 
 		if (name.equals("CAVERN"))
 		{
@@ -100,8 +100,7 @@ public final class CavernCommand
 		{
 			dim = CaveDimensions.HUGE_CAVERN_TYPE;
 		}
-
-		if (dim == null)
+		else
 		{
 			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.invalid").appendText(" : " + name));
 

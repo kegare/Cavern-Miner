@@ -4,14 +4,17 @@ import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
+import net.minecraft.world.gen.feature.BlockStateFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
+import net.minecraft.world.gen.placement.ChanceConfig;
 import net.minecraft.world.gen.placement.ChanceRangeConfig;
 import net.minecraft.world.gen.placement.CountConfig;
 import net.minecraft.world.gen.placement.FrequencyConfig;
@@ -67,6 +70,11 @@ public class CavernBiome extends Biome
 
 	protected void addCaveFeatures()
 	{
+		addFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS,
+			Feature.LAKE.withConfiguration(new BlockStateFeatureConfig(Blocks.WATER.getDefaultState())).withPlacement(CavePlacements.CAVE_LAKE.get().configure(new ChanceConfig(4))));
+		addFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS,
+			Feature.LAKE.withConfiguration(new BlockStateFeatureConfig(Blocks.LAVA.getDefaultState())).withPlacement(CavePlacements.CAVE_LAKE.get().configure(new ChanceConfig(10))));
+
 		addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
 			CaveFeatures.VEIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
 
@@ -97,7 +105,6 @@ public class CavernBiome extends Biome
 
 	protected void addFeatures()
 	{
-		DefaultBiomeFeatures.addLakes(this);
 		DefaultBiomeFeatures.addMonsterRooms(this);
 	}
 }

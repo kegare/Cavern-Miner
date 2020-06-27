@@ -32,11 +32,11 @@ import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGenerator<T>
+public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 {
 	private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
 
-	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, T settings)
+	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, CavernGenSettings settings)
 	{
 		super(world, biomeProvider, settings);
 	}
@@ -63,7 +63,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		BlockPos.Mutable posCache = new BlockPos.Mutable();
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
-		T settings = getSettings();
+		CavernGenSettings settings = getSettings();
 		int floor = settings.getBedrockFloorHeight();
 		int roof = settings.getBedrockRoofHeight();
 		boolean flat = settings.isFlatBedrock();
@@ -126,7 +126,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		BlockPos.Mutable posCache = new BlockPos.Mutable();
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
-		T settings = getSettings();
+		CavernGenSettings settings = getSettings();
 		int floor = settings.getBedrockFloorHeight() + 1;
 		int roof = settings.getBedrockRoofHeight() - 1;
 		int ground = getGroundHeight();
@@ -165,7 +165,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		BlockPos.Mutable posAbove = new BlockPos.Mutable();
 		int xStart = chunk.getPos().getXStart();
 		int zStart = chunk.getPos().getZStart();
-		T settings = getSettings();
+		CavernGenSettings settings = getSettings();
 		int roof = settings.getBedrockRoofHeight() - 1;
 
 		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))

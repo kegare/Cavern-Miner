@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.AbstractIterator;
 import com.mojang.datafixers.Dynamic;
 
-import cavern.miner.world.dimension.CavernDimension;
+import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.vein.Vein;
 import cavern.miner.world.vein.VeinProvider;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -31,11 +31,13 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 	}
 
 	@Nullable
-	public VeinProvider getVeinProvider(IWorld world)
+	public VeinProvider getVeinProvider(IWorld world, ChunkGenerator<? extends GenerationSettings> generator)
 	{
-		if (world.getDimension() instanceof CavernDimension)
+		GenerationSettings settings = generator.getSettings();
+
+		if (settings instanceof CavernGenSettings)
 		{
-			return ((CavernDimension)world.getDimension()).getVeinProvider();
+			return ((CavernGenSettings)settings).getVeinProvider();
 		}
 
 		return null;
@@ -44,7 +46,7 @@ public class VeinFeature extends Feature<NoFeatureConfig>
 	@Override
 	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config)
 	{
-		VeinProvider provider = getVeinProvider(world);
+		VeinProvider provider = getVeinProvider(world, generator);
 
 		if (provider == null)
 		{
