@@ -66,28 +66,43 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		T settings = getSettings();
 		int floor = settings.getBedrockFloorHeight();
 		int roof = settings.getBedrockRoofHeight();
+		boolean flat = settings.isFlatBedrock();
 		int ground = getGroundHeight();
 
 		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
 		{
 			if (floor < 256)
 			{
-				for (int y = floor + 4; y >= floor; --y)
+				if (flat)
 				{
-					if (y <= floor + rand.nextInt(5))
+					chunk.setBlockState(posCache.setPos(pos.getX(), floor, pos.getZ()), BEDROCK, false);
+				}
+				else
+				{
+					for (int y = floor + 4; y >= floor; --y)
 					{
-						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), BEDROCK, false);
+						if (y <= floor + rand.nextInt(5))
+						{
+							chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), BEDROCK, false);
+						}
 					}
 				}
 			}
 
 			if (roof > 0)
 			{
-				for (int y = roof; y >= roof - 4; --y)
+				if (flat)
 				{
-					if (y >= roof - rand.nextInt(5))
+					chunk.setBlockState(posCache.setPos(pos.getX(), roof, pos.getZ()), BEDROCK, false);
+				}
+				else
+				{
+					for (int y = roof; y >= roof - 4; --y)
 					{
-						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), BEDROCK, false);
+						if (y >= roof - rand.nextInt(5))
+						{
+							chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), BEDROCK, false);
+						}
 					}
 				}
 			}

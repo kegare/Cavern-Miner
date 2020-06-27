@@ -18,6 +18,7 @@ public class CavernConfig
 
 	public final ForgeConfigSpec.DoubleValue lightBrightness;
 
+	public final ForgeConfigSpec.BooleanValue flatBedrock;
 	public final ForgeConfigSpec.DoubleValue cave;
 	public final ForgeConfigSpec.DoubleValue canyon;
 	public final ForgeConfigSpec.DoubleValue extremeCave;
@@ -56,6 +57,7 @@ public class CavernConfig
 		builder.pop();
 
 		builder.push("decoration");
+		flatBedrock = builder.comment("If true, generate flat bedrock layers.", serverSide).define("flat_bedrock", false);
 		cave = builder.comment("The generation probability of caves.", serverSide).defineInRange("cave", 0.2D, 0.0D, 1.0D);
 		canyon = builder.comment("The generation probability of canyons.", serverSide).defineInRange("canyon", 0.02D, 0.0D, 1.0D);
 		extremeCave = builder.comment("The generation probability of extreme caves.", serverSide).defineInRange("extreme_cave", 0.15D, 0.0D, 1.0D);

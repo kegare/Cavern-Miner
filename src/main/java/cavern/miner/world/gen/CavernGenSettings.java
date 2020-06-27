@@ -22,6 +22,11 @@ public class CavernGenSettings extends GenerationSettings
 		return 0;
 	}
 
+	public boolean isFlatBedrock()
+	{
+		return CavernConfig.INSTANCE.flatBedrock.get();
+	}
+
 	public int getGroundHeight()
 	{
 		return CavernConfig.INSTANCE.groundDecoration.get() ? 150 : 0;

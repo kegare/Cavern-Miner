@@ -18,6 +18,7 @@ public class HugeCavernConfig
 
 	public final ForgeConfigSpec.DoubleValue lightBrightness;
 
+	public final ForgeConfigSpec.BooleanValue flatBedrock;
 	public final ForgeConfigSpec.DoubleValue cave;
 
 	public final ForgeConfigSpec.EnumValue<NaturalSpawnerType> spawnerType;
@@ -50,6 +51,7 @@ public class HugeCavernConfig
 		builder.pop();
 
 		builder.push("decoration");
+		flatBedrock = builder.comment("If true, generate flat bedrock layers.", serverSide).define("flat_bedrock", false);
 		cave = builder.comment("The generation probability of caves.", serverSide).defineInRange("cave", 0.5D, 0.0D, 1.0D);
 		builder.pop();
 
