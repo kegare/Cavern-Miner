@@ -4,9 +4,9 @@ import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.gen.HugeCavernGenSettings;
-import cavern.miner.world.spawner.CaveMobSpawner;
-import cavern.miner.world.spawner.HugeCavernMobSpawner;
-import cavern.miner.world.spawner.WorldSpawnerType;
+import cavern.miner.world.spawner.NaturalSpawner;
+import cavern.miner.world.spawner.HugeCavernNaturalSpawner;
+import cavern.miner.world.spawner.NaturalSpawnerType;
 import cavern.miner.world.vein.HugeCavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
@@ -44,17 +44,17 @@ public class HugeCavernDimension extends CavernDimension
 	}
 
 	@Override
-	public WorldSpawnerType getSpawnerType()
+	public NaturalSpawnerType getSpawnerType()
 	{
 		return HugeCavernConfig.INSTANCE.spawnerType.get();
 	}
 
 	@Override
-	public CaveMobSpawner createCaveMobSpawner()
+	public NaturalSpawner createNaturalSpawner()
 	{
 		if (world instanceof ServerWorld)
 		{
-			return new HugeCavernMobSpawner((ServerWorld)world);
+			return new HugeCavernNaturalSpawner((ServerWorld)world);
 		}
 
 		return null;

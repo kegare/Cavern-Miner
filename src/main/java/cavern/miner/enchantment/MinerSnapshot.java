@@ -2,10 +2,9 @@ package cavern.miner.enchantment;
 
 import java.util.Comparator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.annotation.Nullable;
-
-import com.google.common.collect.Sets;
 
 import cavern.miner.util.BlockStateHelper;
 import net.minecraft.block.BlockState;
@@ -23,7 +22,7 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 	protected final BlockState originState;
 	protected final LivingEntity miner;
 
-	protected final Set<BlockPos> miningTargets = Sets.newTreeSet(this);
+	protected final Set<BlockPos> miningTargets = new TreeSet<>(this);
 
 	public MinerSnapshot(EnchantmentMiner ench, World world, BlockPos pos, BlockState state, @Nullable LivingEntity entity)
 	{

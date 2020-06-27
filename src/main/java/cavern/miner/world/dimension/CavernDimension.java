@@ -17,9 +17,9 @@ import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.Caver;
 import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
-import cavern.miner.world.spawner.CaveMobSpawner;
-import cavern.miner.world.spawner.CavernMobSpawner;
-import cavern.miner.world.spawner.WorldSpawnerType;
+import cavern.miner.world.spawner.NaturalSpawner;
+import cavern.miner.world.spawner.CavernNaturalSpawner;
+import cavern.miner.world.spawner.NaturalSpawnerType;
 import cavern.miner.world.vein.CavernVeinProvider;
 import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
@@ -52,7 +52,7 @@ public class CavernDimension extends Dimension
 
 	protected final CavernGenSettings settings;
 	protected final VeinProvider veinProvider;
-	protected final CaveMobSpawner caveMobSpawner;
+	protected final NaturalSpawner naturalSpawner;
 
 	protected final float[] lightBrightnessTable = new float[16];
 
@@ -61,7 +61,7 @@ public class CavernDimension extends Dimension
 		super(world, type, 0);
 		this.settings = createGenerationSettings();
 		this.veinProvider = createVeinProvider();
-		this.caveMobSpawner = createCaveMobSpawner();
+		this.naturalSpawner = createNaturalSpawner();
 
 		float brightness = getLightBrightness();
 
@@ -100,25 +100,25 @@ public class CavernDimension extends Dimension
 		return veinProvider;
 	}
 
-	public WorldSpawnerType getSpawnerType()
+	public NaturalSpawnerType getSpawnerType()
 	{
 		return CavernConfig.INSTANCE.spawnerType.get();
 	}
 
 	@Nullable
-	public CaveMobSpawner createCaveMobSpawner()
+	public NaturalSpawner createNaturalSpawner()
 	{
 		if (world instanceof ServerWorld)
 		{
-			return new CavernMobSpawner((ServerWorld)world);
+			return new CavernNaturalSpawner((ServerWorld)world);
 		}
 
 		return null;
 	}
 
-	public Optional<CaveMobSpawner> getCaveMobSpawner()
+	public Optional<NaturalSpawner> getNaturalSpawner()
 	{
-		return Optional.ofNullable(caveMobSpawner);
+		return Optional.ofNullable(naturalSpawner);
 	}
 
 	public float getLightBrightness()

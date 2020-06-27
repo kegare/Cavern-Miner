@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import cavern.miner.world.dimension.CavernDimension;
-import cavern.miner.world.spawner.CaveMobSpawner;
-import cavern.miner.world.spawner.WorldSpawnerType;
+import cavern.miner.world.spawner.NaturalSpawner;
+import cavern.miner.world.spawner.NaturalSpawnerType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.crash.CrashReport;
@@ -236,9 +236,9 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 		{
 			CavernDimension cavern = (CavernDimension)world.getDimension();
 
-			if (cavern.getSpawnerType() == WorldSpawnerType.CAVERN)
+			if (cavern.getSpawnerType() == NaturalSpawnerType.CAVERN)
 			{
-				cavern.getCaveMobSpawner().ifPresent(CaveMobSpawner::spawnMobs);
+				cavern.getNaturalSpawner().ifPresent(NaturalSpawner::spawnMobs);
 			}
 		}
 	}
@@ -248,7 +248,7 @@ public class CavernChunkGenerator<T extends CavernGenSettings> extends ChunkGene
 	{
 		if (world.getDimension() instanceof CavernDimension)
 		{
-			if (((CavernDimension)world.getDimension()).getSpawnerType() != WorldSpawnerType.VANILLA)
+			if (((CavernDimension)world.getDimension()).getSpawnerType() != NaturalSpawnerType.VANILLA)
 			{
 				return Collections.emptyList();
 			}

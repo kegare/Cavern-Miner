@@ -5,9 +5,9 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.server.ServerWorld;
 
-public class CavernMobSpawner extends CaveMobSpawner
+public class CavernNaturalSpawner extends NaturalSpawner
 {
-	public CavernMobSpawner(ServerWorld world)
+	public CavernNaturalSpawner(ServerWorld world)
 	{
 		super(world);
 	}
