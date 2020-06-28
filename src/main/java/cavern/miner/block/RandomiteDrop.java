@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ImmutableList;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -54,11 +53,6 @@ public final class RandomiteDrop
 	public static void clear()
 	{
 		ENTRIES.clear();
-	}
-
-	public static ImmutableList<DropEntry> getEntries()
-	{
-		return ImmutableList.copyOf(ENTRIES);
 	}
 
 	public static abstract class DropEntry extends WeightedRandom.Item
