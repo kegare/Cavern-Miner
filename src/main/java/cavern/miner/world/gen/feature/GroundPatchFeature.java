@@ -25,7 +25,7 @@ public class GroundPatchFeature extends RandomPatchFeature
 	@Override
 	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, BlockClusterFeatureConfig config)
 	{
-		int max = world.getMaxHeight() - 1;
+		int max = generator.getMaxHeight() - 1;
 		int ground = generator.getGroundHeight();
 		int ySpread = max - ground;
 		BlockState state = config.stateProvider.getBlockState(rand, pos);

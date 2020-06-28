@@ -67,12 +67,12 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 		return result;
 	}
 
-	public Iterable<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, BlockPos pos, Random random, Vein vein)
+	public Iterable<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, BlockPos pos, Random rand, Vein vein)
 	{
 		return () -> new AbstractIterator<BlockPos>()
 		{
 			final int ground = generator.getGroundHeight();
-			final int worldHeight = world.getMaxHeight() - 1;
+			final int maxHeight = generator.getMaxHeight() - 1;
 			final int size = vein.getSize();
 			final int min = vein.getMinHeight() + size;
 			final int max = vein.getMaxHeight() - size;
@@ -90,12 +90,12 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 					return endOfData();
 				}
 
-				int x = random.nextInt(16) + pos.getX();
-				int z = random.nextInt(16) + pos.getZ();
+				int x = rand.nextInt(16) + pos.getX();
+				int z = rand.nextInt(16) + pos.getZ();
 
 				targetY.clear();
 
-				for (int y = Math.max(min, 1); y <= Math.min(max, ground > 0 ? ground - 1 : worldHeight); ++y)
+				for (int y = Math.max(min, 1); y <= Math.min(max, ground > 0 ? ground - 1 : maxHeight); ++y)
 				{
 					if (!world.isAirBlock(findPos.setPos(x, y, z)) && vein.isTargetBlock(world.getBlockState(findPos)))
 					{
@@ -110,7 +110,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 
 				if (prevPos.equals(BlockPos.ZERO))
 				{
-					findPos.setPos(x, targetY.getInt(random.nextInt(targetY.size())), z);
+					findPos.setPos(x, targetY.getInt(rand.nextInt(targetY.size())), z);
 				}
 				else
 				{
@@ -118,10 +118,10 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 
 					for (int i = 0, j = targetY.size(); i < j; ++i)
 					{
-						if (findPos.setPos(x, targetY.getInt(random.nextInt(j)), z).withinDistance(prevPos, size))
+						if (findPos.setPos(x, targetY.getInt(rand.nextInt(j)), z).withinDistance(prevPos, size))
 						{
-							x = random.nextInt(16) + pos.getX();
-							z = random.nextInt(16) + pos.getZ();
+							x = rand.nextInt(16) + pos.getX();
+							z = rand.nextInt(16) + pos.getZ();
 						}
 						else
 						{

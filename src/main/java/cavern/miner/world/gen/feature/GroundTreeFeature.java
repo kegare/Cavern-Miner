@@ -43,7 +43,7 @@ public class GroundTreeFeature extends Feature<CountConfig>
 			tree = BIRCH_TREE;
 		}
 
-		int max = world.getMaxHeight() - 1;
+		int max = generator.getMaxHeight() - 1;
 		int ground = generator.getGroundHeight();
 		int groundHeight = max - ground - 10;
 		BlockPos originPos = new BlockPos(pos.getX(), ground, pos.getZ());

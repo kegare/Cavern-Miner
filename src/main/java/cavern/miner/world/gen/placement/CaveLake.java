@@ -21,15 +21,11 @@ public class CaveLake extends Placement<ChanceConfig>
 	}
 
 	@Override
-	public Stream<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random random, ChanceConfig config, BlockPos pos)
+	public Stream<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, ChanceConfig config, BlockPos pos)
 	{
-		if (random.nextInt(config.chance) == 0)
+		if (rand.nextInt(config.chance) == 0)
 		{
-			int x = random.nextInt(16) + pos.getX();
-			int z = random.nextInt(16) + pos.getZ();
-			int y = random.nextInt(generator.getMaxHeight() - 15) + 5;
-
-			return Stream.of(new BlockPos(x, y, z));
+			return Stream.of(new BlockPos(rand.nextInt(16) + pos.getX(), rand.nextInt(generator.getMaxHeight() - 15) + 5, rand.nextInt(16) + pos.getZ()));
 		}
 
 		return Stream.empty();

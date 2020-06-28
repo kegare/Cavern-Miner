@@ -33,7 +33,7 @@ public class HugeCavernBiome extends CavernBiome
 	}
 
 	@Override
-	protected void addCaveFeatures()
+	protected void addFeatures()
 	{
 		addFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS,
 			Feature.LAKE.withConfiguration(new BlockStateFeatureConfig(Blocks.WATER.getDefaultState())).withPlacement(CavePlacements.CAVE_LAKE.get().configure(new ChanceConfig(3))));
@@ -43,7 +43,4 @@ public class HugeCavernBiome extends CavernBiome
 		addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
 			CaveFeatures.VEIN.get().withConfiguration(VeinFeatureConfig.ProviderType.HUGE_CAVERN.createConfig()).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
 	}
-
-	@Override
-	protected void addFeatures() {}
 }

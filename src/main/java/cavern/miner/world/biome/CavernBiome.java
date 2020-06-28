@@ -12,6 +12,7 @@ import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
 import net.minecraft.world.gen.feature.BlockStateFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
+import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.placement.ChanceConfig;
 import net.minecraft.world.gen.placement.ChanceRangeConfig;
@@ -27,13 +28,12 @@ public class CavernBiome extends Biome
 	{
 		super(new Biome.Builder().surfaceBuilder(SurfaceBuilder.NOPE, SurfaceBuilder.STONE_STONE_GRAVEL_CONFIG).precipitation(Biome.RainType.NONE)
 			.depth(-1.0F).scale(0.0F).temperature(0.5F).downfall(0.0F).waterColor(4159204).waterFogColor(329011).category(Biome.Category.NONE).parent(null));
-		this.addFeatures();
 	}
 
 	public void init()
 	{
 		addCarvers();
-		addCaveFeatures();
+		addFeatures();
 	}
 
 	protected void addCarvers()
@@ -67,7 +67,7 @@ public class CavernBiome extends Biome
 		}
 	}
 
-	protected void addCaveFeatures()
+	protected void addFeatures()
 	{
 		addFeature(GenerationStage.Decoration.LOCAL_MODIFICATIONS,
 			Feature.LAKE.withConfiguration(new BlockStateFeatureConfig(Blocks.WATER.getDefaultState())).withPlacement(CavePlacements.CAVE_LAKE.get().configure(new ChanceConfig(4))));
@@ -76,6 +76,9 @@ public class CavernBiome extends Biome
 
 		addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
 			CaveFeatures.VEIN.get().withConfiguration(VeinFeatureConfig.ProviderType.CAVERN.createConfig()).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
+
+		addFeature(GenerationStage.Decoration.UNDERGROUND_STRUCTURES,
+			Feature.MONSTER_ROOM.withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(CavePlacements.CAVE_DUNGEON_ROOM.get().configure(new FrequencyConfig(8))));
 
 		float chance = CavernConfig.INSTANCE.towerDungeon.get().floatValue();
 
@@ -100,10 +103,5 @@ public class CavernBiome extends Biome
 
 		addFeature(GenerationStage.Decoration.VEGETAL_DECORATION,
 			CaveFeatures.GROUND_TREE.get().withConfiguration(new CountConfig(32)).withPlacement(place.configure(new FrequencyConfig(10))));
-	}
-
-	protected void addFeatures()
-	{
-		DefaultBiomeFeatures.addMonsterRooms(this);
 	}
 }
