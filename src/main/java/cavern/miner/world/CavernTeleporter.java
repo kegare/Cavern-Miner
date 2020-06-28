@@ -132,14 +132,14 @@ public class CavernTeleporter implements ITeleporter
 			.filter(o -> new BlockPos(o.getX(), 0, o.getZ()).withinDistance(new BlockPos(checkPos.getX(), 0, checkPos.getZ()), radius))
 			.sorted((o1, o2) -> Double.compare(o1.distanceSq(checkPos), o2.distanceSq(checkPos))).collect(Collectors.toList());
 
-		for (BlockPos portalPos : positions)
+		for (BlockPos pos : positions)
 		{
-			if (placeInPortal(world, entity, yaw, 8, portalPos))
+			if (placeInPortal(world, entity, yaw, 8, pos))
 			{
 				return true;
 			}
 
-			list.removePortal(portalBlock, portalPos);
+			list.removePortal(portalBlock, pos);
 		}
 
 		return false;
@@ -147,7 +147,7 @@ public class CavernTeleporter implements ITeleporter
 
 	public boolean placeInPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos)
 	{
-		BlockPos pos = null;
+		final BlockPos pos;
 
 		if (world.getBlockState(checkPos).getBlock() == portalBlock)
 		{
@@ -159,18 +159,11 @@ public class CavernTeleporter implements ITeleporter
 
 			if (pos == null)
 			{
-				pos = world.getSpawnPoint();
-			}
-
-			if (world.getBlockState(pos).getBlock() != portalBlock)
-			{
 				return false;
 			}
 		}
 
-		final BlockPos portalPos = pos.toImmutable();
-
-		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(portalBlock, portalPos));
+		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(portalBlock, pos));
 
 		if (portalVec == null)
 		{
@@ -182,8 +175,8 @@ public class CavernTeleporter implements ITeleporter
 			teleportDirection = Direction.NORTH;
 		}
 
-		BlockPattern.PatternHelper pattern = portalBlock.createPatternHelper(world, portalPos);
-		BlockPattern.PortalInfo portalInfo = pattern.getPortalInfo(teleportDirection, portalPos, portalVec.y, entity.getMotion(), portalVec.x);
+		BlockPattern.PatternHelper pattern = portalBlock.createPatternHelper(world, pos);
+		BlockPattern.PortalInfo portalInfo = pattern.getPortalInfo(teleportDirection, pos, portalVec.y, entity.getMotion(), portalVec.x);
 
 		if (portalInfo == null)
 		{
