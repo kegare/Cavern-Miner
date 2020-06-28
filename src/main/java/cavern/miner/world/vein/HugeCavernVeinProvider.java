@@ -2,8 +2,6 @@ package cavern.miner.world.vein;
 
 import java.util.List;
 
-import com.google.common.collect.ImmutableList;
-
 import cavern.miner.config.dimension.HugeCavernConfig;
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.BlockState;
@@ -11,9 +9,9 @@ import net.minecraft.block.BlockState;
 public class HugeCavernVeinProvider extends VeinProvider
 {
 	@Override
-	public ImmutableList<Vein> getVeins()
+	public List<Vein> getVeins()
 	{
-		return ImmutableList.copyOf(HugeCavernConfig.INSTANCE.veins.getVeins());
+		return HugeCavernConfig.INSTANCE.veins.getVeins();
 	}
 
 	@Override

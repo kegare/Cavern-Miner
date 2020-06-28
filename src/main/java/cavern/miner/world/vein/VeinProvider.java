@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
-
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,9 +29,9 @@ public class VeinProvider
 
 	protected final List<Vein> autoEntries = new ArrayList<>();
 
-	public ImmutableList<Vein> getVeins()
+	public List<Vein> getVeins()
 	{
-		return ImmutableList.of();
+		return Collections.emptyList();
 	}
 
 	@Nullable
