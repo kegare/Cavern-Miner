@@ -4,15 +4,14 @@ import cavern.miner.config.dimension.CavernConfig;
 import cavern.miner.init.CaveFeatures;
 import cavern.miner.init.CavePlacements;
 import cavern.miner.init.CaveWorldCarvers;
+import cavern.miner.world.gen.feature.VeinFeatureConfig;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.carver.ConfiguredCarver;
 import net.minecraft.world.gen.feature.BlockClusterFeatureConfig;
 import net.minecraft.world.gen.feature.BlockStateFeatureConfig;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.placement.ChanceConfig;
 import net.minecraft.world.gen.placement.ChanceRangeConfig;
@@ -43,28 +42,28 @@ public class CavernBiome extends Biome
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN.get(), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, createCarver(CaveWorldCarvers.CAVERN.get(), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.canyon.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.CAVERN_CANYON.get(), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, createCarver(CaveWorldCarvers.CAVERN_CANYON.get(), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.extremeCave.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CAVE.get(), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, createCarver(CaveWorldCarvers.EXTREME_CAVE.get(), new ProbabilityConfig(probability)));
 		}
 
 		probability = CavernConfig.INSTANCE.extremeCanyon.get().floatValue();
 
 		if (probability > 0.0F)
 		{
-			addCarver(GenerationStage.Carving.AIR, new ConfiguredCarver<>(CaveWorldCarvers.EXTREME_CANYON.get(), new ProbabilityConfig(probability)));
+			addCarver(GenerationStage.Carving.AIR, createCarver(CaveWorldCarvers.EXTREME_CANYON.get(), new ProbabilityConfig(probability)));
 		}
 	}
 
@@ -76,7 +75,7 @@ public class CavernBiome extends Biome
 			Feature.LAKE.withConfiguration(new BlockStateFeatureConfig(Blocks.LAVA.getDefaultState())).withPlacement(CavePlacements.CAVE_LAKE.get().configure(new ChanceConfig(10))));
 
 		addFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
-			CaveFeatures.VEIN.get().withConfiguration(IFeatureConfig.NO_FEATURE_CONFIG).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
+			CaveFeatures.VEIN.get().withConfiguration(VeinFeatureConfig.ProviderType.CAVERN.createConfig()).withPlacement(Placement.NOPE.configure(IPlacementConfig.NO_PLACEMENT_CONFIG)));
 
 		float chance = CavernConfig.INSTANCE.towerDungeon.get().floatValue();
 

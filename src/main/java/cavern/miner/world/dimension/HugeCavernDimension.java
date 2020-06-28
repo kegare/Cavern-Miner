@@ -7,8 +7,6 @@ import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.HugeCavernNaturalSpawner;
 import cavern.miner.world.spawner.NaturalSpawner;
 import cavern.miner.world.spawner.NaturalSpawnerType;
-import cavern.miner.world.vein.HugeCavernVeinProvider;
-import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -29,12 +27,6 @@ public class HugeCavernDimension extends CavernDimension
 	protected ChunkGeneratorType<CavernGenSettings, CavernChunkGenerator> getGeneratorType()
 	{
 		return CaveChunkGeneratorTypes.HUGE_CAVERN.get();
-	}
-
-	@Override
-	protected VeinProvider createVeinProvider()
-	{
-		return new HugeCavernVeinProvider();
 	}
 
 	@Override

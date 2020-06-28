@@ -20,8 +20,6 @@ import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.spawner.CavernNaturalSpawner;
 import cavern.miner.world.spawner.NaturalSpawner;
 import cavern.miner.world.spawner.NaturalSpawnerType;
-import cavern.miner.world.vein.CavernVeinProvider;
-import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -72,14 +70,7 @@ public class CavernDimension extends Dimension
 		ChunkGeneratorType<CavernGenSettings, CavernChunkGenerator> type = getGeneratorType();
 		CavernGenSettings settings = type.createSettings();
 
-		settings.setVeinProvider(createVeinProvider());
-
 		return type.create(world, BiomeProviderType.FIXED.create(BiomeProviderType.FIXED.createSettings(world.getWorldInfo()).setBiome(settings.getDefaultBiome())), settings);
-	}
-
-	protected VeinProvider createVeinProvider()
-	{
-		return new CavernVeinProvider();
 	}
 
 	public NaturalSpawnerType getSpawnerType()

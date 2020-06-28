@@ -4,12 +4,9 @@ import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
-
 import com.google.common.collect.AbstractIterator;
 import com.mojang.datafixers.Dynamic;
 
-import cavern.miner.world.gen.CavernGenSettings;
 import cavern.miner.world.vein.Vein;
 import cavern.miner.world.vein.VeinProvider;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -21,38 +18,18 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.NoFeatureConfig;
 
-public class VeinFeature extends Feature<NoFeatureConfig>
+public class VeinFeature extends Feature<VeinFeatureConfig>
 {
-	public VeinFeature(Function<Dynamic<?>, ? extends NoFeatureConfig> factory)
+	public VeinFeature(Function<Dynamic<?>, ? extends VeinFeatureConfig> factory)
 	{
 		super(factory);
 	}
 
-	@Nullable
-	public VeinProvider getVeinProvider(IWorld world, ChunkGenerator<? extends GenerationSettings> generator)
-	{
-		GenerationSettings settings = generator.getSettings();
-
-		if (settings instanceof CavernGenSettings)
-		{
-			return ((CavernGenSettings)settings).getVeinProvider();
-		}
-
-		return null;
-	}
-
 	@Override
-	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, NoFeatureConfig config)
+	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, VeinFeatureConfig config)
 	{
-		VeinProvider provider = getVeinProvider(world, generator);
-
-		if (provider == null)
-		{
-			return false;
-		}
-
+		VeinProvider provider = config.getProvider();
 		boolean result = false;
 
 		for (Vein vein : provider.getVeins())
