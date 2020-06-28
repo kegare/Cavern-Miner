@@ -129,9 +129,6 @@ public class CrackedStoneBlock extends CaveOreBlock
 
 	protected void fireExplosion(World world, BlockPos pos)
 	{
-		double posX = pos.getX() + 0.5D;
-		double posY = pos.getY() + 0.5D;
-		double posZ = pos.getZ() + 0.5D;
 		float strength = 1.45F;
 
 		if (RANDOM.nextDouble() < 0.15D)
@@ -139,6 +136,6 @@ public class CrackedStoneBlock extends CaveOreBlock
 			strength = 3.0F;
 		}
 
-		world.createExplosion(null, posX, posY, posZ, strength, false, Explosion.Mode.NONE);
+		world.createExplosion(null, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, strength, false, Explosion.Mode.NONE);
 	}
 }

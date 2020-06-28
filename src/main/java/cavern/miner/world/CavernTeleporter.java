@@ -116,14 +116,21 @@ public class CavernTeleporter implements ITeleporter
 	{
 		ResourceLocation key = portalBlock.getRegistryName();
 		DimensionType dim = world.getDimension().getType();
-		BlockPos pos = cache.getLastPos(key, dim, null);
+		BlockPos pos = cache.getLastPos(key, dim).orElse(null);
 
 		if (pos == null)
 		{
 			return false;
 		}
 
-		return placeInPortal(world, entity, yaw, radius, pos);
+		if (placeInPortal(world, entity, yaw, radius, pos))
+		{
+			return true;
+		}
+
+		cache.setLastPos(key, dim, null);
+
+		return false;
 	}
 
 	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos, CavePortalList list)

@@ -41,7 +41,7 @@ public class RandomiteOreBlock extends CaveOreBlock
 		List<ItemStack> drops = Lists.newArrayList();
 		ItemStack stack = builder.get(LootParameters.TOOL);
 
-		if (EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, stack) > 0)
+		if (stack != null && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, stack) > 0)
 		{
 			drops.add(new ItemStack(this));
 

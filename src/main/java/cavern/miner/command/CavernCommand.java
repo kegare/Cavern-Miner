@@ -37,7 +37,7 @@ public final class CavernCommand
 {
 	private static final SimpleCommandExceptionType INVALID_MINER = new SimpleCommandExceptionType(new TranslationTextComponent("cavern.message.miner.invalid"));
 
-	public static void register(CommandDispatcher<CommandSource> dispatcher)
+	public static void register(final CommandDispatcher<CommandSource> dispatcher)
 	{
 		dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("cavern").then(registerRegenerate()).then(registerReload()).then(registerMiner()).then(registerRecord()));
 	}

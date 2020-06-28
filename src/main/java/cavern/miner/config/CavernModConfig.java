@@ -60,16 +60,13 @@ public class CavernModConfig
 
 			if (file.canRead() && file.length() > 0L)
 			{
-				FileInputStream fis = new FileInputStream(file);
-				BufferedReader buffer = new BufferedReader(new InputStreamReader(fis));
-
-				while (line == null)
+				try (FileInputStream fis = new FileInputStream(file); BufferedReader buffer = new BufferedReader(new InputStreamReader(fis)))
 				{
-					line = buffer.readLine();
+					while (line == null)
+					{
+						line = buffer.readLine();
+					}
 				}
-
-				buffer.close();
-				fis.close();
 			}
 
 			if (INTERNAL_VERSION.equals(Strings.nullToEmpty(line)))
@@ -99,13 +96,10 @@ public class CavernModConfig
 
 			if (file.canWrite())
 			{
-				FileOutputStream fos = new FileOutputStream(file);
-				BufferedWriter buffer = new BufferedWriter(new OutputStreamWriter(fos));
-
-				buffer.write(INTERNAL_VERSION);
-
-				buffer.close();
-				fos.close();
+				try (FileOutputStream fos = new FileOutputStream(file); BufferedWriter buffer = new BufferedWriter(new OutputStreamWriter(fos)))
+				{
+					buffer.write(INTERNAL_VERSION);
+				}
 			}
 		}
 		catch (IOException e)

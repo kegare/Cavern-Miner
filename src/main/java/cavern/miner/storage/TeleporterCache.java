@@ -3,8 +3,9 @@ package cavern.miner.storage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
-import org.apache.commons.lang3.ObjectUtils;
+import javax.annotation.Nullable;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -25,37 +26,29 @@ public class TeleporterCache implements INBTSerializable<CompoundNBT>
 	private final Map<ResourceLocation, DimensionType> lastDim = new HashMap<>();
 	private final Table<ResourceLocation, DimensionType, BlockPos> lastPos = HashBasedTable.create();
 
-	public DimensionType getLastDim(ResourceLocation key)
+	public Optional<DimensionType> getLastDim(ResourceLocation key)
 	{
-		return getLastDim(key, DimensionType.OVERWORLD);
+		return Optional.ofNullable(lastDim.get(key));
 	}
 
-	public DimensionType getLastDim(ResourceLocation key, DimensionType nullDefault)
+	public void setLastDim(ResourceLocation key, @Nullable DimensionType type)
 	{
-		return lastDim.getOrDefault(key, nullDefault);
+		if (type == null)
+		{
+			lastDim.remove(key);
+		}
+		else
+		{
+			lastDim.put(key, type);
+		}
 	}
 
-	public void setLastDim(ResourceLocation key, DimensionType type)
+	public Optional<BlockPos> getLastPos(ResourceLocation key, DimensionType type)
 	{
-		lastDim.put(key, type);
+		return Optional.ofNullable(lastPos.get(key, type));
 	}
 
-	public BlockPos getLastPos(ResourceLocation key, DimensionType type)
-	{
-		return lastPos.get(key, type);
-	}
-
-	public BlockPos getLastPos(ResourceLocation key, DimensionType type, BlockPos nullDefault)
-	{
-		return ObjectUtils.defaultIfNull(getLastPos(key, type), ObjectUtils.defaultIfNull(nullDefault, BlockPos.ZERO));
-	}
-
-	public boolean hasLastPos(ResourceLocation key, DimensionType type)
-	{
-		return lastPos.contains(key, type);
-	}
-
-	public void setLastPos(ResourceLocation key, DimensionType type, BlockPos pos)
+	public void setLastPos(ResourceLocation key, DimensionType type, @Nullable BlockPos pos)
 	{
 		if (pos == null)
 		{
@@ -64,17 +57,6 @@ public class TeleporterCache implements INBTSerializable<CompoundNBT>
 		else
 		{
 			lastPos.put(key, type, pos);
-		}
-	}
-
-	public void clearLastPos(ResourceLocation key, DimensionType type)
-	{
-		for (Cell<ResourceLocation, DimensionType, BlockPos> entry : lastPos.cellSet())
-		{
-			if ((key == null || entry.getRowKey().equals(key)) && entry.getColumnKey() == type)
-			{
-				lastPos.remove(entry.getRowKey(), entry.getColumnKey());
-			}
 		}
 	}
 
