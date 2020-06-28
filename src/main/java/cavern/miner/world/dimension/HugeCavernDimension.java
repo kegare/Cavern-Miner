@@ -36,7 +36,7 @@ public class HugeCavernDimension extends CavernDimension
 	}
 
 	@Override
-	protected NaturalSpawner createNaturalSpawner()
+	public NaturalSpawner createNaturalSpawner()
 	{
 		if (world instanceof ServerWorld)
 		{

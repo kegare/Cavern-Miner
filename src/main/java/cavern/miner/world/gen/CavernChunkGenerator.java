@@ -36,6 +36,8 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 {
 	private static final BlockState BEDROCK = Blocks.BEDROCK.getDefaultState();
 
+	private NaturalSpawner naturalSpawner;
+
 	public CavernChunkGenerator(IWorld world, BiomeProvider biomeProvider, CavernGenSettings settings)
 	{
 		super(world, biomeProvider, settings);
@@ -232,18 +234,15 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 	@Override
 	public void spawnMobs(ServerWorld world, boolean spawnHostileMobs, boolean spawnPeacefulMobs)
 	{
-		if (!spawnHostileMobs)
-		{
-			return;
-		}
-
 		if (world.getWorldInfo().getGenerator() == WorldType.DEBUG_ALL_BLOCK_STATES)
 		{
 			return;
 		}
 
-		if (world.getDifficulty() == Difficulty.PEACEFUL || !world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING))
+		if (!spawnHostileMobs || world.getDifficulty() == Difficulty.PEACEFUL || !world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING))
 		{
+			naturalSpawner = null;
+
 			return;
 		}
 
@@ -253,7 +252,15 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 
 			if (cavern.getSpawnerType() == NaturalSpawnerType.CAVERN)
 			{
-				cavern.getNaturalSpawner().ifPresent(NaturalSpawner::spawnMobs);
+				if (naturalSpawner == null)
+				{
+					naturalSpawner = cavern.createNaturalSpawner();
+				}
+
+				if (naturalSpawner != null)
+				{
+					naturalSpawner.spawnMobs();
+				}
 			}
 		}
 	}

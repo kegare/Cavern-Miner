@@ -1,7 +1,6 @@
 package cavern.miner.world.dimension;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -48,14 +47,11 @@ public class CavernDimension extends Dimension
 {
 	private static final Vec3d FOG_COLOR = new Vec3d(0.01D, 0.01D, 0.01D);
 
-	private final NaturalSpawner naturalSpawner;
-
 	private final float[] lightBrightnessTable;
 
 	public CavernDimension(World world, DimensionType type)
 	{
 		super(world, type, 0);
-		this.naturalSpawner = createNaturalSpawner();
 		this.lightBrightnessTable = createLightBrightnessTable();
 	}
 
@@ -79,7 +75,7 @@ public class CavernDimension extends Dimension
 	}
 
 	@Nullable
-	protected NaturalSpawner createNaturalSpawner()
+	public NaturalSpawner createNaturalSpawner()
 	{
 		if (world instanceof ServerWorld)
 		{
@@ -87,11 +83,6 @@ public class CavernDimension extends Dimension
 		}
 
 		return null;
-	}
-
-	public Optional<NaturalSpawner> getNaturalSpawner()
-	{
-		return Optional.ofNullable(naturalSpawner);
 	}
 
 	protected float[] createLightBrightnessTable()
