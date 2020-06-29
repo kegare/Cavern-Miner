@@ -35,6 +35,7 @@ public class CavernTeleporter implements ITeleporter
 	private final CavernPortalBlock portalBlock;
 	private final BlockState portalFrameBlock;
 
+	private BlockPos destPos;
 	private Vec3d portalOffset;
 	private Direction teleportDirection;
 
@@ -42,6 +43,13 @@ public class CavernTeleporter implements ITeleporter
 	{
 		this.portalBlock = portal;
 		this.portalFrameBlock = frame;
+	}
+
+	public CavernTeleporter setDestPos(BlockPos pos)
+	{
+		destPos = pos;
+
+		return this;
 	}
 
 	public CavernTeleporter setPortalInfo(Vec3d offset, Direction direction)
@@ -55,37 +63,40 @@ public class CavernTeleporter implements ITeleporter
 	@Override
 	public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
 	{
-		final Entity newEntity = repositionEntity.apply(false);
-
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
 		boolean placed = false;
 
 		if (GeneralConfig.INSTANCE.posCache.get())
 		{
-			placed = newEntity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, newEntity, yaw, radius, o)).orElse(false);
+			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, entity, yaw, radius, o)).orElse(false);
 		}
 
-		final BlockPos originPos = newEntity.getPosition();
+		if (destPos != null && !destPos.equals(entity.getPosition()))
+		{
+			entity.moveToBlockPosAndAngles(destPos, yaw, entity.rotationPitch);
+		}
+
+		final BlockPos originPos = destPos == null ? entity.getPosition() : destPos;
 
 		if (!placed)
 		{
-			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, newEntity, yaw, radius, originPos, o)).orElse(false);
+			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, entity, yaw, radius, originPos, o)).orElse(false);
 		}
 
 		boolean toCave = destWorld.getDimension() instanceof CavernDimension;
-		boolean isPlayer = newEntity instanceof ServerPlayerEntity;
+		boolean isPlayer = entity instanceof ServerPlayerEntity;
 		boolean loading = false;
 
 		if (!placed)
 		{
 			if (toCave && isPlayer)
 			{
-				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(LoadingScreenMessage.Stage.LOAD));
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), new LoadingScreenMessage(LoadingScreenMessage.Stage.LOAD));
 
 				loading = true;
 			}
 
-			placed = placeInPortal(destWorld, newEntity, yaw, radius, originPos);
+			placed = placeInPortal(destWorld, entity, yaw, radius, originPos);
 
 			if (!placed)
 			{
@@ -93,22 +104,22 @@ public class CavernTeleporter implements ITeleporter
 
 				if (pos != null)
 				{
-					placed = placeInPortal(destWorld, newEntity, yaw, radius, pos);
+					placed = placeInPortal(destWorld, entity, yaw, radius, pos);
 				}
 			}
 		}
 
 		if (!placed)
 		{
-			placed = CavebornEventHandler.placeEntity(destWorld, originPos, newEntity);
+			placed = CavebornEventHandler.placeEntity(destWorld, originPos, entity);
 		}
 
 		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
 		{
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)newEntity), new LoadingScreenMessage(LoadingScreenMessage.Stage.DONE));
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), new LoadingScreenMessage(LoadingScreenMessage.Stage.DONE));
 		}
 
-		return newEntity;
+		return repositionEntity.apply(false);
 	}
 
 	public boolean placeInCachedPortal(ServerWorld world, Entity entity, float yaw, int radius, TeleporterCache cache)

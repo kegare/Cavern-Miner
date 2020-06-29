@@ -200,11 +200,18 @@ public class CavernPortalBlock extends Block
 			return;
 		}
 
+		MinecraftServer server = entity.getServer();
+
+		if (server == null)
+		{
+			return;
+		}
+
 		DimensionType currentDim = world.getDimension().getType();
 		DimensionType destDim = currentDim != getDimension() ? getDimension() : DimensionType.OVERWORLD;
 
 		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
-		BlockPos prevPos = null;
+		BlockPos destPos = null;
 
 		if (cache != null)
 		{
@@ -218,30 +225,29 @@ public class CavernPortalBlock extends Block
 				destDim = prevDim;
 			}
 
-			prevPos = cache.getLastPos(key, destDim).orElse(null);
+			destPos = cache.getLastPos(key, destDim).orElse(null);
 
 			cache.setLastDim(key, currentDim);
 			cache.setLastPos(key, currentDim, entity.getPosition());
 		}
 
-		MinecraftServer server = entity.getServer();
+		ServerWorld destWorld = server.getWorld(destDim);
 
-		if (server != null)
+		if (destWorld == null)
 		{
-			ServerWorld destWorld = server.getWorld(destDim);
+			return;
+		}
 
-			if (destWorld == null)
-			{
-				return;
-			}
+		if (destPos == null || !GeneralConfig.INSTANCE.posCache.get())
+		{
+			destPos = entity.getPosition();
+		}
 
-			BlockPos destPos = GeneralConfig.INSTANCE.posCache.get() && prevPos != null ? prevPos : entity.getPosition();
-			ChunkPos chunkPos = new ChunkPos(destPos);
+		ChunkPos chunkPos = new ChunkPos(destPos);
 
-			if (!destWorld.getChunkProvider().isChunkLoaded(chunkPos))
-			{
-				destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, destPos);
-			}
+		if (!destWorld.getChunkProvider().isChunkLoaded(chunkPos))
+		{
+			destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, destPos);
 		}
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));
@@ -253,7 +259,7 @@ public class CavernPortalBlock extends Block
 			floorPos = floorPos.down();
 		}
 
-		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)));
+		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)).setDestPos(destPos));
 	}
 
 	public CavernTeleporter createTeleporter(IWorld world, BlockPos pos, Entity entity, @Nullable BlockState frame)

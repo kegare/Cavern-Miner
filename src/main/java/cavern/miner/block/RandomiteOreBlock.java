@@ -52,7 +52,7 @@ public class RandomiteOreBlock extends CaveOreBlock
 
 		for (int i = 0; i <= fortune; ++i)
 		{
-			ItemStack drop = getRandomDropItem();
+			ItemStack drop = RandomiteDrop.get().getDropItem();
 
 			if (!drop.isEmpty())
 			{
@@ -61,10 +61,5 @@ public class RandomiteOreBlock extends CaveOreBlock
 		}
 
 		return drops;
-	}
-
-	protected ItemStack getRandomDropItem()
-	{
-		return RandomiteDrop.get().getDropItem();
 	}
 }
