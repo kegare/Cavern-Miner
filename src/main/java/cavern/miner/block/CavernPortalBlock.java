@@ -354,10 +354,17 @@ public class CavernPortalBlock extends Block
 				this.rightDir = Direction.SOUTH;
 			}
 
-			for (BlockPos blockPos = pos; pos.getY() > blockPos.getY() - 21 && pos.getY() > 0 && isEmptyBlock(pos.down()); pos = pos.down())
+			BlockPos.Mutable checkPos = new BlockPos.Mutable(pos);
+
+			while (checkPos.getY() > 0 && checkPos.getY() > pos.getY() - 21)
 			{
-				;
+				if (!isEmptyBlock(checkPos.move(Direction.DOWN)))
+				{
+					break;
+				}
 			}
+
+			pos = checkPos.up();
 
 			int i = getDistanceUntilEdge(pos, leftDir) - 1;
 
@@ -383,11 +390,11 @@ public class CavernPortalBlock extends Block
 		{
 			int i;
 
+			BlockPos.Mutable checkPos = new BlockPos.Mutable();
+
 			for (i = 0; i < 22; ++i)
 			{
-				BlockPos pos1 = pos.offset(face, i);
-
-				if (!isEmptyBlock(pos1) || !isFrameBlock(pos1.down()))
+				if (!isEmptyBlock(checkPos.setPos(pos).move(face, i)) || !isFrameBlock(checkPos.move(Direction.DOWN)))
 				{
 					break;
 				}
@@ -408,13 +415,13 @@ public class CavernPortalBlock extends Block
 
 		protected int calculatePortalHeight()
 		{
+			BlockPos.Mutable pos = new BlockPos.Mutable();
+
 			outside: for (height = 0; height < 21; ++height)
 			{
 				for (int i = 0; i < width; ++i)
 				{
-					BlockPos pos = bottomLeft.offset(rightDir, i).up(height);
-
-					if (!isEmptyBlock(pos))
+					if (!isEmptyBlock(pos.setPos(bottomLeft).move(rightDir, i).move(Direction.UP, height)))
 					{
 						break outside;
 					}
@@ -426,14 +433,14 @@ public class CavernPortalBlock extends Block
 
 					if (i == 0)
 					{
-						if (!isFrameBlock(pos.offset(leftDir)))
+						if (!isFrameBlock(pos.move(leftDir)))
 						{
 							break outside;
 						}
 					}
 					else if (i == width - 1)
 					{
-						if (!isFrameBlock(pos.offset(rightDir)))
+						if (!isFrameBlock(pos.move(rightDir)))
 						{
 							break outside;
 						}
@@ -443,7 +450,7 @@ public class CavernPortalBlock extends Block
 
 			for (int i = 0; i < width; ++i)
 			{
-				if (!isFrameBlock(bottomLeft.offset(rightDir, i).up(height)))
+				if (!isFrameBlock(pos.setPos(bottomLeft).move(rightDir, i).move(Direction.UP, height)))
 				{
 					height = 0;
 
@@ -494,13 +501,13 @@ public class CavernPortalBlock extends Block
 
 		public void placePortalBlocks()
 		{
+			BlockPos.Mutable pos = new BlockPos.Mutable();
+
 			for (int i = 0; i < width; ++i)
 			{
-				BlockPos pos = bottomLeft.offset(rightDir, i);
-
 				for (int j = 0; j < height; ++j)
 				{
-					world.setBlockState(pos.up(j), CavernPortalBlock.this.getDefaultState().with(AXIS, axis), 18);
+					world.setBlockState(pos.setPos(bottomLeft).move(rightDir, i).move(Direction.UP, j), CavernPortalBlock.this.getDefaultState().with(AXIS, axis), 18);
 				}
 			}
 		}
