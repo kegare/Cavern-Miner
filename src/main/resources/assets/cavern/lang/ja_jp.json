@@ -23,6 +23,8 @@
 	"enchantment.cavern.area_miner": "範囲採掘",
 	"biome.cavern.cavern": "大洞窟",
 	"biome.cavern.huge_cavern": "果てなき大洞窟",
+	"generator.cavern.cavern": "大洞窟",
+	"generator.cavern.huge_cavern": "果てなき大洞窟",
 	"cavern.miner.beginner": "初心者",
 	"cavern.miner.stone": "石掘り",
 	"cavern.miner.iron": "鉄掘り",

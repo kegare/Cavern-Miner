@@ -23,6 +23,8 @@
 	"enchantment.cavern.area_miner": "Area Miner",
 	"biome.cavern.cavern": "Cavern",
 	"biome.cavern.huge_cavern": "Huge Cavern",
+	"generator.cavern.cavern": "Cavern",
+	"generator.cavern.huge_cavern": "Huge Cavern",
 	"itemGroup.cavern": "Cavern: Miner",
 	"cavern.miner.beginner": "Beginner",
 	"cavern.miner.stone": "Stone Miner",

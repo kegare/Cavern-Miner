@@ -26,12 +26,12 @@ public final class CaveTags
 
 	public static class Items
 	{
-		public static final Tag<Item> ORES_MAGNITE = tag("ores/magnite");
-		public static final Tag<Item> ORES_AQUAMARINE = tag("ores/aquamarine");
-		public static final Tag<Item> ORES_RANDOMITE = tag("ores/randomite");
+		public static final Tag<Item> ORES_MAGNITE = tag(Blocks.ORES_MAGNITE);
+		public static final Tag<Item> ORES_AQUAMARINE = tag(Blocks.ORES_AQUAMARINE);
+		public static final Tag<Item> ORES_RANDOMITE = tag(Blocks.ORES_RANDOMITE);
 
-		public static final Tag<Item> STORAGE_BLOCKS_MAGNITE = tag("storage_blocks/magnite");
-		public static final Tag<Item> STORAGE_BLOCKS_AQUAMARINE = tag("storage_blocks/aquamarine");
+		public static final Tag<Item> STORAGE_BLOCKS_MAGNITE = tag(Blocks.STORAGE_BLOCKS_MAGNITE);
+		public static final Tag<Item> STORAGE_BLOCKS_AQUAMARINE = tag(Blocks.STORAGE_BLOCKS_AQUAMARINE);
 
 		public static final Tag<Item> INGOTS_MAGNITE = tag("ingots/magnite");
 
@@ -42,6 +42,11 @@ public final class CaveTags
 		private static Tag<Item> tag(String name)
 		{
 			return new ItemTags.Wrapper(new ResourceLocation("forge", name));
+		}
+
+		private static Tag<Item> tag(Tag<?> tag)
+		{
+			return new ItemTags.Wrapper(tag.getId());
 		}
 	}
 }

@@ -211,14 +211,14 @@ public class CavernPortalBlock extends Block
 			ResourceLocation key = getRegistryName();
 			DimensionType prevDim = destDim;
 
-			destDim = cache.getLastDim(key, destDim);
+			destDim = cache.getLastDim(key).orElse(destDim);
 
 			if (destDim == currentDim)
 			{
 				destDim = prevDim;
 			}
 
-			prevPos = cache.getLastPos(key, destDim);
+			prevPos = cache.getLastPos(key, destDim).orElse(null);
 
 			cache.setLastDim(key, currentDim);
 			cache.setLastPos(key, currentDim, entity.getPosition());
@@ -291,11 +291,11 @@ public class CavernPortalBlock extends Block
 		{
 			int[] aint = new int[Direction.AxisDirection.values().length];
 			Direction direction = size.rightDir.rotateYCCW();
-			BlockPos blockpos = size.bottomLeft.up(size.getHeight() - 1);
+			BlockPos blockPos = size.bottomLeft.up(size.getHeight() - 1);
 
 			for (Direction.AxisDirection d : Direction.AxisDirection.values())
 			{
-				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(direction.getAxisDirection() == d ? blockpos : blockpos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
+				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(direction.getAxisDirection() == d ? blockPos : blockPos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
 
 				for (int i = 0; i < size.getWidth(); ++i)
 				{
@@ -321,7 +321,7 @@ public class CavernPortalBlock extends Block
 				}
 			}
 
-			return new BlockPattern.PatternHelper(direction.getAxisDirection() == ax ? blockpos : blockpos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
+			return new BlockPattern.PatternHelper(direction.getAxisDirection() == ax ? blockPos : blockPos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
 		}
 	}
 

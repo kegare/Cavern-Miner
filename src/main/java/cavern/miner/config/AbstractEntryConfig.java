@@ -68,13 +68,10 @@ public abstract class AbstractEntryConfig
 
 			if (file.canRead() && file.length() > 0L)
 			{
-				FileInputStream fis = new FileInputStream(file);
-				BufferedReader buffer = new BufferedReader(new InputStreamReader(fis));
-
-				fromJson(buffer);
-
-				buffer.close();
-				fis.close();
+				try (FileInputStream fis = new FileInputStream(file); BufferedReader buffer = new BufferedReader(new InputStreamReader(fis)))
+				{
+					fromJson(buffer);
+				}
 
 				return true;
 			}
@@ -103,13 +100,10 @@ public abstract class AbstractEntryConfig
 
 			if (file.canWrite())
 			{
-				FileOutputStream fos = new FileOutputStream(file);
-				BufferedWriter buffer = new BufferedWriter(new OutputStreamWriter(fos));
-
-				buffer.write(Strings.nullToEmpty(toJson()));
-
-				buffer.close();
-				fos.close();
+				try (FileOutputStream fos = new FileOutputStream(file); BufferedWriter buffer = new BufferedWriter(new OutputStreamWriter(fos)))
+				{
+					buffer.write(Strings.nullToEmpty(toJson()));
+				}
 
 				return true;
 			}

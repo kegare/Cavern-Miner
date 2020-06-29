@@ -81,16 +81,15 @@ public class CavernItemGroup extends ItemGroup
 
 		for (RegistryObject<Enchantment> entry : CaveEnchantments.REGISTRY.getEntries())
 		{
-			entry.ifPresent(ench ->
+			Enchantment ench = entry.get();
+
+			if (ench.type != null)
 			{
-				if (ench.type != null)
+				for (int i = ench.getMinLevel(); i <= ench.getMaxLevel(); ++i)
 				{
-					for (int i = ench.getMinLevel(); i <= ench.getMaxLevel(); ++i)
-					{
-						items.add(EnchantedBookItem.getEnchantedItemStack(new EnchantmentData(ench, i)));
-					}
+					items.add(EnchantedBookItem.getEnchantedItemStack(new EnchantmentData(ench, i)));
 				}
-			});
+			}
 		}
 	}
 }

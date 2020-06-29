@@ -2,8 +2,7 @@ package cavern.miner.storage;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import com.google.common.collect.ImmutableList;
+import java.util.Set;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -50,9 +49,9 @@ public class MinerRecord implements INBTSerializable<CompoundNBT>
 		set(state.getBlock(), count);
 	}
 
-	public ImmutableList<Map.Entry<Block, Integer>> getEntries()
+	public Set<Map.Entry<Block, Integer>> getEntries()
 	{
-		return ImmutableList.copyOf(entries.entrySet());
+		return entries.entrySet();
 	}
 
 	@Override

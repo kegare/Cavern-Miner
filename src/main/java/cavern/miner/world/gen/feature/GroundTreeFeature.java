@@ -43,17 +43,17 @@ public class GroundTreeFeature extends Feature<CountConfig>
 			tree = BIRCH_TREE;
 		}
 
-		int max = world.getMaxHeight() - 1;
+		int max = generator.getMaxHeight() - 1;
 		int ground = generator.getGroundHeight();
 		int groundHeight = max - ground - 10;
-		BlockPos blockPos = new BlockPos(pos.getX(), ground, pos.getZ());
+		BlockPos originPos = new BlockPos(pos.getX(), ground, pos.getZ());
 
 		int i = 0;
 		BlockPos.Mutable posCache = new BlockPos.Mutable();
 
 		outside: for (int count = 0; count < config.count; ++count)
 		{
-			posCache.setPos(blockPos).move(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(groundHeight + 1), rand.nextInt(8) - rand.nextInt(8));
+			posCache.setPos(originPos).move(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(groundHeight + 1), rand.nextInt(8) - rand.nextInt(8));
 
 			if (posCache.getY() >= max)
 			{

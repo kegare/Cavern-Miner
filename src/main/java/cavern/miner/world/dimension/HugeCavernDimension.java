@@ -1,19 +1,17 @@
 package cavern.miner.world.dimension;
 
 import cavern.miner.config.dimension.HugeCavernConfig;
-import cavern.miner.init.CaveBiomes;
+import cavern.miner.init.CaveChunkGeneratorTypes;
+import cavern.miner.world.gen.CavernChunkGenerator;
 import cavern.miner.world.gen.CavernGenSettings;
-import cavern.miner.world.gen.HugeCavernGenSettings;
-import cavern.miner.world.spawner.CaveMobSpawner;
-import cavern.miner.world.spawner.HugeCavernMobSpawner;
-import cavern.miner.world.spawner.WorldSpawnerType;
-import cavern.miner.world.vein.HugeCavernVeinProvider;
-import cavern.miner.world.vein.VeinProvider;
+import cavern.miner.world.spawner.HugeCavernNaturalSpawner;
+import cavern.miner.world.spawner.NaturalSpawner;
+import cavern.miner.world.spawner.NaturalSpawnerType;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.gen.ChunkGeneratorType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -26,35 +24,23 @@ public class HugeCavernDimension extends CavernDimension
 	}
 
 	@Override
-	public Biome getBiome()
+	protected ChunkGeneratorType<CavernGenSettings, CavernChunkGenerator> getGeneratorType()
 	{
-		return CaveBiomes.HUGE_CAVERN.get();
+		return CaveChunkGeneratorTypes.HUGE_CAVERN.get();
 	}
 
 	@Override
-	public CavernGenSettings createGenerationSettings()
-	{
-		return new HugeCavernGenSettings();
-	}
-
-	@Override
-	public VeinProvider createVeinProvider()
-	{
-		return new HugeCavernVeinProvider();
-	}
-
-	@Override
-	public WorldSpawnerType getSpawnerType()
+	public NaturalSpawnerType getSpawnerType()
 	{
 		return HugeCavernConfig.INSTANCE.spawnerType.get();
 	}
 
 	@Override
-	public CaveMobSpawner createCaveMobSpawner()
+	public NaturalSpawner createNaturalSpawner()
 	{
 		if (world instanceof ServerWorld)
 		{
-			return new HugeCavernMobSpawner((ServerWorld)world);
+			return new HugeCavernNaturalSpawner((ServerWorld)world);
 		}
 
 		return null;

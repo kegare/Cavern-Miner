@@ -21,15 +21,11 @@ public class CenterChanceRange extends Placement<ChanceRangeConfig>
 	}
 
 	@Override
-	public Stream<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random random, ChanceRangeConfig config, BlockPos pos)
+	public Stream<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, ChanceRangeConfig config, BlockPos pos)
 	{
-		if (random.nextFloat() < config.chance)
+		if (rand.nextFloat() < config.chance)
 		{
-			int x = pos.getX() + 8;
-			int z = pos.getZ() + 8;
-			int y = random.nextInt(config.top - config.topOffset) + config.bottomOffset;
-
-			return Stream.of(new BlockPos(x, y, z));
+			return Stream.of(new BlockPos(pos.getX() + 8, rand.nextInt(config.top - config.topOffset) + config.bottomOffset, pos.getZ() + 8));
 		}
 
 		return Stream.empty();

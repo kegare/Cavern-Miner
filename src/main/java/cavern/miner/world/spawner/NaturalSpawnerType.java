@@ -1,6 +1,6 @@
 package cavern.miner.world.spawner;
 
-public enum WorldSpawnerType
+public enum NaturalSpawnerType
 {
 	DISABLED,
 	VANILLA,

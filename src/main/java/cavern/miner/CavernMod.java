@@ -12,6 +12,7 @@ import cavern.miner.config.dimension.VeinConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveChunkGeneratorTypes;
 import cavern.miner.init.CaveCriteriaTriggers;
 import cavern.miner.init.CaveDimensions;
 import cavern.miner.init.CaveEnchantments;
@@ -63,6 +64,7 @@ public final class CavernMod
 		CaveEnchantments.REGISTRY.register(modEventBus);
 		CaveBiomes.REGISTRY.register(modEventBus);
 		CaveDimensions.REGISTRY.register(modEventBus);
+		CaveChunkGeneratorTypes.REGISTRY.register(modEventBus);
 		CaveWorldCarvers.REGISTRY.register(modEventBus);
 		CaveFeatures.REGISTRY.register(modEventBus);
 		CavePlacements.REGISTRY.register(modEventBus);

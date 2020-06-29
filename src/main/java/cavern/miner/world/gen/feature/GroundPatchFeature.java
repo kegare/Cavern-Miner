@@ -7,6 +7,7 @@ import com.mojang.datafixers.Dynamic;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
@@ -24,42 +25,42 @@ public class GroundPatchFeature extends RandomPatchFeature
 	@Override
 	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, BlockClusterFeatureConfig config)
 	{
-		int max = world.getMaxHeight() - 1;
+		int max = generator.getMaxHeight() - 1;
 		int ground = generator.getGroundHeight();
 		int ySpread = max - ground;
 		BlockState state = config.stateProvider.getBlockState(rand, pos);
-		BlockPos blockPos;
+		BlockPos originPos;
 
 		if (config.field_227298_k_)
 		{
-			blockPos = new BlockPos(pos.getX(), ground, pos.getZ());
+			originPos = new BlockPos(pos.getX(), ground, pos.getZ());
 		}
 		else
 		{
-			blockPos = pos;
+			originPos = pos;
 		}
 
 		int i = 0;
-		BlockPos.Mutable posCache = new BlockPos.Mutable();
+		BlockPos.Mutable posHere = new BlockPos.Mutable();
+		BlockPos.Mutable posBelow = new BlockPos.Mutable();
 
 		for (int count = 0; count < config.tryCount; ++count)
 		{
-			posCache.setPos(blockPos).move(rand.nextInt(config.xSpread + 1) - rand.nextInt(config.xSpread + 1), rand.nextInt(ySpread + 1), rand.nextInt(config.zSpread + 1) - rand.nextInt(config.zSpread + 1));
+			posHere.setPos(originPos).move(rand.nextInt(config.xSpread + 1) - rand.nextInt(config.xSpread + 1), rand.nextInt(ySpread + 1), rand.nextInt(config.zSpread + 1) - rand.nextInt(config.zSpread + 1));
 
-			if (posCache.getY() >= max)
+			if (posHere.getY() >= max)
 			{
 				continue;
 			}
 
-			BlockPos posBelow = posCache.down();
-			BlockState stateBelow = world.getBlockState(posBelow);
+			BlockState stateBelow = world.getBlockState(posBelow.setPos(posHere).move(Direction.DOWN));
 
-			if ((world.isAirBlock(posCache) || config.isReplaceable && world.getBlockState(posCache).getMaterial().isReplaceable()) && state.isValidPosition(world, posCache) &&
+			if ((world.isAirBlock(posHere) || config.isReplaceable && world.getBlockState(posHere).getMaterial().isReplaceable()) && state.isValidPosition(world, posHere) &&
 				(config.whitelist.isEmpty() || config.whitelist.contains(stateBelow.getBlock())) && !config.blacklist.contains(stateBelow) &&
 				(!config.requiresWater || world.getFluidState(posBelow.west()).isTagged(FluidTags.WATER) || world.getFluidState(posBelow.east()).isTagged(FluidTags.WATER) ||
 				world.getFluidState(posBelow.north()).isTagged(FluidTags.WATER) || world.getFluidState(posBelow.south()).isTagged(FluidTags.WATER)))
 			{
-				config.blockPlacer.func_225567_a_(world, posCache, state, rand);
+				config.blockPlacer.func_225567_a_(world, posHere, state, rand);
 
 				++i;
 			}

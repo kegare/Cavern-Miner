@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import cavern.miner.config.CavernModConfig;
 import cavern.miner.init.CaveBiomes;
-import cavern.miner.world.spawner.WorldSpawnerType;
+import cavern.miner.world.spawner.NaturalSpawnerType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.Tags;
 
@@ -18,9 +18,10 @@ public class HugeCavernConfig
 
 	public final ForgeConfigSpec.DoubleValue lightBrightness;
 
+	public final ForgeConfigSpec.BooleanValue flatBedrock;
 	public final ForgeConfigSpec.DoubleValue cave;
 
-	public final ForgeConfigSpec.EnumValue<WorldSpawnerType> spawnerType;
+	public final ForgeConfigSpec.EnumValue<NaturalSpawnerType> spawnerType;
 	public final ForgeConfigSpec.IntValue chunkRadius;
 	public final ForgeConfigSpec.IntValue heightRadius;
 	public final ForgeConfigSpec.IntValue maxCount;
@@ -50,11 +51,12 @@ public class HugeCavernConfig
 		builder.pop();
 
 		builder.push("decoration");
+		flatBedrock = builder.comment("If true, generate flat bedrock layers.", serverSide).define("flat_bedrock", false);
 		cave = builder.comment("The generation probability of caves.", serverSide).defineInRange("cave", 0.5D, 0.0D, 1.0D);
 		builder.pop();
 
 		builder.push("natural_spawn");
-		spawnerType = builder.comment("The spawner type of natural monsters spawn.", serverSide).defineEnum("spawner_type", WorldSpawnerType.CAVERN);
+		spawnerType = builder.comment("The spawner type of natural monsters spawn.", serverSide).defineEnum("spawner_type", NaturalSpawnerType.CAVERN);
 		chunkRadius = builder.comment("How far (in chunks) monsters must spawn.", serverSide).defineInRange("chunk_radius", 6, 1, 10);
 		heightRadius = builder.comment("How high (in blocks) monsters must spawn.", serverSide).defineInRange("height_radius", 70, 10, 200);
 		maxCount = builder.comment("How many monsters must spawn.", serverSide).defineInRange("max_count", 30, 0, 5000);

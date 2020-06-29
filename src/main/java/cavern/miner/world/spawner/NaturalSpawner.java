@@ -9,6 +9,7 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import cavern.miner.CavernMod;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.CavePortalList;
 import net.minecraft.entity.Entity;
@@ -29,14 +30,14 @@ import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.Event.Result;
 
-public class CaveMobSpawner
+public class NaturalSpawner
 {
 	private final ServerWorld world;
 	private final Random rand = new Random();
 
-	private final Map<ChunkPos, BlockPos> eligibleChunksForSpawning = new HashMap<>();
+	private final Map<ChunkPos, BlockPos> eligibleChunks = new HashMap<>();
 
-	public CaveMobSpawner(ServerWorld world)
+	public NaturalSpawner(ServerWorld world)
 	{
 		this.world = world;
 	}
@@ -88,7 +89,7 @@ public class CaveMobSpawner
 
 	public boolean findEligibleChunks()
 	{
-		eligibleChunksForSpawning.clear();
+		eligibleChunks.clear();
 
 		ServerPlayerEntity player = world.getRandomPlayer();
 
@@ -99,20 +100,25 @@ public class CaveMobSpawner
 
 		BlockPos pos = player.getPosition();
 
-		ChunkPos.getAllInBox(new ChunkPos(pos), getChunkRadius(player)).filter(this::canSpawnChunk).forEach(o -> eligibleChunksForSpawning.put(o, pos));
+		ChunkPos.getAllInBox(new ChunkPos(pos), getChunkRadius(player)).filter(this::canSpawnChunk).forEach(o -> eligibleChunks.put(o, pos));
 
-		return !eligibleChunksForSpawning.isEmpty();
+		return !eligibleChunks.isEmpty();
 	}
 
 	public void spawnMobs()
 	{
 		if (world.getGameTime() % 20L == 0L)
 		{
-			eligibleChunksForSpawning.clear();
+			eligibleChunks.clear();
 		}
 
 		for (EntityClassification type : EntityClassification.values())
 		{
+			if (type == EntityClassification.MISC)
+			{
+				continue;
+			}
+
 			int maxCount = getMaxCount(type);
 
 			if (maxCount <= 0 || world.countEntities().getInt(type) >= maxCount)
@@ -120,12 +126,12 @@ public class CaveMobSpawner
 				continue;
 			}
 
-			if (eligibleChunksForSpawning.isEmpty() && !findEligibleChunks())
+			if (eligibleChunks.isEmpty() && !findEligibleChunks())
 			{
 				break;
 			}
 
-			List<ChunkPos> shuffled = new ArrayList<>(eligibleChunksForSpawning.keySet());
+			List<ChunkPos> shuffled = new ArrayList<>(eligibleChunks.keySet());
 			Collections.shuffle(shuffled, rand);
 
 			BlockPos.Mutable pos = new BlockPos.Mutable();
@@ -194,7 +200,18 @@ public class CaveMobSpawner
 							continue;
 						}
 
-						Entity entity = entry.entityType.create(world);
+						Entity entity;
+
+						try
+						{
+							entity = entry.entityType.create(world);
+						}
+						catch (Exception e)
+						{
+							CavernMod.LOG.warn("Failed to create mob", e);
+
+							continue;
+						}
 
 						if (entity == null || !(entity instanceof MobEntity))
 						{
@@ -241,31 +258,24 @@ public class CaveMobSpawner
 
 	protected void findRandomPosition(BlockPos.Mutable pos, EntityClassification type, ChunkPos chunkPos)
 	{
-		BlockPos playerPos = eligibleChunksForSpawning.get(chunkPos);
-		int y = 0;
+		int playerY = eligibleChunks.getOrDefault(chunkPos, BlockPos.ZERO).getY();
+		int x = chunkPos.getXStart() + rand.nextInt(16);
+		int z = chunkPos.getZStart() + rand.nextInt(16);
+		int y;
 
-		if (playerPos != null)
-		{
-			y = playerPos.getY();
-		}
-
-		int posX = chunkPos.getXStart() + rand.nextInt(16);
-		int posZ = chunkPos.getZStart() + rand.nextInt(16);
-		int posY;
-
-		if (y > 0)
+		if (playerY > 0)
 		{
 			int max = world.getActualHeight() - 1;
 			int radius = getHeightRadius(type);
 
-			posY = MathHelper.nextInt(rand, Math.max(y - radius, 1), Math.min(y + radius, max));
+			y = MathHelper.nextInt(rand, Math.max(playerY - radius, 1), Math.min(playerY + radius, max));
 		}
 		else
 		{
-			posY = MathHelper.nextInt(rand, 1, world.getActualHeight() - 1);
+			y = MathHelper.nextInt(rand, 1, world.getActualHeight() - 1);
 		}
 
-		pos.setPos(posX, posY, posZ);
+		pos.setPos(x, y, z);
 	}
 
 	@Nullable

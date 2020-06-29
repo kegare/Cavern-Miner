@@ -1,7 +1,9 @@
 package cavern.miner.storage;
 
+import java.util.Collection;
+import java.util.Set;
+
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 
 import cavern.miner.block.CavernPortalBlock;
@@ -29,14 +31,14 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 		return cavePortals.remove(portal, pos);
 	}
 
-	public ImmutableSet<BlockPos> getPortalPositions()
+	public Collection<BlockPos> getPortalPositions()
 	{
-		return ImmutableSet.copyOf(cavePortals.values());
+		return cavePortals.values();
 	}
 
-	public ImmutableSet<BlockPos> getPortalPositions(CavernPortalBlock portal)
+	public Set<BlockPos> getPortalPositions(CavernPortalBlock portal)
 	{
-		return ImmutableSet.copyOf(cavePortals.get(portal));
+		return cavePortals.get(portal);
 	}
 
 	public boolean hasPortal(int chunkX, int chunkZ)

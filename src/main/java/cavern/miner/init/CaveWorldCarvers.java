@@ -1,10 +1,10 @@
 package cavern.miner.init;
 
-import cavern.miner.world.carver.CavernCanyonWorldCarver;
-import cavern.miner.world.carver.CavernWorldCarver;
-import cavern.miner.world.carver.ExtremeCanyonWorldCarver;
-import cavern.miner.world.carver.ExtremeCaveWorldCarver;
-import cavern.miner.world.carver.HugeCaveWorldCarver;
+import cavern.miner.world.gen.carver.CavernCanyonWorldCarver;
+import cavern.miner.world.gen.carver.CavernWorldCarver;
+import cavern.miner.world.gen.carver.ExtremeCanyonWorldCarver;
+import cavern.miner.world.gen.carver.ExtremeCaveWorldCarver;
+import cavern.miner.world.gen.carver.HugeCaveWorldCarver;
 import net.minecraft.world.gen.carver.WorldCarver;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraftforge.fml.RegistryObject;
