@@ -30,11 +30,13 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, VeinFeatureConfig config)
 	{
 		VeinProvider provider = config.getProvider();
+		int ground = generator.getGroundHeight();
+		int max = generator.getMaxHeight() - 1;
 		boolean result = false;
 
 		for (Vein vein : provider.getVeins())
 		{
-			for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
+			for (BlockPos genPos : getPositions(world, vein.isStoneTarget() && ground > 0 ? ground - 1 : max, pos, rand, vein))
 			{
 				if (genPos.equals(BlockPos.ZERO))
 				{
@@ -50,7 +52,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 
 		for (Vein vein : provider.getAutoEntries())
 		{
-			for (BlockPos genPos : getPositions(world, generator, pos, rand, vein))
+			for (BlockPos genPos : getPositions(world, vein.isStoneTarget() && ground > 0 ? ground - 1 : max, pos, rand, vein))
 			{
 				if (genPos.equals(BlockPos.ZERO))
 				{
@@ -67,12 +69,10 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 		return result;
 	}
 
-	public Iterable<BlockPos> getPositions(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, BlockPos pos, Random rand, Vein vein)
+	public Iterable<BlockPos> getPositions(IWorld world, int maxHeight, BlockPos pos, Random rand, Vein vein)
 	{
 		return () -> new AbstractIterator<BlockPos>()
 		{
-			final int ground = generator.getGroundHeight();
-			final int maxHeight = generator.getMaxHeight() - 1;
 			final int size = vein.getSize();
 			final int min = vein.getMinHeight() + size;
 			final int max = vein.getMaxHeight() - size;
@@ -95,7 +95,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 
 				targetY.clear();
 
-				for (int y = Math.max(min, 1); y <= Math.min(max, ground > 0 ? ground - 1 : maxHeight); ++y)
+				for (int y = Math.max(min, 1); y <= Math.min(max, maxHeight); ++y)
 				{
 					if (!world.isAirBlock(findPos.setPos(x, y, z)) && vein.isTargetBlock(world.getBlockState(findPos)))
 					{

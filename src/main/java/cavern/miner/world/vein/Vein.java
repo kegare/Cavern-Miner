@@ -1,7 +1,5 @@
 package cavern.miner.world.vein;
 
-import java.util.Arrays;
-
 import com.google.common.collect.ImmutableSet;
 
 import cavern.miner.util.BlockStateHelper;
@@ -59,14 +57,30 @@ public class Vein
 		return properties.maxHeight;
 	}
 
-	public boolean isTargetBlock(BlockState state)
+	public boolean isTargetBlock(BlockState... states)
 	{
 		if (properties.targetBlocks == null || properties.targetBlocks.length == 0)
 		{
 			return false;
 		}
 
-		return Arrays.stream(properties.targetBlocks).anyMatch(o -> BlockStateHelper.equals(o, state));
+		for (BlockState state : states)
+		{
+			for (BlockState target : properties.targetBlocks)
+			{
+				if (BlockStateHelper.equals(state, target))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	public boolean isStoneTarget()
+	{
+		return properties.targetBlocks == Properties.NATURAL_STONES || isTargetBlock(Properties.NATURAL_STONES);
 	}
 
 	public static class Properties
