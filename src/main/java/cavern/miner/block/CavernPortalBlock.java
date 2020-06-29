@@ -252,11 +252,11 @@ public class CavernPortalBlock extends Block
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));
 
-		BlockPos floorPos = pos;
+		BlockPos.Mutable floorPos = new BlockPos.Mutable(pos);
 
 		while (world.getBlockState(floorPos).getBlock() == this)
 		{
-			floorPos = floorPos.down();
+			floorPos.move(Direction.DOWN);
 		}
 
 		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)).setDestPos(destPos));
@@ -297,11 +297,19 @@ public class CavernPortalBlock extends Block
 		{
 			int[] aint = new int[Direction.AxisDirection.values().length];
 			Direction direction = size.rightDir.rotateYCCW();
-			BlockPos blockPos = size.bottomLeft.up(size.height - 1);
+			BlockPos originPos = size.bottomLeft.up(size.height - 1);
+			BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
 			for (Direction.AxisDirection d : Direction.AxisDirection.values())
 			{
-				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(direction.getAxisDirection() == d ? blockPos : blockPos.offset(size.rightDir, size.width - 1), Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.width, size.height, 1);
+				blockPos.setPos(originPos);
+
+				if (direction.getAxisDirection() != d)
+				{
+					blockPos.move(size.rightDir, size.width - 1);
+				}
+
+				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(blockPos, Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.width, size.height, 1);
 
 				for (int i = 0; i < size.width; ++i)
 				{
@@ -327,7 +335,14 @@ public class CavernPortalBlock extends Block
 				}
 			}
 
-			return new BlockPattern.PatternHelper(direction.getAxisDirection() == ax ? blockPos : blockPos.offset(size.rightDir, size.width - 1), Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.width, size.height, 1);
+			blockPos.setPos(originPos);
+
+			if (direction.getAxisDirection() != ax)
+			{
+				blockPos.move(size.rightDir, size.width - 1);
+			}
+
+			return new BlockPattern.PatternHelper(blockPos, Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.width, size.height, 1);
 		}
 	}
 
