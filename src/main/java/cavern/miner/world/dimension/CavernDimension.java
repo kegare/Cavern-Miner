@@ -321,12 +321,12 @@ public class CavernDimension extends Dimension
 	@OnlyIn(Dist.CLIENT)
 	public float getFogDensity(Entity entity)
 	{
-		return ((float)entity.getPosY() / (getActualHeight() * 0.5F)) * 0.005F;
+		return (float)entity.getPosY() / (getActualHeight() * 0.5F) * 0.005F;
 	}
 
 	@OnlyIn(Dist.CLIENT)
 	public float getFogDepth(Entity entity)
 	{
-		return MathHelper.clamp(((float)entity.getPosY() / (getActualHeight() * 0.5F)) * 0.65F, 0.0F, 0.8F);
+		return MathHelper.clamp((float)entity.getPosY() / (getActualHeight() * 0.5F) * 0.65F, 0.0F, 0.8F);
 	}
 }

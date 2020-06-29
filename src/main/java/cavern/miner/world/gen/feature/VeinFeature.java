@@ -34,7 +34,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 		int max = generator.getMaxHeight() - 1;
 		boolean result = false;
 
-		for (Vein vein : provider.getVeins())
+		for (Vein vein : provider.getConfigVeins())
 		{
 			for (BlockPos genPos : getPositions(world, vein.isStoneTarget() && ground > 0 ? ground - 1 : max, pos, rand, vein))
 			{

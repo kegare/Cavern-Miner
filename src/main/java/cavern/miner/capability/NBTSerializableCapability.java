@@ -21,7 +21,7 @@ public class NBTSerializableCapability<E> implements ICapabilitySerializable<INB
 	}
 
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, final Direction side)
+	public <T> LazyOptional<T> getCapability(final Capability<T> cap, final Direction side)
 	{
 		return capability.orEmpty(cap, instance);
 	}

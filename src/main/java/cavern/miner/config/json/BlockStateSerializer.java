@@ -22,9 +22,9 @@ import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.Util;
 
-public class BlockStateSerializer implements JsonSerializer<BlockState>, JsonDeserializer<BlockState>
+public enum BlockStateSerializer implements JsonSerializer<BlockState>, JsonDeserializer<BlockState>
 {
-	public static final BlockStateSerializer INSTANCE = new BlockStateSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(BlockState src, Type typeOfSrc, JsonSerializationContext context)

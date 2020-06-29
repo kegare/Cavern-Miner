@@ -13,9 +13,9 @@ import com.google.gson.JsonSerializer;
 import net.minecraft.entity.EntityType;
 import net.minecraftforge.common.DungeonHooks;
 
-public class DungeonMobSerializer implements JsonSerializer<DungeonHooks.DungeonMob>, JsonDeserializer<DungeonHooks.DungeonMob>
+public enum DungeonMobSerializer implements JsonSerializer<DungeonHooks.DungeonMob>, JsonDeserializer<DungeonHooks.DungeonMob>
 {
-	public static final DungeonMobSerializer INSTANCE = new DungeonMobSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(DungeonHooks.DungeonMob src, Type typeOfSrc, JsonSerializationContext context)

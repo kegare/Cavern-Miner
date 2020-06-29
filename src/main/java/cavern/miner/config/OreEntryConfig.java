@@ -10,8 +10,8 @@ import com.google.gson.JsonParseException;
 import cavern.miner.config.json.OreEntrySerializer;
 import cavern.miner.init.CaveBlocks;
 import cavern.miner.init.CaveTags;
+import cavern.miner.world.vein.OreRarity;
 import cavern.miner.world.vein.OreRegistry;
-import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.Tags;
 
@@ -93,19 +93,19 @@ public class OreEntryConfig extends AbstractEntryConfig
 	{
 		entries.clear();
 
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_COAL, VeinProvider.Rarity.COMMON, 1));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_IRON, VeinProvider.Rarity.COMMON, 1));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_GOLD, VeinProvider.Rarity.RARE, 2));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_REDSTONE, VeinProvider.Rarity.UNCOMMON, 2));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_LAPIS, VeinProvider.Rarity.RARE, 2));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_EMERALD, VeinProvider.Rarity.EMERALD, 3));
-		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_DIAMOND, VeinProvider.Rarity.DIAMOND, 5));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_COAL, OreRarity.COMMON, 1));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_IRON, OreRarity.COMMON, 1));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_GOLD, OreRarity.RARE, 2));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_REDSTONE, OreRarity.UNCOMMON, 2));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_LAPIS, OreRarity.RARE, 2));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_EMERALD, OreRarity.EMERALD, 3));
+		entries.add(new OreRegistry.TagEntry(Tags.Blocks.ORES_DIAMOND, OreRarity.DIAMOND, 5));
 
-		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_MAGNITE, VeinProvider.Rarity.COMMON, 1));
-		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_AQUAMARINE, VeinProvider.Rarity.AQUA, 2));
-		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_RANDOMITE, VeinProvider.Rarity.RANDOMITE, 2));
+		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_MAGNITE, OreRarity.COMMON, 1));
+		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_AQUAMARINE, OreRarity.AQUA, 2));
+		entries.add(new OreRegistry.TagEntry(CaveTags.Blocks.ORES_RANDOMITE, OreRarity.RANDOMITE, 2));
 
-		entries.add(new OreRegistry.BlockEntry(CaveBlocks.CRACKED_STONE.get(), VeinProvider.Rarity.RANDOMITE, 2));
+		entries.add(new OreRegistry.BlockEntry(CaveBlocks.CRACKED_STONE.get(), OreRarity.RANDOMITE, 2));
 	}
 
 	@Override

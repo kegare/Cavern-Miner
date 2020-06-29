@@ -76,7 +76,7 @@ public class CavernPortalBlock extends Block
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
+	public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context)
 	{
 		switch (state.get(AXIS))
 		{
@@ -95,7 +95,7 @@ public class CavernPortalBlock extends Block
 		{
 			case COUNTERCLOCKWISE_90:
 			case CLOCKWISE_90:
-				switch(state.get(AXIS))
+				switch (state.get(AXIS))
 				{
 					case Z:
 						return state.with(AXIS, Direction.Axis.X);
@@ -146,18 +146,18 @@ public class CavernPortalBlock extends Block
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos)
+	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos)
 	{
 		Direction.Axis axis = facing.getAxis();
 		Direction.Axis stateAxis = state.get(AXIS);
 		boolean flag = stateAxis != axis && axis.isHorizontal();
 
-		if (!flag && facingState.getBlock() != this && !(new Size(worldIn, currentPos, stateAxis)).isAlreadyValid())
+		if (!flag && facingState.getBlock() != this && !new Size(world, currentPos, stateAxis).isAlreadyValid())
 		{
 			return Blocks.AIR.getDefaultState();
 		}
 
-		return super.updatePostPlacement(state, facing, facingState, worldIn, currentPos, facingPos);
+		return super.updatePostPlacement(state, facing, facingState, world, currentPos, facingPos);
 	}
 
 	@Override
@@ -291,15 +291,15 @@ public class CavernPortalBlock extends Block
 		{
 			int[] aint = new int[Direction.AxisDirection.values().length];
 			Direction direction = size.rightDir.rotateYCCW();
-			BlockPos blockPos = size.bottomLeft.up(size.getHeight() - 1);
+			BlockPos blockPos = size.bottomLeft.up(size.height - 1);
 
 			for (Direction.AxisDirection d : Direction.AxisDirection.values())
 			{
-				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(direction.getAxisDirection() == d ? blockPos : blockPos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
+				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(direction.getAxisDirection() == d ? blockPos : blockPos.offset(size.rightDir, size.width - 1), Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.width, size.height, 1);
 
-				for (int i = 0; i < size.getWidth(); ++i)
+				for (int i = 0; i < size.width; ++i)
 				{
-					for (int j = 0; j < size.getHeight(); ++j)
+					for (int j = 0; j < size.height; ++j)
 					{
 						CachedBlockInfo cachedInfo = helper.translateOffset(i, j, 1);
 
@@ -321,7 +321,7 @@ public class CavernPortalBlock extends Block
 				}
 			}
 
-			return new BlockPattern.PatternHelper(direction.getAxisDirection() == ax ? blockPos : blockPos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
+			return new BlockPattern.PatternHelper(direction.getAxisDirection() == ax ? blockPos : blockPos.offset(size.rightDir, size.width - 1), Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.width, size.height, 1);
 		}
 	}
 
@@ -386,7 +386,7 @@ public class CavernPortalBlock extends Block
 			}
 		}
 
-		protected int getDistanceUntilEdge(BlockPos pos, Direction face)
+		protected int getDistanceUntilEdge(BlockPos pos, Direction facing)
 		{
 			int i;
 
@@ -394,23 +394,13 @@ public class CavernPortalBlock extends Block
 
 			for (i = 0; i < 22; ++i)
 			{
-				if (!isEmptyBlock(checkPos.setPos(pos).move(face, i)) || !isFrameBlock(checkPos.move(Direction.DOWN)))
+				if (!isEmptyBlock(checkPos.setPos(pos).move(facing, i)) || !isFrameBlock(checkPos.move(Direction.DOWN)))
 				{
 					break;
 				}
 			}
 
-			return isFrameBlock(pos.offset(face, i)) ? i : 0;
-		}
-
-		public int getHeight()
-		{
-			return height;
-		}
-
-		public int getWidth()
-		{
-			return width;
+			return isFrameBlock(pos.offset(facing, i)) ? i : 0;
 		}
 
 		protected int calculatePortalHeight()

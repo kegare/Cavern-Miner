@@ -8,7 +8,7 @@ import cavern.miner.util.BlockStateTagList;
 public class CavernVeinProvider extends VeinProvider
 {
 	@Override
-	public List<Vein> getVeins()
+	public List<Vein> getConfigVeins()
 	{
 		return CavernConfig.INSTANCE.veins.getVeins();
 	}

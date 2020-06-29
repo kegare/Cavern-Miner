@@ -1,7 +1,5 @@
 package cavern.miner.client.gui;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -72,18 +70,12 @@ public class MinerRecordScreen extends Screen
 		{
 			super(mc, MinerRecordScreen.this.width, MinerRecordScreen.this.height, 32, MinerRecordScreen.this.height - 20 - 8, 18);
 
-			List<Map.Entry<Block, Integer>> list = new ArrayList<>(MinerRecordScreen.this.record.getEntries());
-
-			list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-
 			int count = 0;
 			int score = 0;
 
-			for (Map.Entry<Block, Integer> entry : list)
+			for (Map.Entry<Block, Integer> entry : MinerRecordScreen.this.record.getEntries())
 			{
-				RecordEntry recordEntry = new RecordEntry(entry);
-
-				addEntry(recordEntry);
+				addEntry(new RecordEntry(entry));
 
 				count += entry.getValue();
 

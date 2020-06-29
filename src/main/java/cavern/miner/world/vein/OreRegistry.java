@@ -191,7 +191,7 @@ public final class OreRegistry
 
 		Optional<Object> getParent();
 
-		Optional<VeinProvider.Rarity> getRarity();
+		Optional<OreRarity> getRarity();
 
 		Optional<Integer> getPoint();
 	}
@@ -205,7 +205,7 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.empty();
 		}
@@ -222,7 +222,7 @@ public final class OreRegistry
 		private final Block block;
 		private final Object parentEntry;
 
-		private final VeinProvider.Rarity rarity;
+		private final OreRarity rarity;
 		private final Integer point;
 
 		public BlockEntry(Block block, Object parent)
@@ -233,7 +233,7 @@ public final class OreRegistry
 			this.point = null;
 		}
 
-		public BlockEntry(Block block, VeinProvider.Rarity rarity, Integer point)
+		public BlockEntry(Block block, OreRarity rarity, Integer point)
 		{
 			this.block = block;
 			this.parentEntry = null;
@@ -253,7 +253,7 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.ofNullable(rarity);
 		}
@@ -299,7 +299,7 @@ public final class OreRegistry
 		private final BlockState blockState;
 		private final OreEntry parentEntry;
 
-		private final VeinProvider.Rarity rarity;
+		private final OreRarity rarity;
 		private final Integer point;
 
 		public BlockStateEntry(BlockState state, OreEntry parent)
@@ -310,7 +310,7 @@ public final class OreRegistry
 			this.point = null;
 		}
 
-		public BlockStateEntry(BlockState state, VeinProvider.Rarity rarity, Integer point)
+		public BlockStateEntry(BlockState state, OreRarity rarity, Integer point)
 		{
 			this.blockState = state;
 			this.parentEntry = null;
@@ -330,7 +330,7 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.ofNullable(rarity);
 		}
@@ -376,7 +376,7 @@ public final class OreRegistry
 		private final Tag<Block> tag;
 		private final OreEntry parentEntry;
 
-		private final VeinProvider.Rarity rarity;
+		private final OreRarity rarity;
 		private final Integer point;
 
 		public TagEntry(Tag<Block> tag, OreEntry parent)
@@ -387,7 +387,7 @@ public final class OreRegistry
 			this.point = null;
 		}
 
-		public TagEntry(Tag<Block> tag, VeinProvider.Rarity rarity, Integer point)
+		public TagEntry(Tag<Block> tag, OreRarity rarity, Integer point)
 		{
 			this.tag = tag;
 			this.parentEntry = null;
@@ -407,7 +407,7 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.ofNullable(rarity);
 		}

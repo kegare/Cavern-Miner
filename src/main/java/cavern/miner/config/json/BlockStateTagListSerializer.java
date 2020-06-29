@@ -17,9 +17,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tags.Tag;
 
-public class BlockStateTagListSerializer implements JsonSerializer<BlockStateTagList>, JsonDeserializer<BlockStateTagList>
+public enum BlockStateTagListSerializer implements JsonSerializer<BlockStateTagList>, JsonDeserializer<BlockStateTagList>
 {
-	public static final BlockStateTagListSerializer INSTANCE = new BlockStateTagListSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(BlockStateTagList src, Type typeOfSrc, JsonSerializationContext context)

@@ -3,6 +3,8 @@ package cavern.miner.config.dimension;
 import java.io.File;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import cavern.miner.config.CavernModConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.spawner.NaturalSpawnerType;
@@ -11,10 +13,16 @@ import net.minecraftforge.common.Tags;
 
 public class HugeCavernConfig
 {
-	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+	public static final HugeCavernConfig INSTANCE;
+	public static final ForgeConfigSpec SPEC;
 
-	public static final HugeCavernConfig INSTANCE = new HugeCavernConfig(BUILDER);
-	public static final ForgeConfigSpec SPEC = BUILDER.build();
+	static
+	{
+		final Pair<HugeCavernConfig, ForgeConfigSpec> factory = new ForgeConfigSpec.Builder().configure(HugeCavernConfig::new);
+
+		INSTANCE = factory.getLeft();
+		SPEC = factory.getRight();
+	}
 
 	public final ForgeConfigSpec.DoubleValue lightBrightness;
 
@@ -42,7 +50,7 @@ public class HugeCavernConfig
 	public final VeinConfig veins = new VeinConfig(getConfigDir());
 	public final NaturalSpawnConfig naturalSpawns = new NaturalSpawnConfig(getConfigDir(), () -> Arrays.asList(CaveBiomes.HUGE_CAVERN.get()));
 
-	public HugeCavernConfig(final ForgeConfigSpec.Builder builder)
+	private HugeCavernConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
 

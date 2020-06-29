@@ -63,6 +63,6 @@ public class HugeCavernDimension extends CavernDimension
 	@Override
 	public float getFogDepth(Entity entity)
 	{
-		return MathHelper.clamp(1.0F - Math.abs(0.5F - ((world.getDayTime() % 24000L) / 24000.0F)), 0.0F, 0.8F);
+		return MathHelper.clamp(1.0F - Math.abs(0.5F - world.getDayTime() % 24000L / 24000.0F), 0.0F, 0.8F);
 	}
 }
