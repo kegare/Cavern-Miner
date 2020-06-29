@@ -66,14 +66,14 @@ public class CavernTeleporter implements ITeleporter
 		int radius = GeneralConfig.INSTANCE.findRadius.get();
 		boolean placed = false;
 
-		if (GeneralConfig.INSTANCE.posCache.get())
-		{
-			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, entity, yaw, radius, o)).orElse(false);
-		}
-
 		if (destPos != null && !destPos.equals(entity.getPosition()))
 		{
 			entity.moveToBlockPosAndAngles(destPos, yaw, entity.rotationPitch);
+		}
+
+		if (GeneralConfig.INSTANCE.posCache.get())
+		{
+			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, entity, yaw, radius, o)).orElse(false);
 		}
 
 		final BlockPos originPos = destPos == null ? entity.getPosition() : destPos;

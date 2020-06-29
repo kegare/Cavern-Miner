@@ -228,7 +228,7 @@ public class CavernPortalBlock extends Block
 			destPos = cache.getLastPos(key, destDim).orElse(null);
 
 			cache.setLastDim(key, currentDim);
-			cache.setLastPos(key, currentDim, entity.getPosition());
+			cache.setLastPos(key, currentDim, pos);
 		}
 
 		ServerWorld destWorld = server.getWorld(destDim);
