@@ -1,5 +1,6 @@
 package cavern.miner.world;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -147,7 +148,7 @@ public class CavernTeleporter implements ITeleporter
 	{
 		List<BlockPos> positions = list.getPortalPositions(portalBlock).stream()
 			.filter(o -> new BlockPos(o.getX(), 0, o.getZ()).withinDistance(new BlockPos(checkPos.getX(), 0, checkPos.getZ()), radius))
-			.sorted((o1, o2) -> Double.compare(o1.distanceSq(checkPos), o2.distanceSq(checkPos))).collect(Collectors.toList());
+			.sorted(Comparator.comparingDouble(o -> o.distanceSq(checkPos))).collect(Collectors.toList());
 
 		for (BlockPos pos : positions)
 		{
@@ -211,156 +212,76 @@ public class CavernTeleporter implements ITeleporter
 		BlockPos.Mutable pos = new BlockPos.Mutable();
 		BlockPos resultPos = null;
 
-		outside: for (int r = 1; r <= radius; ++r)
+		resultPos = BlockPosHelper.findPos(world, originPos, radius, min, max, o ->
 		{
-			for (int rx = -r; rx <= r; ++rx)
+			if (!world.isAirBlock(pos.setPos(o)) || !world.getBlockState(pos.move(Direction.DOWN)).isSolid())
 			{
-				for (int rz = -r; rz <= r; ++rz)
+				return false;
+			}
+
+			int i1 = j % 2;
+			int i2 = 1 - i1;
+
+			if (j % 4 >= 2)
+			{
+				i1 = -i1;
+				i2 = -i2;
+			}
+
+			for (int size1 = 0; size1 < 3; ++size1)
+			{
+				for (int size2 = 0; size2 < 4; ++size2)
 				{
-					if (Math.abs(rx) < r && Math.abs(rz) < r) continue;
-
-					int x = originPos.getX() + rx;
-					int y = min;
-					int z = originPos.getZ() + rz;
-
-					finder: while (true)
+					for (int height = -1; height < 4; ++height)
 					{
-						for (y = originPos.getY(); y <= max; ++y)
+						pos.setPos(o.getX() + (size2 - 1) * i1 + size1 * i2, o.getY() + height, o.getZ() + (size2 - 1) * i2 - size1 * i1);
+
+						if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 						{
-							if (world.isAirBlock(pos.setPos(x, y, z)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
-							{
-								break finder;
-							}
+							return false;
 						}
-
-						for (y = originPos.getY(); y >= min; --y)
-						{
-							if (world.isAirBlock(pos.setPos(x, y, z)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
-							{
-								break finder;
-							}
-						}
-
-						y = 0;
-
-						break;
-					}
-
-					if (y < min || y > max)
-					{
-						continue;
-					}
-
-					int i1 = j % 2;
-					int i2 = 1 - i1;
-
-					if (j % 4 >= 2)
-					{
-						i1 = -i1;
-						i2 = -i2;
-					}
-
-					boolean hasSpace = true;
-
-					space: for (int size1 = 0; size1 < 3; ++size1)
-					{
-						for (int size2 = 0; size2 < 4; ++size2)
-						{
-							for (int height = -1; height < 4; ++height)
-							{
-								pos.setPos(x + (size2 - 1) * i1 + size1 * i2, y + height, z + (size2 - 1) * i2 - size1 * i1);
-
-								if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
-								{
-									hasSpace = false;
-
-									break space;
-								}
-							}
-						}
-					}
-
-					if (hasSpace)
-					{
-						i = j % 4;
-						resultPos = new BlockPos(x, y, z);
-
-						break outside;
 					}
 				}
 			}
-		}
 
-		if (resultPos == null)
+			return true;
+		});
+
+		if (resultPos != null)
 		{
-			outside: for (int r = 1; r <= radius; ++r)
+			i = j % 4;
+		}
+		else
+		{
+			resultPos = BlockPosHelper.findPos(world, originPos, radius, min, max, o ->
 			{
-				for (int rx = -r; rx <= r; ++rx)
+				if (!world.isAirBlock(pos.setPos(o)) || !world.getBlockState(pos.move(Direction.DOWN)).isSolid())
 				{
-					for (int rz = -r; rz <= r; ++rz)
+					return false;
+				}
+
+				int i1 = j % 2;
+				int i2 = 1 - i1;
+
+				for (int width = 0; width < 4; ++width)
+				{
+					for (int height = -1; height < 4; ++height)
 					{
-						if (Math.abs(rx) < r && Math.abs(rz) < r) continue;
+						pos.setPos(o.getX() + (width - 1) * i1, o.getY() + height, o.getZ() + (width - 1) * i2);
 
-						int x = originPos.getX() + rx;
-						int y = min;
-						int z = originPos.getZ() + rz;
-
-						finder: while (true)
+						if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 						{
-							for (y = originPos.getY(); y <= max; ++y)
-							{
-								if (world.isAirBlock(pos.setPos(x, y, z)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
-								{
-									break finder;
-								}
-							}
-
-							for (y = originPos.getY(); y >= min; --y)
-							{
-								if (world.isAirBlock(pos.setPos(x, y, z)) && world.getBlockState(pos.move(Direction.DOWN)).isSolid())
-								{
-									break finder;
-								}
-							}
-
-							y = 0;
-
-							break;
-						}
-
-						if (y < min || y > max)
-						{
-							continue;
-						}
-
-						int i1 = j % 2;
-						int i2 = 1 - i1;
-						boolean hasSpace = true;
-
-						space: for (int width = 0; width < 4; ++width)
-						{
-							for (int height = -1; height < 4; ++height)
-							{
-								pos.setPos(x + (width - 1) * i1, y + height, z + (width - 1) * i2);
-
-								if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
-								{
-									hasSpace = false;
-
-									break space;
-								}
-							}
-						}
-
-						if (hasSpace)
-						{
-							i = j % 2;
-							resultPos = new BlockPos(x, y, z);
-
-							break outside;
+							return false;
 						}
 					}
 				}
+
+				return true;
+			});
+
+			if (resultPos != null)
+			{
+				i = j % 2;
 			}
 		}
 
