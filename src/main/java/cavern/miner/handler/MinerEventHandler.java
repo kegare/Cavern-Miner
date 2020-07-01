@@ -3,7 +3,7 @@ package cavern.miner.handler;
 import cavern.miner.block.CaveOreBlock;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveCriteriaTriggers;
-import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.MiningInteractMessage;
 import cavern.miner.storage.Miner;
 import cavern.miner.storage.PlacedCache;

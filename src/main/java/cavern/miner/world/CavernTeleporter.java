@@ -11,7 +11,7 @@ import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.handler.CavebornEventHandler;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.network.CaveNetworkConstants;
+import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.storage.CavePortalList;
 import cavern.miner.storage.TeleporterCache;

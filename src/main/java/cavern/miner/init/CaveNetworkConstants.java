@@ -1,11 +1,16 @@
-package cavern.miner.network;
+package cavern.miner.init;
 
+import cavern.miner.network.LoadingScreenMessage;
+import cavern.miner.network.MinerPointMessage;
+import cavern.miner.network.MinerRecordMessage;
+import cavern.miner.network.MinerUpdateMessage;
+import cavern.miner.network.MiningInteractMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-public class CaveNetworkConstants
+public final class CaveNetworkConstants
 {
 	public static final String NET_MARKER = "CAVERN";
 	public static final int NET_VERSION = 3;

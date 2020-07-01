@@ -2,8 +2,8 @@ package cavern.miner.storage;
 
 import cavern.miner.enchantment.MinerUnit;
 import cavern.miner.init.CaveCriteriaTriggers;
+import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.init.CaveSounds;
-import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
 import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.network.MinerUpdateMessage;
