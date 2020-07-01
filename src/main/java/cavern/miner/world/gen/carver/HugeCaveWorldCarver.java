@@ -9,9 +9,9 @@ import net.minecraft.world.gen.feature.ProbabilityConfig;
 
 public class HugeCaveWorldCarver extends CavernWorldCarver
 {
-	public HugeCaveWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> config, int maxHeight)
+	public HugeCaveWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> factory)
 	{
-		super(config, maxHeight);
+		super(factory);
 	}
 
 	@Override

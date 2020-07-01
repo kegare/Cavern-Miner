@@ -108,7 +108,7 @@ public class CavernModConfig
 		}
 	}
 
-	public static void register(ModLoadingContext context)
+	public static void register(final ModLoadingContext context)
 	{
 		context.registerConfig(ModConfig.Type.COMMON, GeneralConfig.SPEC, "cavern_miner/general.toml");
 		context.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC, "cavern_miner/client.toml");
