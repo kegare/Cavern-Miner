@@ -16,7 +16,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.GenerationSettings;
-import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.feature.Feature;
 
 public class VeinFeature extends Feature<VeinFeatureConfig>
@@ -69,7 +68,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 		return result;
 	}
 
-	public Iterable<BlockPos> getPositions(IWorld world, int maxHeight, BlockPos pos, Random rand, Vein vein)
+	public Iterable<BlockPos> getPositions(final IWorld world, final int maxHeight, final BlockPos pos, final Random rand, final Vein vein)
 	{
 		return () -> new AbstractIterator<BlockPos>()
 		{
@@ -162,18 +161,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 		int width = 2 * (MathHelper.ceil(f) + i);
 		int height = 2 * (2 + i);
 
-		for (int j = x; j <= x + width; ++j)
-		{
-			for (int k = z; k <= z + width; ++k)
-			{
-				if (y <= world.getHeight(Heightmap.Type.OCEAN_FLOOR_WG, j, k))
-				{
-					return doPlace(world, rand, vein, xStart, xEnd, zStart, zEnd, yStart, yEnd, x, y, z, width, height);
-				}
-			}
-		}
-
-		return false;
+		return doPlace(world, rand, vein, xStart, xEnd, zStart, zEnd, yStart, yEnd, x, y, z, width, height);
 	}
 
 	protected boolean doPlace(IWorld world, Random random, Vein vein, double xStart, double xEnd, double zStart, double zEnd, double yStart, double yEnd, int x, int y, int z, int width, int height)
