@@ -25,9 +25,11 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -62,22 +64,25 @@ public class CavernTeleporter implements ITeleporter
 	}
 
 	@Override
-	public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity)
+	public Entity placeEntity(final Entity entity, final ServerWorld currentWorld, final ServerWorld destWorld, final float yaw, final Function<Boolean, Entity> repositionEntity)
 	{
-		int radius = GeneralConfig.INSTANCE.findRadius.get();
-		boolean placed = false;
+		final int radius = GeneralConfig.INSTANCE.findRadius.get();
 
 		if (destPos != null && !destPos.equals(entity.getPosition()))
 		{
 			entity.moveToBlockPosAndAngles(destPos, yaw, entity.rotationPitch);
 		}
 
+		final BlockPos originPos = destPos == null ? entity.getPosition() : destPos;
+
+		destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(originPos), Math.max(Math.floorDiv(radius, 16), 1), originPos);
+
+		boolean placed = false;
+
 		if (GeneralConfig.INSTANCE.posCache.get())
 		{
 			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, entity, yaw, radius, o)).orElse(false);
 		}
-
-		final BlockPos originPos = destPos == null ? entity.getPosition() : destPos;
 
 		if (!placed)
 		{
@@ -123,7 +128,7 @@ public class CavernTeleporter implements ITeleporter
 		return repositionEntity.apply(false);
 	}
 
-	public boolean placeInCachedPortal(ServerWorld world, Entity entity, float yaw, int radius, TeleporterCache cache)
+	public boolean placeInCachedPortal(final ServerWorld world, final Entity entity, final float yaw, final int radius, final TeleporterCache cache)
 	{
 		ResourceLocation key = portalBlock.getRegistryName();
 		DimensionType dim = world.getDimension().getType();
@@ -144,7 +149,7 @@ public class CavernTeleporter implements ITeleporter
 		return false;
 	}
 
-	public boolean placeInStoredPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos, CavePortalList list)
+	public boolean placeInStoredPortal(final ServerWorld world, final Entity entity, final float yaw, final int radius, final BlockPos checkPos, final CavePortalList list)
 	{
 		List<BlockPos> positions = list.getPortalPositions(portalBlock).stream()
 			.filter(o -> new BlockPos(o.getX(), 0, o.getZ()).withinDistance(new BlockPos(checkPos.getX(), 0, checkPos.getZ()), radius))
@@ -163,7 +168,7 @@ public class CavernTeleporter implements ITeleporter
 		return false;
 	}
 
-	public boolean placeInPortal(ServerWorld world, Entity entity, float yaw, int radius, BlockPos checkPos)
+	public boolean placeInPortal(final ServerWorld world, final Entity entity, final float yaw, final int radius, final BlockPos checkPos)
 	{
 		final BlockPos pos;
 
@@ -203,13 +208,14 @@ public class CavernTeleporter implements ITeleporter
 	}
 
 	@Nullable
-	public BlockPos makePortal(ServerWorld world, BlockPos originPos, int radius)
+	public BlockPos makePortal(final ServerWorld world, final BlockPos originPos, final int radius)
 	{
-		int min = 10;
-		int max = world.getActualHeight() - 10;
+		final int min = 10;
+		final int max = world.getActualHeight() - 10;
+		final BlockPos.Mutable pos = new BlockPos.Mutable();
+
 		int i = 0;
 		int j = world.rand.nextInt(4);
-		BlockPos.Mutable pos = new BlockPos.Mutable();
 		BlockPos resultPos = null;
 
 		resultPos = BlockPosHelper.findPos(world, originPos, radius, min, max, o ->
@@ -228,13 +234,13 @@ public class CavernTeleporter implements ITeleporter
 				i2 = -i2;
 			}
 
-			for (int size1 = 0; size1 < 3; ++size1)
+			for (int width1 = 0; width1 < 3; ++width1)
 			{
-				for (int size2 = 0; size2 < 4; ++size2)
+				for (int width2 = 0; width2 < 4; ++width2)
 				{
 					for (int height = -1; height < 4; ++height)
 					{
-						pos.setPos(o.getX() + (size2 - 1) * i1 + size1 * i2, o.getY() + height, o.getZ() + (size2 - 1) * i2 - size1 * i1);
+						pos.setPos(o.getX() + (width2 - 1) * i1 + width1 * i2, o.getY() + height, o.getZ() + (width2 - 1) * i2 - width1 * i1);
 
 						if (height < 0 && !world.getBlockState(pos).isSolid() || height >= 0 && !world.isAirBlock(pos))
 						{
@@ -298,12 +304,12 @@ public class CavernTeleporter implements ITeleporter
 		{
 			resultPos = originPos;
 
-			for (int size1 = -1; size1 <= 1; ++size1)
+			for (int width1 = -1; width1 <= 1; ++width1)
 			{
-				for (int size2 = 1; size2 < 3; ++size2)
+				for (int width2 = 1; width2 < 3; ++width2)
 				{
-					int x = resultPos.getX() + (size2 - 1) * i1 + size1 * i2;
-					int z = resultPos.getZ() + (size2 - 1) * i2 - size1 * i1;
+					int x = resultPos.getX() + (width2 - 1) * i1 + width1 * i2;
+					int z = resultPos.getZ() + (width2 - 1) * i2 - width1 * i1;
 
 					for (int height = -1; height < 3; ++height)
 					{

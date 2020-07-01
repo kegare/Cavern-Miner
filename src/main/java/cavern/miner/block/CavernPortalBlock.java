@@ -22,6 +22,7 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -34,8 +35,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -43,8 +44,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
 
 public class CavernPortalBlock extends Block
 {
@@ -113,6 +112,12 @@ public class CavernPortalBlock extends Block
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
 	{
 		builder.add(AXIS);
+	}
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader reader, BlockPos pos, PlayerEntity player)
+	{
+		return ItemStack.EMPTY;
 	}
 
 	public boolean trySpawnPortal(IWorld world, BlockPos pos)
@@ -231,23 +236,9 @@ public class CavernPortalBlock extends Block
 			cache.setLastPos(key, currentDim, pos);
 		}
 
-		ServerWorld destWorld = server.getWorld(destDim);
-
-		if (destWorld == null)
-		{
-			return;
-		}
-
 		if (destPos == null || !GeneralConfig.INSTANCE.posCache.get())
 		{
 			destPos = entity.getPosition();
-		}
-
-		ChunkPos chunkPos = new ChunkPos(destPos);
-
-		if (!destWorld.getChunkProvider().isChunkLoaded(chunkPos))
-		{
-			destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, destPos);
 		}
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));
