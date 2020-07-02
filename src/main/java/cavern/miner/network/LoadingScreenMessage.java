@@ -47,7 +47,7 @@ public class LoadingScreenMessage
 	{
 		if (msg.stage != Stage.ERROR)
 		{
-			ctx.get().enqueueWork(() -> msg.stage.run());
+			ctx.get().enqueueWork(msg.stage::run);
 		}
 
 		ctx.get().setPacketHandled(true);

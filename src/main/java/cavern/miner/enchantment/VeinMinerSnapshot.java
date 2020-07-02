@@ -8,7 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockReader;
 
 public class VeinMinerSnapshot extends MinerSnapshot
 {
@@ -16,9 +16,9 @@ public class VeinMinerSnapshot extends MinerSnapshot
 
 	private BlockPos checkPos;
 
-	public VeinMinerSnapshot(EnchantmentMiner ench, World world, BlockPos pos, BlockState state, LivingEntity entity)
+	public VeinMinerSnapshot(EnchantmentMiner ench, IBlockReader reader, BlockPos pos, BlockState state, LivingEntity entity)
 	{
-		super(ench, world, pos, state, entity);
+		super(ench, reader, pos, state, entity);
 	}
 
 	public int getMiningLimit()
@@ -103,9 +103,9 @@ public class VeinMinerSnapshot extends MinerSnapshot
 	@Override
 	public boolean validTarget(BlockPos pos)
 	{
-		BlockState state = world.getBlockState(pos);
+		BlockState state = reader.getBlockState(pos);
 
-		if (state.getBlock().isAir(state, world, pos) || state.getBlockHardness(world, pos) < 0.0F)
+		if (state.getBlock().isAir(state, reader, pos) || state.getBlockHardness(reader, pos) < 0.0F)
 		{
 			return false;
 		}

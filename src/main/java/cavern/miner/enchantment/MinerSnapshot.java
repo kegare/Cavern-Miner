@@ -12,22 +12,22 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockReader;
 
 public abstract class MinerSnapshot implements Comparator<BlockPos>
 {
 	protected final EnchantmentMiner enchMiner;
-	protected final World world;
+	protected final IBlockReader reader;
 	protected final BlockPos originPos;
 	protected final BlockState originState;
 	protected final LivingEntity miner;
 
 	protected final Set<BlockPos> miningTargets = new TreeSet<>(this);
 
-	public MinerSnapshot(EnchantmentMiner ench, World world, BlockPos pos, BlockState state, @Nullable LivingEntity entity)
+	public MinerSnapshot(EnchantmentMiner ench, IBlockReader reader, BlockPos pos, BlockState state, @Nullable LivingEntity entity)
 	{
 		this.enchMiner = ench;
-		this.world = world;
+		this.reader = reader;
 		this.originPos = pos;
 		this.originState = state;
 		this.miner = entity;
@@ -38,9 +38,9 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 		return enchMiner;
 	}
 
-	public World getWorld()
+	public IBlockReader getReader()
 	{
-		return world;
+		return reader;
 	}
 
 	public BlockPos getOriginPos()
@@ -74,16 +74,6 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 		return miningTargets.isEmpty();
 	}
 
-	public boolean equals(World worldIn, BlockPos pos)
-	{
-		if (worldIn == null || pos == null)
-		{
-			return false;
-		}
-
-		return world.getDimension().getType() == worldIn.getDimension().getType() && originPos.equals(pos);
-	}
-
 	public int getTargetCount()
 	{
 		return isEmpty() ? 0 : miningTargets.size();
@@ -108,9 +98,9 @@ public abstract class MinerSnapshot implements Comparator<BlockPos>
 
 	public boolean validTarget(BlockPos pos)
 	{
-		BlockState state = world.getBlockState(pos);
+		BlockState state = reader.getBlockState(pos);
 
-		if (state.getBlock().isAir(state, world, pos) || state.getBlockHardness(world, pos) < 0.0F)
+		if (state.getBlock().isAir(state, reader, pos) || state.getBlockHardness(reader, pos) < 0.0F)
 		{
 			return false;
 		}

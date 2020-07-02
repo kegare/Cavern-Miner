@@ -4,13 +4,13 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.IBlockReader;
 
 public class AreaMinerSnapshot extends MinerSnapshot
 {
-	public AreaMinerSnapshot(EnchantmentMiner ench, World world, BlockPos pos, BlockState state, LivingEntity entity)
+	public AreaMinerSnapshot(EnchantmentMiner ench, IBlockReader reader, BlockPos pos, BlockState state, LivingEntity entity)
 	{
-		super(ench, world, pos, state, entity);
+		super(ench, reader, pos, state, entity);
 	}
 
 	public int getRowRange()
