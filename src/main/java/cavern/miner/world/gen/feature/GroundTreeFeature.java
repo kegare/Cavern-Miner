@@ -34,6 +34,13 @@ public class GroundTreeFeature extends Feature<CountConfig>
 	@Override
 	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, CountConfig config)
 	{
+		int ground = generator.getGroundHeight();
+
+		if (ground <= 0)
+		{
+			return false;
+		}
+
 		BlockState state = OAK_SAPLING;
 		Tree tree = OAK_TREE;
 
@@ -44,7 +51,6 @@ public class GroundTreeFeature extends Feature<CountConfig>
 		}
 
 		int max = generator.getMaxHeight() - 1;
-		int ground = generator.getGroundHeight();
 		int groundHeight = max - ground - 10;
 		BlockPos originPos = new BlockPos(pos.getX(), ground, pos.getZ());
 
