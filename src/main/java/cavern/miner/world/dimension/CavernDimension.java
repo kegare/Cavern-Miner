@@ -1,5 +1,6 @@
 package cavern.miner.world.dimension;
 
+import java.util.Comparator;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -140,13 +141,57 @@ public class CavernDimension extends Dimension
 	@Override
 	public BlockPos findSpawn(ChunkPos chunkPos, boolean checkValid)
 	{
-		return getSpawnPoint();
+		CavePortalList portalList = world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).orElse(null);
+
+		if (portalList == null || portalList.isPortalEmpty())
+		{
+			return BlockPos.ZERO;
+		}
+
+		final BlockPos originPos = chunkPos.asBlockPos().add(8, 50, 8);
+		final Comparator<BlockPos> comparator = Comparator.comparingDouble(o -> o.distanceSq(originPos));
+
+		CavernPortalBlock portal = CaveDimensions.getPortalBlock(getType());
+
+		if (portal != null)
+		{
+			BlockPos pos = portalList.getPortalPositions(portal).stream().min(comparator).orElse(null);
+
+			if (pos != null)
+			{
+				return pos;
+			}
+		}
+
+		return portalList.getPortalPositions().stream().min(comparator).orElse(BlockPos.ZERO);
 	}
 
 	@Override
 	public BlockPos findSpawn(int posX, int posZ, boolean checkValid)
 	{
-		return getSpawnPoint();
+		CavePortalList portalList = world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).orElse(null);
+
+		if (portalList == null || portalList.isPortalEmpty())
+		{
+			return BlockPos.ZERO;
+		}
+
+		final BlockPos originPos = new BlockPos(posX, 50, posZ);
+		final Comparator<BlockPos> comparator = Comparator.comparingDouble(o -> o.distanceSq(originPos));
+
+		CavernPortalBlock portal = CaveDimensions.getPortalBlock(getType());
+
+		if (portal != null)
+		{
+			BlockPos pos = portalList.getPortalPositions(portal).stream().min(comparator).orElse(null);
+
+			if (pos != null)
+			{
+				return pos;
+			}
+		}
+
+		return portalList.getPortalPositions().stream().min(comparator).orElse(BlockPos.ZERO);
 	}
 
 	@Override

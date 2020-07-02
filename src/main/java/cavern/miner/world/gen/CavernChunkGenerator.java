@@ -226,7 +226,7 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 	}
 
 	@Override
-	public int func_222529_a(int x, int z, Heightmap.Type heightmapType)
+	public int getHeight(int x, int z, Heightmap.Type heightmapType)
 	{
 		return 0;
 	}

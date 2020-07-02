@@ -3,6 +3,7 @@ package cavern.miner.storage;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -41,22 +42,17 @@ public final class MinerRank
 		}
 	}
 
-	public static RankEntry get(String name)
-	{
-		return get(name, BEGINNER);
-	}
-
-	public static RankEntry get(String name, RankEntry nullDefault)
+	public static Optional<RankEntry> get(String name)
 	{
 		for (RankEntry entry : ENTRIES)
 		{
 			if (entry.getName().equalsIgnoreCase(name))
 			{
-				return entry;
+				return Optional.of(entry);
 			}
 		}
 
-		return nullDefault;
+		return Optional.empty();
 	}
 
 	public static RankEntry getNextEntry(RankEntry current)
