@@ -12,6 +12,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -49,7 +50,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 	public Miner setPoint(int value)
 	{
-		point = Math.max(value, 0);
+		point = MathHelper.clamp(value, 0, 9999999);
 
 		return this;
 	}

@@ -17,7 +17,7 @@ public class LoadingScreenMessage
 {
 	private final Stage stage;
 
-	public LoadingScreenMessage(Stage stage)
+	private LoadingScreenMessage(Stage stage)
 	{
 		this.stage = stage;
 	}
@@ -64,6 +64,11 @@ public class LoadingScreenMessage
 		private Stage(@Nullable Supplier<SafeRunnable> task)
 		{
 			this.task = task;
+		}
+
+		public LoadingScreenMessage create()
+		{
+			return new LoadingScreenMessage(this);
 		}
 
 		public void run()

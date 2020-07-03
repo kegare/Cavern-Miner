@@ -97,7 +97,7 @@ public class CavernTeleporter implements ITeleporter
 		{
 			if (toCave && isPlayer)
 			{
-				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), new LoadingScreenMessage(LoadingScreenMessage.Stage.LOAD));
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), LoadingScreenMessage.Stage.LOAD.create());
 
 				loading = true;
 			}
@@ -122,7 +122,7 @@ public class CavernTeleporter implements ITeleporter
 
 		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
 		{
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), new LoadingScreenMessage(LoadingScreenMessage.Stage.DONE));
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), LoadingScreenMessage.Stage.DONE.create());
 		}
 
 		return repositionEntity.apply(false);

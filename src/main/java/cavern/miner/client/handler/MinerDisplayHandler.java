@@ -190,10 +190,6 @@ public class MinerDisplayHandler
 
 			pointText = corner.isLeft() ? pointText + " < " + per : per + " > " + pointText;
 		}
-		else
-		{
-			pointText = "MAX";
-		}
 
 		String comboText = null;
 
