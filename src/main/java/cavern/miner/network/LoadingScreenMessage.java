@@ -2,15 +2,12 @@ package cavern.miner.network;
 
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
-
 import cavern.miner.CavernMod;
-import cavern.miner.client.ClientProxy;
+import cavern.miner.client.handler.network.LoadingScreenMessageHandler;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.DistExecutor.SafeRunnable;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 public class LoadingScreenMessage
@@ -22,19 +19,22 @@ public class LoadingScreenMessage
 		this.stage = stage;
 	}
 
+	public Stage getStage()
+	{
+		return stage;
+	}
+
 	public static LoadingScreenMessage decode(final PacketBuffer buf)
 	{
 		try
 		{
-			Stage stage = Stage.valueOf(buf.readString());
-
-			return new LoadingScreenMessage(stage);
+			return Stage.valueOf(buf.readString()).create();
 		}
 		catch (IndexOutOfBoundsException e)
 		{
 			CavernMod.LOG.error("LoadingScreenMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
-			return new LoadingScreenMessage(Stage.ERROR);
+			return Stage.ERROR.create();
 		}
 	}
 
@@ -47,7 +47,7 @@ public class LoadingScreenMessage
 	{
 		if (msg.stage != Stage.ERROR)
 		{
-			ctx.get().enqueueWork(msg.stage::run);
+			ctx.get().enqueueWork(() -> DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> new LoadingScreenMessageHandler(msg)));
 		}
 
 		ctx.get().setPacketHandled(true);
@@ -55,28 +55,13 @@ public class LoadingScreenMessage
 
 	public enum Stage
 	{
-		ERROR(null),
-		LOAD(() -> ClientProxy::displayLoadingScreen),
-		DONE(() -> ClientProxy::closeLoadingScreen);
-
-		private final Supplier<SafeRunnable> task;
-
-		private Stage(@Nullable Supplier<SafeRunnable> task)
-		{
-			this.task = task;
-		}
+		ERROR,
+		LOAD,
+		DONE;
 
 		public LoadingScreenMessage create()
 		{
 			return new LoadingScreenMessage(this);
-		}
-
-		public void run()
-		{
-			if (task != null)
-			{
-				DistExecutor.safeRunWhenOn(Dist.CLIENT, task);
-			}
 		}
 	}
 }

@@ -10,10 +10,13 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
@@ -142,5 +145,32 @@ public class JsonHelper
 		ResourceLocation key = deserializeKey(e);
 
 		return key == null ? null : ForgeRegistries.ENTITIES.getValue(key);
+	}
+
+	@Nullable
+	public static Enchantment deserializeEnchantment(JsonElement e)
+	{
+		ResourceLocation key = deserializeKey(e);
+
+		return key == null ? null : ForgeRegistries.ENCHANTMENTS.getValue(key);
+	}
+
+	@Nullable
+	public static Effect deserializeEffect(JsonElement e)
+	{
+		ResourceLocation key = deserializeKey(e);
+
+		return key == null ? null : ForgeRegistries.POTIONS.getValue(key);
+	}
+
+	public static JsonObject serializeEffectInstance(EffectInstance effect)
+	{
+		return EffectInstanceSerializer.INSTANCE.serialize(effect, effect.getClass(), null).getAsJsonObject();
+	}
+
+	@Nullable
+	public static EffectInstance deserializeEffectInstance(JsonObject e)
+	{
+		return EffectInstanceSerializer.INSTANCE.deserialize(e, e.getClass(), null);
 	}
 }

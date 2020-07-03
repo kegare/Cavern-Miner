@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
+import cavern.miner.config.GeneralConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -52,7 +53,7 @@ public class RandomiteOreBlock extends CaveOreBlock
 
 		for (int i = 0; i <= fortune; ++i)
 		{
-			ItemStack drop = RandomiteDrop.get().getDropItem();
+			ItemStack drop = GeneralConfig.INSTANCE.randomiteDrops.getRandomDropItem(RANDOM);
 
 			if (!drop.isEmpty())
 			{

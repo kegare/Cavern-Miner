@@ -16,7 +16,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.WorldType;
@@ -239,10 +238,8 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 			return;
 		}
 
-		if (!spawnHostileMobs || world.getDifficulty() == Difficulty.PEACEFUL || !world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING))
+		if (!world.getGameRules().getBoolean(GameRules.DO_MOB_SPAWNING))
 		{
-			naturalSpawner = null;
-
 			return;
 		}
 

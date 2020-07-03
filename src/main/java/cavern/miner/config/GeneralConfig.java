@@ -30,6 +30,7 @@ public class GeneralConfig
 	public final OreEntryConfig oreEntries = new OreEntryConfig();
 	public final MinerRankConfig minerRanks = new MinerRankConfig();
 	public final RandomiteDropConfig randomiteDrops = new RandomiteDropConfig();
+	public final CavemanTradeConfig cavemanTrades = new CavemanTradeConfig();
 
 	private GeneralConfig(final ForgeConfigSpec.Builder builder)
 	{
@@ -57,5 +58,6 @@ public class GeneralConfig
 		oreEntries.load();
 		minerRanks.load();
 		randomiteDrops.load();
+		cavemanTrades.load();
 	}
 }

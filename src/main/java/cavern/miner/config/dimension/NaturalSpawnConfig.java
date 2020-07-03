@@ -138,6 +138,7 @@ public class NaturalSpawnConfig extends AbstractEntryConfig
 		List<Biome.SpawnListEntry> ambients = new ArrayList<>();
 
 		ambients.add(new Biome.SpawnListEntry(EntityType.BAT, 20, 8, 8));
+		ambients.add(new Biome.SpawnListEntry(CaveEntities.CAVEMAN.get(), 1, 1, 1));
 
 		spawns.put(EntityClassification.AMBIENT, ambients);
 	}

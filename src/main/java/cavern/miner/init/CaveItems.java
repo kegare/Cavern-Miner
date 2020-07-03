@@ -44,6 +44,8 @@ public final class CaveItems
 	public static final RegistryObject<AxeItem> AQUAMARINE_AXE = REGISTRY.register("aquamarine_axe", () -> new AxeItem(CaveItemTier.AQUAMARINE, 5.0F, -2.8F, createProperties()));
 	public static final RegistryObject<ShovelItem> AQUAMARINE_SHOVEL = REGISTRY.register("aquamarine_shovel", () -> new ShovelItem(CaveItemTier.AQUAMARINE, 1.5F, -2.8F, createProperties()));
 
+	public static final RegistryObject<SpawnEggItem> CAVEMAN_SPAWN_EGG = REGISTRY.register("caveman_spawn_egg",
+		() -> new CaveSpawnEggItem<>(CaveEntities.CAVEMAN, EntityType.PLAYER, 0xAAAAAA, 0xCCCCCC, createProperties()));
 	public static final RegistryObject<SpawnEggItem> CAVENIC_SKELETON_SPAWN_EGG = REGISTRY.register("cavenic_skeleton_spawn_egg",
 		() -> new CaveSpawnEggItem<>(CaveEntities.CAVENIC_SKELETON, EntityType.SKELETON, 0xAAAAAA, 0xDDDDDD, createProperties()));
 
