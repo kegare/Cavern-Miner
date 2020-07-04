@@ -23,14 +23,14 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 public class CavernModConfig
 {
-	private static final String INTERNAL_VERSION = "1";
+	private static final String INTERNAL_VERSION = "2";
 
 	public static File getConfigDir()
 	{
 		return new File(FMLPaths.CONFIGDIR.get().toFile(), "cavern_miner");
 	}
 
-	public static void check()
+	private static void makeDirs()
 	{
 		final File[] configDirs = {getConfigDir(), CavernConfig.getConfigDir(), HugeCavernConfig.getConfigDir()};
 
@@ -46,19 +46,20 @@ public class CavernModConfig
 				dir.mkdirs();
 			}
 		}
+	}
+
+	public static void check()
+	{
+		makeDirs();
 
 		try
 		{
-			final File file = new File(configDirs[0], ".version");
-
-			if (!file.exists() && !file.createNewFile())
-			{
-				return;
-			}
+			final File dir = getConfigDir();
+			final File file = new File(dir, ".version");
 
 			String line = null;
 
-			if (file.canRead() && file.length() > 0L)
+			if (file.exists() && file.canRead() && file.length() > 0L)
 			{
 				try (FileInputStream fis = new FileInputStream(file); BufferedReader buffer = new BufferedReader(new InputStreamReader(fis)))
 				{
@@ -74,19 +75,18 @@ public class CavernModConfig
 				return;
 			}
 
-			for (File dir : configDirs)
+			if (line != null && line.length() > 0)
 			{
-				FileUtils.deleteDirectory(dir);
+				File bakDir = new File(dir.getParent(), dir.getName() + "_bak");
 
-				if (dir.getParentFile() != null)
+				if (bakDir.exists())
 				{
-					dir.getParentFile().mkdirs();
+					FileUtils.deleteDirectory(bakDir);
 				}
 
-				if (!dir.exists())
-				{
-					dir.mkdirs();
-				}
+				FileUtils.moveDirectory(dir, bakDir);
+
+				makeDirs();
 			}
 
 			if (!file.exists() && !file.createNewFile())
