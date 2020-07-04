@@ -44,6 +44,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 			object.add("effect", JsonHelper.serializeEffectInstance(((CavemanTrade.EffectEntry)src).getEffect()));
 		}
 
+		object.addProperty("weight", src.itemWeight);
 		object.addProperty("cost", src.getCost());
 		object.addProperty("rank", src.getRankName());
 
@@ -54,6 +55,17 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 	public CavemanTrade.TradeEntry deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
 		JsonObject object = json.getAsJsonObject();
+
+		int weight;
+
+		if (object.has("weight"))
+		{
+			weight = object.get("weight").getAsInt();
+		}
+		else
+		{
+			weight = 0;
+		}
 
 		int cost;
 
@@ -83,7 +95,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 
 			if (!stack.isEmpty())
 			{
-				return new CavemanTrade.ItemStackEntry(stack, cost, rank);
+				return new CavemanTrade.ItemStackEntry(stack, weight, cost, rank);
 			}
 		}
 		else if (object.has("enchanted_book"))
@@ -104,7 +116,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 					level = ench.getMinLevel();
 				}
 
-				return new CavemanTrade.EnchantedBookEntry(new EnchantmentData(ench, level), cost, rank);
+				return new CavemanTrade.EnchantedBookEntry(new EnchantmentData(ench, level), weight, cost, rank);
 			}
 		}
 		else if (object.has("effect"))
@@ -113,7 +125,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 
 			if (effect != null)
 			{
-				return new CavemanTrade.EffectEntry(effect, cost, rank);
+				return new CavemanTrade.EffectEntry(effect, weight, cost, rank);
 			}
 		}
 

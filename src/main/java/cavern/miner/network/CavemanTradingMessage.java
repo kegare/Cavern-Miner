@@ -120,6 +120,8 @@ public class CavemanTradingMessage
 						world.addEntity(new ItemEntity(world, pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, stack));
 					}
 				}
+
+				caveman.getTradeEntries().remove(msg.entryId);
 			});
 		}
 

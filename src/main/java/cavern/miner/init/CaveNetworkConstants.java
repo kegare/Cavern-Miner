@@ -1,7 +1,7 @@
 package cavern.miner.init;
 
-import cavern.miner.network.CavemanTradingMessage;
 import cavern.miner.network.CavemanTradeMessage;
+import cavern.miner.network.CavemanTradingMessage;
 import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.network.MinerPointMessage;
 import cavern.miner.network.MinerRecordMessage;

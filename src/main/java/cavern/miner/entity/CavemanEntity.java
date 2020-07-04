@@ -1,5 +1,7 @@
 package cavern.miner.entity;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -14,6 +16,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
 import net.minecraft.entity.Pose;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.SpawnReason;
@@ -28,18 +31,25 @@ import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.Hand;
+import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 public class CavemanEntity extends CreatureEntity
 {
 	private static final DataParameter<Boolean> SITTING = EntityDataManager.createKey(CavemanEntity.class, DataSerializers.BOOLEAN);
+
+	private final List<CavemanTrade.TradeEntry> tradeEntries = new ArrayList<>();
 
 	public CavemanEntity(EntityType<? extends CreatureEntity> type, World world)
 	{
@@ -107,6 +117,48 @@ public class CavemanEntity extends CreatureEntity
 		return isSitting() ? super.getEyeHeight() * 0.6F : super.getStandingEyeHeight(pose, size);
 	}
 
+	public List<CavemanTrade.TradeEntry> getTradeEntries()
+	{
+		if (world.isRemote)
+		{
+			return Collections.emptyList();
+		}
+
+		if (tradeEntries.isEmpty())
+		{
+			refreshTradeEntries();
+		}
+
+		return tradeEntries;
+	}
+
+	public void refreshTradeEntries()
+	{
+		if (world.isRemote)
+		{
+			return;
+		}
+
+		tradeEntries.clear();
+
+		List<CavemanTrade.TradeEntry> list = GeneralConfig.INSTANCE.cavemanTrades.getEntries();
+
+		for (int i = 0, count = 5 + rand.nextInt(5); i < count; ++i)
+		{
+			tradeEntries.add(WeightedRandom.getRandomItem(rand, list));
+		}
+	}
+
+	@Override
+	public ILivingEntityData onInitialSpawn(IWorld world, DifficultyInstance difficulty, SpawnReason reason, ILivingEntityData spawnData, CompoundNBT dataTag)
+	{
+		ILivingEntityData data = super.onInitialSpawn(world, difficulty, reason, spawnData, dataTag);
+
+		refreshTradeEntries();
+
+		return data;
+	}
+
 	@Override
 	protected boolean processInteract(PlayerEntity player, Hand hand)
 	{
@@ -149,9 +201,28 @@ public class CavemanEntity extends CreatureEntity
 		return 1;
 	}
 
-	public List<CavemanTrade.TradeEntry> getTradeEntries()
+	@Override
+	public void writeAdditional(CompoundNBT compound)
 	{
-		return GeneralConfig.INSTANCE.cavemanTrades.getEntries();
+		super.writeAdditional(compound);
+
+		ListNBT list = new ListNBT();
+
+		tradeEntries.stream().map(CavemanTrade::write).forEach(list::add);
+
+		compound.put("TradeEntries", list);
+	}
+
+	@Override
+	public void readAdditional(CompoundNBT compound)
+	{
+		super.readAdditional(compound);
+
+		tradeEntries.clear();
+
+		ListNBT list = compound.getList("TradeEntries", Constants.NBT.TAG_COMPOUND);
+
+		list.stream().map(o -> CavemanTrade.read((CompoundNBT)o)).forEach(tradeEntries::add);
 	}
 
 	public static boolean canSpawnInLight(EntityType<? extends CreatureEntity> type, IWorld world, SpawnReason reason, BlockPos pos, Random random)

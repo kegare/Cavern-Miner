@@ -95,15 +95,15 @@ public class CavemanTradeConfig extends AbstractEntryConfig
 	{
 		entries.clear();
 
-		entries.add(new CavemanTrade.ItemStackEntry(new ItemStack(Items.TORCH, 64), 100, null));
+		entries.add(new CavemanTrade.ItemStackEntry(new ItemStack(Items.TORCH, 64), 100, 100, null));
 
-		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 1), 150, "STONE"));
-		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 2), 300, "IRON"));
-		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 1), 100, "STONE"));
-		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 2), 200, "IRON"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 1), 50, 150, "STONE"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 2), 30, 300, "IRON"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 1), 50, 100, "STONE"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 2), 30, 200, "IRON"));
 
-		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.REGENERATION, 5 * 20, 1), 50, "STONE"));
-		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.MINING_FATIGUE, 30 * 20, 2), 50, "STONE"));
-		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.NIGHT_VISION, 30 * 20), 50, "STONE"));
+		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.REGENERATION, 5 * 20, 1), 30, 50, "STONE"));
+		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.MINING_FATIGUE, 30 * 20, 2), 50, 50, "STONE"));
+		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.NIGHT_VISION, 30 * 20), 50, 50, "STONE"));
 	}
 }

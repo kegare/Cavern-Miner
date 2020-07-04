@@ -14,6 +14,7 @@ import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -63,7 +64,7 @@ public final class CavemanTrade
 		return EMPTY;
 	}
 
-	public static abstract class TradeEntry
+	public static abstract class TradeEntry extends WeightedRandom.Item
 	{
 		private final int cost;
 		private final String rank;
@@ -71,22 +72,23 @@ public final class CavemanTrade
 		private ItemStack iconItem;
 		private ItemStack rankIconItem;
 
-		public TradeEntry(int cost, @Nullable String rank)
+		public TradeEntry(int weight, int cost, @Nullable String rank)
 		{
+			super(weight);
 			this.cost = cost;
 			this.rank = Strings.isNullOrEmpty(rank) ? MinerRank.BEGINNER.getName() : rank;
 		}
 
 		public TradeEntry(CompoundNBT nbt)
 		{
-			this(nbt.getInt("Cost"), nbt.getString("Rank"));
+			this(nbt.getInt("Weight"), nbt.getInt("Cost"), nbt.getString("Rank"));
 			this.iconItem = ItemStack.read(nbt.getCompound("Icon"));
 			this.rankIconItem = ItemStack.read(nbt.getCompound("RankIcon"));
 		}
 
-		public TradeEntry(int cost)
+		public TradeEntry(int weight, int cost)
 		{
-			this(cost, null);
+			this(weight, cost, null);
 		}
 
 		public int getCost()
@@ -142,6 +144,7 @@ public final class CavemanTrade
 		{
 			CompoundNBT nbt = new CompoundNBT();
 
+			nbt.putInt("Weight", itemWeight);
 			nbt.putInt("Cost", getCost());
 			nbt.putString("Rank", getRankName());
 			nbt.put("Icon", getIconItem().write(new CompoundNBT()));
@@ -155,7 +158,7 @@ public final class CavemanTrade
 	{
 		private EmptyEntry()
 		{
-			super(0);
+			super(0, 0);
 		}
 
 		@Override
@@ -181,9 +184,9 @@ public final class CavemanTrade
 	{
 		private final ItemStack stack;
 
-		public ItemStackEntry(ItemStack stack, int cost, @Nullable String rank)
+		public ItemStackEntry(ItemStack stack, int weight, int cost, @Nullable String rank)
 		{
-			super(cost, rank);
+			super(weight, cost, rank);
 			this.stack = stack;
 		}
 
@@ -221,9 +224,9 @@ public final class CavemanTrade
 	{
 		private final EnchantmentData data;
 
-		public EnchantedBookEntry(EnchantmentData data, int cost, @Nullable String rank)
+		public EnchantedBookEntry(EnchantmentData data, int weight, int cost, @Nullable String rank)
 		{
-			super(cost, rank);
+			super(weight, cost, rank);
 			this.data = data;
 		}
 
@@ -266,9 +269,9 @@ public final class CavemanTrade
 	{
 		private final EffectInstance effect;
 
-		public EffectEntry(EffectInstance effect, int cost, @Nullable String rank)
+		public EffectEntry(EffectInstance effect, int weight, int cost, @Nullable String rank)
 		{
-			super(cost, rank);
+			super(weight, cost, rank);
 			this.effect = effect;
 		}
 
