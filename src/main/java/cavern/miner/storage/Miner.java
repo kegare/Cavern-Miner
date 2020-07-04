@@ -72,9 +72,9 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
-	public Miner setRank(String value)
+	public Miner setRank(String name)
 	{
-		setRank(MinerRank.get(value).orElse(getRank()));
+		setRank(MinerRank.byName(name).orElse(getRank()));
 
 		return this;
 	}
@@ -111,9 +111,9 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
-	public Miner promoteRank(String value)
+	public Miner promoteRank(String name)
 	{
-		promoteRank(MinerRank.get(value).orElse(getRank()));
+		promoteRank(MinerRank.byName(name).orElse(getRank()));
 
 		return this;
 	}
@@ -148,7 +148,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 		if (positive)
 		{
-			MinerRank.RankEntry next = MinerRank.getNextEntry(getRank());
+			MinerRank.RankEntry next = MinerRank.getNextRank(getRank());
 
 			if (!getRank().equals(next) && getPoint() >= next.getPhase())
 			{
@@ -220,7 +220,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	public void deserializeNBT(CompoundNBT nbt)
 	{
 		setPoint(nbt.getInt("Point"));
-		setRank(MinerRank.get(nbt.getString("Rank")).orElse(MinerRank.BEGINNER));
+		setRank(MinerRank.byName(nbt.getString("Rank")).orElse(MinerRank.BEGINNER));
 		getRecord().deserializeNBT(nbt.getCompound("Record"));
 	}
 

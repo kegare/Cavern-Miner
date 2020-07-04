@@ -25,9 +25,10 @@ public final class MinerRank
 
 	private MinerRank() {}
 
-	public static void set(Collection<RankEntry> entries)
+	public static void load(Collection<RankEntry> entries)
 	{
-		clear();
+		ENTRIES.clear();
+		ENTRIES.add(BEGINNER);
 
 		Iterator<RankEntry> iterator = entries.iterator();
 
@@ -42,7 +43,7 @@ public final class MinerRank
 		}
 	}
 
-	public static Optional<RankEntry> get(String name)
+	public static Optional<RankEntry> byName(String name)
 	{
 		for (RankEntry entry : ENTRIES)
 		{
@@ -55,9 +56,14 @@ public final class MinerRank
 		return Optional.empty();
 	}
 
-	public static RankEntry getNextEntry(RankEntry current)
+	public static int getOrder(RankEntry rank)
 	{
-		int i = ENTRIES.indexOf(current);
+		return ENTRIES.indexOf(rank);
+	}
+
+	public static RankEntry getNextRank(RankEntry rank)
+	{
+		int i = ENTRIES.indexOf(rank);
 
 		if (i < 0)
 		{
@@ -69,13 +75,7 @@ public final class MinerRank
 			return ENTRIES.get(++i);
 		}
 
-		return current;
-	}
-
-	public static void clear()
-	{
-		ENTRIES.clear();
-		ENTRIES.add(BEGINNER);
+		return rank;
 	}
 
 	public static ImmutableList<RankEntry> getEntries()
@@ -158,7 +158,7 @@ public final class MinerRank
 			this.translationKey = entry.getTranslationKey();
 			this.iconItem = entry.getIconItem();
 
-			RankEntry next = getNextEntry(entry);
+			RankEntry next = getNextRank(entry);
 
 			if (entry.equals(next))
 			{

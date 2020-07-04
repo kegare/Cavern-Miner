@@ -11,6 +11,8 @@ import cavern.miner.config.json.CavemanTradeSerializer;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveEnchantments;
 import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.NonNullList;
@@ -93,11 +95,15 @@ public class CavemanTradeConfig extends AbstractEntryConfig
 	{
 		entries.clear();
 
-		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 1), 150));
-		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 1), 100));
+		entries.add(new CavemanTrade.ItemStackEntry(new ItemStack(Items.TORCH, 64), 100, null));
 
-		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.REGENERATION, 5 * 20, 1), 50));
-		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.MINING_FATIGUE, 30 * 20, 2), 50));
-		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.NIGHT_VISION, 30 * 20), 50));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 1), 150, "STONE"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.VEIN_MINER.get(), 2), 300, "IRON"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 1), 100, "STONE"));
+		entries.add(new CavemanTrade.EnchantedBookEntry(new EnchantmentData(CaveEnchantments.AREA_MINER.get(), 2), 200, "IRON"));
+
+		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.REGENERATION, 5 * 20, 1), 50, "STONE"));
+		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.MINING_FATIGUE, 30 * 20, 2), 50, "STONE"));
+		entries.add(new CavemanTrade.EffectEntry(new EffectInstance(Effects.NIGHT_VISION, 30 * 20), 50, "STONE"));
 	}
 }

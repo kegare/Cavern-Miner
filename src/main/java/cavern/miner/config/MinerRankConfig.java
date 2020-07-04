@@ -101,6 +101,6 @@ public class MinerRankConfig extends AbstractEntryConfig
 	{
 		super.load();
 
-		MinerRank.set(entries);
+		MinerRank.load(entries);
 	}
 }

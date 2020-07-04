@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import cavern.miner.client.ItemStackCache;
 import cavern.miner.entity.CavemanEntity;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
@@ -23,7 +22,6 @@ import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
@@ -39,6 +37,7 @@ public class CavemanTradeScreen extends Screen
 	private final List<CavemanTrade.TradeEntry> entries;
 
 	private TradeList list;
+	private Button doneButton;
 
 	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries)
 	{
@@ -57,12 +56,30 @@ public class CavemanTradeScreen extends Screen
 	}
 
 	@Override
+	public ITextComponent getTitle()
+	{
+		return caveman != null ? caveman.getDisplayName() : super.getTitle();
+	}
+
+	@Override
 	protected void init()
 	{
 		list = new TradeList(minecraft);
 		children.add(list);
 
-		addButton(new Button(width / 2 - 70, height - 20 - 4, 150, 20, I18n.format("gui.done"), o -> onClose()));
+		doneButton = addButton(new Button(width / 2 - 70, height - 20 - 4, 150, 20, I18n.format("gui.done"), o ->
+		{
+			int id = -1;
+
+			if (list.getSelected() != null)
+			{
+				id = list.getSelected().entryId;
+			}
+
+			CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), id));
+
+			minecraft.displayGuiScreen(null);
+		}));
 
 		super.init();
 	}
@@ -74,7 +91,7 @@ public class CavemanTradeScreen extends Screen
 
 		list.render(mouseX, mouseY, particalTicks);
 
-		drawCenteredString(font, title.getFormattedText(), width / 2, 16, 0xFFFFFF);
+		drawCenteredString(font, getTitle().getFormattedText(), width / 2, 16, 0xFFFFFF);
 
 		Miner miner = null;
 
@@ -113,12 +130,32 @@ public class CavemanTradeScreen extends Screen
 		super.render(mouseX, mouseY, particalTicks);
 	}
 
+	public void updateSelection()
+	{
+		if (list.getSelected() == null)
+		{
+			doneButton.active = true;
+		}
+		else
+		{
+			CavemanTrade.TradeEntry entry = list.getSelected().entry;
+			Miner miner = null;
+
+			if (minecraft.player != null)
+			{
+				miner = minecraft.player.getCapability(CaveCapabilities.MINER).orElse(null);
+			}
+
+			doneButton.active = miner == null || miner.getPoint() >= entry.getCost();
+		}
+	}
+
 	@Override
 	public void onClose()
 	{
-		super.onClose();
+		CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), -1));
 
-		CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), list.getSelected() == null ? -1 : list.getSelected().entryId));
+		super.onClose();
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -138,6 +175,14 @@ public class CavemanTradeScreen extends Screen
 		protected boolean isFocused()
 		{
 			return CavemanTradeScreen.this.getFocused() == this;
+		}
+
+		@Override
+		protected void moveSelection(int diff)
+		{
+			super.moveSelection(diff);
+
+			CavemanTradeScreen.this.updateSelection();
 		}
 
 		@OnlyIn(Dist.CLIENT)
@@ -201,7 +246,7 @@ public class CavemanTradeScreen extends Screen
 				itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, null);
 				RenderSystem.disableRescaleNormal();
 
-				stack = ItemStackCache.get(Items.STONE_PICKAXE);
+				stack = entry.getRankIconItem();
 				x = TradeList.this.width / 2 + 90;
 
 				RenderSystem.enableRescaleNormal();
@@ -223,6 +268,8 @@ public class CavemanTradeScreen extends Screen
 					{
 						TradeList.this.setSelected(this);
 					}
+
+					CavemanTradeScreen.this.updateSelection();
 
 					return true;
 				}

@@ -1,5 +1,10 @@
 package cavern.miner.entity;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Strings;
+
+import cavern.miner.storage.MinerRank;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
@@ -61,17 +66,42 @@ public final class CavemanTrade
 	public static abstract class TradeEntry
 	{
 		private final int cost;
+		private final String rank;
 
 		private ItemStack iconItem;
+		private ItemStack rankIconItem;
+
+		public TradeEntry(int cost, @Nullable String rank)
+		{
+			this.cost = cost;
+			this.rank = Strings.isNullOrEmpty(rank) ? MinerRank.BEGINNER.getName() : rank;
+		}
+
+		public TradeEntry(CompoundNBT nbt)
+		{
+			this(nbt.getInt("Cost"), nbt.getString("Rank"));
+			this.iconItem = ItemStack.read(nbt.getCompound("Icon"));
+			this.rankIconItem = ItemStack.read(nbt.getCompound("RankIcon"));
+		}
 
 		public TradeEntry(int cost)
 		{
-			this.cost = cost;
+			this(cost, null);
 		}
 
 		public int getCost()
 		{
 			return cost;
+		}
+
+		public String getRankName()
+		{
+			return rank;
+		}
+
+		public MinerRank.RankEntry getRank()
+		{
+			return MinerRank.byName(getRankName()).orElse(MinerRank.BEGINNER);
 		}
 
 		public abstract ITextComponent getDisplayName();
@@ -91,9 +121,34 @@ public final class CavemanTrade
 			return iconItem;
 		}
 
+		public ItemStack createRankIconItem()
+		{
+			return getRank().getIconItem().copy();
+		}
+
+		public ItemStack getRankIconItem()
+		{
+			if (rankIconItem == null)
+			{
+				rankIconItem = createRankIconItem();
+			}
+
+			return rankIconItem;
+		}
+
 		public abstract ItemStack createTradeItem();
 
-		public abstract CompoundNBT serializeNBT();
+		public CompoundNBT serializeNBT()
+		{
+			CompoundNBT nbt = new CompoundNBT();
+
+			nbt.putInt("Cost", getCost());
+			nbt.putString("Rank", getRankName());
+			nbt.put("Icon", getIconItem().write(new CompoundNBT()));
+			nbt.put("RankIcon", getRankIconItem().write(new CompoundNBT()));
+
+			return nbt;
+		}
 	}
 
 	private static class EmptyEntry extends TradeEntry
@@ -126,15 +181,16 @@ public final class CavemanTrade
 	{
 		private final ItemStack stack;
 
-		public ItemStackEntry(ItemStack stack, int cost)
+		public ItemStackEntry(ItemStack stack, int cost, @Nullable String rank)
 		{
-			super(cost);
+			super(cost, rank);
 			this.stack = stack;
 		}
 
 		public ItemStackEntry(CompoundNBT nbt)
 		{
-			this(ItemStack.read(nbt), nbt.getInt("Cost"));
+			super(nbt);
+			this.stack = ItemStack.read(nbt);
 		}
 
 		public ItemStack getItemStack()
@@ -157,11 +213,7 @@ public final class CavemanTrade
 		@Override
 		public CompoundNBT serializeNBT()
 		{
-			CompoundNBT nbt = stack.serializeNBT();
-
-			nbt.putInt("Cost", getCost());
-
-			return nbt;
+			return stack.write(super.serializeNBT());
 		}
 	}
 
@@ -169,15 +221,16 @@ public final class CavemanTrade
 	{
 		private final EnchantmentData data;
 
-		public EnchantedBookEntry(EnchantmentData data, int cost)
+		public EnchantedBookEntry(EnchantmentData data, int cost, @Nullable String rank)
 		{
-			super(cost);
+			super(cost, rank);
 			this.data = data;
 		}
 
 		public EnchantedBookEntry(CompoundNBT nbt)
 		{
-			this(new EnchantmentData(ForgeRegistries.ENCHANTMENTS.getValue(ResourceLocation.tryCreate(nbt.getString("Name"))), nbt.getInt("Level")), nbt.getInt("Cost"));
+			super(nbt);
+			this.data = new EnchantmentData(ForgeRegistries.ENCHANTMENTS.getValue(ResourceLocation.tryCreate(nbt.getString("Name"))), nbt.getInt("Level"));
 		}
 
 		public EnchantmentData getData()
@@ -200,11 +253,10 @@ public final class CavemanTrade
 		@Override
 		public CompoundNBT serializeNBT()
 		{
-			CompoundNBT nbt = new CompoundNBT();
+			CompoundNBT nbt = super.serializeNBT();
 
 			nbt.putString("Name", data.enchantment.getRegistryName().toString());
 			nbt.putInt("Level", data.enchantmentLevel);
-			nbt.putInt("Cost", getCost());
 
 			return nbt;
 		}
@@ -214,15 +266,16 @@ public final class CavemanTrade
 	{
 		private final EffectInstance effect;
 
-		public EffectEntry(EffectInstance effect, int cost)
+		public EffectEntry(EffectInstance effect, int cost, @Nullable String rank)
 		{
-			super(cost);
+			super(cost, rank);
 			this.effect = effect;
 		}
 
 		public EffectEntry(CompoundNBT nbt)
 		{
-			this(EffectInstance.read(nbt), nbt.getInt("Cost"));
+			super(nbt);
+			this.effect = EffectInstance.read(nbt);
 		}
 
 		public EffectInstance getEffect()
@@ -245,11 +298,7 @@ public final class CavemanTrade
 		@Override
 		public CompoundNBT serializeNBT()
 		{
-			CompoundNBT nbt = effect.write(new CompoundNBT());
-
-			nbt.putInt("Cost", getCost());
-
-			return nbt;
+			return effect.write(super.serializeNBT());
 		}
 	}
 }

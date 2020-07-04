@@ -11,6 +11,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import cavern.miner.entity.CavemanTrade;
+import cavern.miner.storage.MinerRank;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentData;
 import net.minecraft.item.ItemStack;
@@ -44,6 +45,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 		}
 
 		object.addProperty("cost", src.getCost());
+		object.addProperty("rank", src.getRankName());
 
 		return object;
 	}
@@ -53,7 +55,27 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 	{
 		JsonObject object = json.getAsJsonObject();
 
-		int cost = object.get("cost").getAsInt();
+		int cost;
+
+		if (object.has("cost"))
+		{
+			cost = object.get("cost").getAsInt();
+		}
+		else
+		{
+			cost = 0;
+		}
+
+		String rank;
+
+		if (object.has("rank"))
+		{
+			rank = object.get("rank").getAsString();
+		}
+		else
+		{
+			rank = MinerRank.BEGINNER.getName();
+		}
 
 		if (object.has("item"))
 		{
@@ -61,7 +83,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 
 			if (!stack.isEmpty())
 			{
-				return new CavemanTrade.ItemStackEntry(stack, cost);
+				return new CavemanTrade.ItemStackEntry(stack, cost, rank);
 			}
 		}
 		else if (object.has("enchanted_book"))
@@ -82,7 +104,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 					level = ench.getMinLevel();
 				}
 
-				return new CavemanTrade.EnchantedBookEntry(new EnchantmentData(ench, level), cost);
+				return new CavemanTrade.EnchantedBookEntry(new EnchantmentData(ench, level), cost, rank);
 			}
 		}
 		else if (object.has("effect"))
@@ -91,7 +113,7 @@ public enum CavemanTradeSerializer implements JsonSerializer<CavemanTrade.TradeE
 
 			if (effect != null)
 			{
-				return new CavemanTrade.EffectEntry(effect, cost);
+				return new CavemanTrade.EffectEntry(effect, cost, rank);
 			}
 		}
 
