@@ -1,7 +1,6 @@
 package cavern.miner.init;
 
-import cavern.miner.network.CavemanTradeEffectMessage;
-import cavern.miner.network.CavemanTradeItemMessage;
+import cavern.miner.network.CavemanTradingMessage;
 import cavern.miner.network.CavemanTradeMessage;
 import cavern.miner.network.LoadingScreenMessage;
 import cavern.miner.network.MinerPointMessage;
@@ -44,10 +43,8 @@ public final class CaveNetworkConstants
 		channel.messageBuilder(CavemanTradeMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(CavemanTradeMessage::decode).encoder(CavemanTradeMessage::encode).consumer(CavemanTradeMessage::handle).add();
 
-		channel.messageBuilder(CavemanTradeItemMessage.class, i++, NetworkDirection.PLAY_TO_SERVER)
-			.decoder(CavemanTradeItemMessage::decode).encoder(CavemanTradeItemMessage::encode).consumer(CavemanTradeItemMessage::handle).add();
-		channel.messageBuilder(CavemanTradeEffectMessage.class, i++, NetworkDirection.PLAY_TO_SERVER)
-			.decoder(CavemanTradeEffectMessage::decode).encoder(CavemanTradeEffectMessage::encode).consumer(CavemanTradeEffectMessage::handle).add();
+		channel.messageBuilder(CavemanTradingMessage.class, i++, NetworkDirection.PLAY_TO_SERVER)
+			.decoder(CavemanTradingMessage::decode).encoder(CavemanTradingMessage::encode).consumer(CavemanTradingMessage::handle).add();
 
 		return channel;
 	}

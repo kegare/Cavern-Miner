@@ -1,5 +1,6 @@
 package cavern.miner.entity;
 
+import java.util.List;
 import java.util.Random;
 
 import cavern.miner.config.GeneralConfig;
@@ -26,7 +27,6 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -102,11 +102,6 @@ public class CavemanEntity extends CreatureEntity
 		return isSitting() ? super.getEyeHeight() * 0.6F : super.getStandingEyeHeight(pose, size);
 	}
 
-	public NonNullList<CavemanTrade.TradeEntry> getTradeEntries()
-	{
-		return GeneralConfig.INSTANCE.cavemanTrades.getEntries();
-	}
-
 	@Override
 	protected boolean processInteract(PlayerEntity player, Hand hand)
 	{
@@ -116,7 +111,7 @@ public class CavemanEntity extends CreatureEntity
 
 		if (sitting && player instanceof ServerPlayerEntity)
 		{
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getTradeEntries()));
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), getTradeEntries()));
 		}
 
 		return true;
@@ -126,6 +121,11 @@ public class CavemanEntity extends CreatureEntity
 	public int getMaxSpawnedInChunk()
 	{
 		return 1;
+	}
+
+	public List<CavemanTrade.TradeEntry> getTradeEntries()
+	{
+		return GeneralConfig.INSTANCE.cavemanTrades.getEntries();
 	}
 
 	public static boolean canSpawnInLight(EntityType<? extends CreatureEntity> type, IWorld world, SpawnReason reason, BlockPos pos, Random random)

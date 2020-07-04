@@ -2,6 +2,8 @@ package cavern.miner.client.gui;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import cavern.miner.client.ItemStackCache;
@@ -10,8 +12,7 @@ import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveNetworkConstants;
-import cavern.miner.network.CavemanTradeEffectMessage;
-import cavern.miner.network.CavemanTradeItemMessage;
+import cavern.miner.network.CavemanTradingMessage;
 import cavern.miner.storage.Miner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -32,25 +33,25 @@ import net.minecraftforge.fml.network.PacketDistributor;
 @OnlyIn(Dist.CLIENT)
 public class CavemanTradeScreen extends Screen
 {
+	private final CavemanEntity caveman;
 	private final List<CavemanTrade.TradeEntry> entries;
 
 	private TradeList list;
-	private CavemanEntity caveman;
 
-	public CavemanTradeScreen(List<CavemanTrade.TradeEntry> entries)
+	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries)
 	{
 		super(new TranslationTextComponent("entity.cavern.caveman"));
-		this.entries = entries;
-	}
 
-	private CavemanEntity getCaveman()
-	{
 		if (caveman == null)
 		{
-			caveman = CaveEntities.CAVEMAN.get().create(minecraft.world);
+			this.caveman = CaveEntities.CAVEMAN.get().create(minecraft.world);
+		}
+		else
+		{
+			this.caveman = caveman;
 		}
 
-		return caveman;
+		this.entries = entries;
 	}
 
 	@Override
@@ -85,7 +86,7 @@ public class CavemanTradeScreen extends Screen
 			drawString(font, String.format("%s: %d", I18n.format("cavern.miner.point"), point.intValue()), width / 2 - 155, height - 18, 0xEEEEEE);
 		}
 
-		InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, getCaveman());
+		InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
 
 		super.render(mouseX, mouseY, particalTicks);
 	}
@@ -95,19 +96,7 @@ public class CavemanTradeScreen extends Screen
 	{
 		super.onClose();
 
-		if (list.getSelected() != null)
-		{
-			CavemanTrade.TradeEntry entry = list.getSelected().entry;
-
-			if (entry instanceof CavemanTrade.EffectEntry)
-			{
-				CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradeEffectMessage((CavemanTrade.EffectEntry)entry));
-			}
-			else
-			{
-				CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradeItemMessage(entry));
-			}
-		}
+		CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), list.getSelected() == null ? -1 : list.getSelected().entryId));
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -117,7 +106,10 @@ public class CavemanTradeScreen extends Screen
 		{
 			super(mc, CavemanTradeScreen.this.width, CavemanTradeScreen.this.height, 32, CavemanTradeScreen.this.height - 20 - 8, 18);
 
-			CavemanTradeScreen.this.entries.forEach(o -> addEntry(new TradeEntry(o)));
+			for (int i = 0; i < CavemanTradeScreen.this.entries.size(); ++i)
+			{
+				addEntry(new TradeEntry(i, CavemanTradeScreen.this.entries.get(i)));
+			}
 		}
 
 		@Override
@@ -129,10 +121,12 @@ public class CavemanTradeScreen extends Screen
 		@OnlyIn(Dist.CLIENT)
 		protected class TradeEntry extends ExtendedList.AbstractListEntry<TradeEntry>
 		{
+			private final int entryId;
 			private final CavemanTrade.TradeEntry entry;
 
-			protected TradeEntry(CavemanTrade.TradeEntry entry)
+			protected TradeEntry(int id, CavemanTrade.TradeEntry entry)
 			{
+				this.entryId = id;
 				this.entry = entry;
 			}
 

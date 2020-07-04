@@ -20,16 +20,18 @@ import net.minecraftforge.fml.network.NetworkEvent;
 
 public class CavemanTradeMessage
 {
+	private final int entityId;
 	private final List<CavemanTrade.TradeEntry> entries;
 
-	public CavemanTradeMessage(List<CavemanTrade.TradeEntry> entries)
+	public CavemanTradeMessage(int entityId, List<CavemanTrade.TradeEntry> entries)
 	{
+		this.entityId = entityId;
 		this.entries = entries;
 	}
 
-	public CavemanTradeMessage(CompoundNBT nbt)
+	public CavemanTradeMessage(int entityId, CompoundNBT nbt)
 	{
-		this(new ArrayList<>());
+		this(entityId, new ArrayList<>());
 
 		ListNBT listNBT = nbt.getList("Entries", Constants.NBT.TAG_COMPOUND);
 
@@ -51,6 +53,11 @@ public class CavemanTradeMessage
 				entries.add(new CavemanTrade.EffectEntry(entryNBT));
 			}
 		}
+	}
+
+	public int getEntityId()
+	{
+		return entityId;
 	}
 
 	public List<CavemanTrade.TradeEntry> getEntries()
@@ -92,18 +99,19 @@ public class CavemanTradeMessage
 	{
 		try
 		{
-			return new CavemanTradeMessage(buf.readCompoundTag());
+			return new CavemanTradeMessage(buf.readInt(), buf.readCompoundTag());
 		}
 		catch (IndexOutOfBoundsException e)
 		{
 			CavernMod.LOG.error("CavemanTradeMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
-			return new CavemanTradeMessage(Collections.emptyList());
+			return new CavemanTradeMessage(0, Collections.emptyList());
 		}
 	}
 
 	public static void encode(final CavemanTradeMessage msg, final PacketBuffer buf)
 	{
+		buf.writeInt(msg.entityId);
 		buf.writeCompoundTag(msg.serializeNBT());
 	}
 
