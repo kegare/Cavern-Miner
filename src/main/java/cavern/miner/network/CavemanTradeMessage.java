@@ -21,16 +21,18 @@ public class CavemanTradeMessage
 {
 	private final int entityId;
 	private final List<CavemanTrade.TradeEntry> entries;
+	private final int[] inactiveEntries;
 
-	public CavemanTradeMessage(int entityId, List<CavemanTrade.TradeEntry> entries)
+	public CavemanTradeMessage(int entityId, List<CavemanTrade.TradeEntry> entries, int[] inactiveEntries)
 	{
 		this.entityId = entityId;
 		this.entries = entries;
+		this.inactiveEntries = inactiveEntries;
 	}
 
-	public CavemanTradeMessage(int entityId, CompoundNBT nbt)
+	public CavemanTradeMessage(int entityId, CompoundNBT nbt, int[] inactiveEntries)
 	{
-		this(entityId, new ArrayList<>());
+		this(entityId, new ArrayList<>(), inactiveEntries);
 
 		nbt.getList("Entries", Constants.NBT.TAG_COMPOUND).forEach(o -> entries.add(CavemanTrade.read((CompoundNBT)o)));
 	}
@@ -43,6 +45,11 @@ public class CavemanTradeMessage
 	public List<CavemanTrade.TradeEntry> getEntries()
 	{
 		return entries;
+	}
+
+	public int[] getInactiveEntries()
+	{
+		return inactiveEntries;
 	}
 
 	public CompoundNBT serializeNBT()
@@ -61,13 +68,13 @@ public class CavemanTradeMessage
 	{
 		try
 		{
-			return new CavemanTradeMessage(buf.readInt(), buf.readCompoundTag());
+			return new CavemanTradeMessage(buf.readInt(), buf.readCompoundTag(), buf.readVarIntArray());
 		}
 		catch (IndexOutOfBoundsException e)
 		{
 			CavernMod.LOG.error("CavemanTradeMessage: Unexpected end of packet.\\nMessage: " + ByteBufUtil.hexDump(buf, 0, buf.writerIndex()), e);
 
-			return new CavemanTradeMessage(0, Collections.emptyList());
+			return new CavemanTradeMessage(0, Collections.emptyList(), new int[0]);
 		}
 	}
 
@@ -75,6 +82,7 @@ public class CavemanTradeMessage
 	{
 		buf.writeInt(msg.entityId);
 		buf.writeCompoundTag(msg.serializeNBT());
+		buf.writeVarIntArray(msg.inactiveEntries);
 	}
 
 	public static void handle(final CavemanTradeMessage msg, final Supplier<NetworkEvent.Context> ctx)

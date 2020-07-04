@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import cavern.miner.entity.CavemanEntity;
@@ -35,11 +37,12 @@ public class CavemanTradeScreen extends Screen
 {
 	private final CavemanEntity caveman;
 	private final List<CavemanTrade.TradeEntry> entries;
+	private final int[] inactiveEntries;
 
 	private TradeList list;
 	private Button doneButton;
 
-	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries)
+	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries, int[] inactiveEntries)
 	{
 		super(new TranslationTextComponent("entity.cavern.caveman"));
 
@@ -53,6 +56,7 @@ public class CavemanTradeScreen extends Screen
 		}
 
 		this.entries = entries;
+		this.inactiveEntries = inactiveEntries;
 	}
 
 	@Override
@@ -147,6 +151,11 @@ public class CavemanTradeScreen extends Screen
 			}
 
 			doneButton.active = miner == null || miner.getPoint() >= entry.getCost();
+
+			if (doneButton.active)
+			{
+				doneButton.active = !ArrayUtils.contains(inactiveEntries, list.getSelected().entryId);
+			}
 		}
 	}
 
@@ -213,7 +222,7 @@ public class CavemanTradeScreen extends Screen
 				{
 					mc.player.getCapability(CaveCapabilities.MINER).ifPresent(o ->
 					{
-						if (o.getPoint() < entry.getCost())
+						if (o.getPoint() < entry.getCost() || ArrayUtils.contains(CavemanTradeScreen.this.inactiveEntries, entryId))
 						{
 							result.applyTextStyle(TextFormatting.GRAY);
 						}

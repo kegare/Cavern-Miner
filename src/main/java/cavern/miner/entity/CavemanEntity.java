@@ -4,8 +4,13 @@ import java.util.List;
 import java.util.Random;
 
 import cavern.miner.config.GeneralConfig;
+import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.CavemanTradeMessage;
+import cavern.miner.storage.Miner;
+import cavern.miner.storage.MinerRank;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
@@ -111,7 +116,28 @@ public class CavemanEntity extends CreatureEntity
 
 		if (sitting && player instanceof ServerPlayerEntity)
 		{
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), getTradeEntries()));
+			List<CavemanTrade.TradeEntry> list = getTradeEntries();
+			int[] inactiveEntries = new int[0];
+			Miner miner = player.getCapability(CaveCapabilities.MINER).orElse(null);
+
+			if (miner != null)
+			{
+				IntList inactiveList = new IntArrayList();
+
+				for (int i = 0; i < list.size(); ++i)
+				{
+					CavemanTrade.TradeEntry entry = list.get(i);
+
+					if (MinerRank.getOrder(miner.getRank()) < MinerRank.getOrder(entry.getRank()))
+					{
+						inactiveList.add(i);
+					}
+				}
+
+				inactiveEntries = inactiveList.toIntArray();
+			}
+
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), list, inactiveEntries));
 		}
 
 		return true;

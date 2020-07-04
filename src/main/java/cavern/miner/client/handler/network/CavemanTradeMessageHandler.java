@@ -41,6 +41,6 @@ public class CavemanTradeMessageHandler implements SafeRunnable
 			caveman = null;
 		}
 
-		mc.displayGuiScreen(new CavemanTradeScreen(caveman, msg.getEntries()));
+		mc.displayGuiScreen(new CavemanTradeScreen(caveman, msg.getEntries(), msg.getInactiveEntries()));
 	}
 }
