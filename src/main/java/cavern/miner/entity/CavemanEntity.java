@@ -179,31 +179,20 @@ public class CavemanEntity extends CreatureEntity
 		{
 			List<CavemanTrade.TradeEntry> list = getTradeEntries();
 			MinerRank.RankEntry rank = player.getCapability(CaveCapabilities.MINER).map(Miner::getRank).orElse(MinerRank.BEGINNER);
-			int[] inactiveEntries;
+			IntList inactived = new IntArrayList();
+			int order = MinerRank.getOrder(rank);
 
-			if (rank != MinerRank.BEGINNER)
+			for (int i = 0; i < list.size(); ++i)
 			{
-				IntList inactiveList = new IntArrayList();
-				int order = MinerRank.getOrder(rank);
+				CavemanTrade.TradeEntry entry = list.get(i);
 
-				for (int i = 0; i < list.size(); ++i)
+				if (order < MinerRank.getOrder(entry.getRank()))
 				{
-					CavemanTrade.TradeEntry entry = list.get(i);
-
-					if (order < MinerRank.getOrder(entry.getRank()))
-					{
-						inactiveList.add(i);
-					}
+					inactived.add(i);
 				}
-
-				inactiveEntries = inactiveList.toIntArray();
-			}
-			else
-			{
-				inactiveEntries = new int[0];
 			}
 
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), list, inactiveEntries));
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), list, inactived.toIntArray()));
 		}
 
 		return true;
