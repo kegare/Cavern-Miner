@@ -74,6 +74,7 @@ public class CavemanTradingMessage
 				else return;
 
 				caveman.setSitting(false);
+				caveman.resetTradingPlayer();
 
 				if (msg.entryId < 0)
 				{

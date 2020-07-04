@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.init.CaveNetworkConstants;
@@ -50,6 +52,8 @@ public class CavemanEntity extends CreatureEntity
 	private static final DataParameter<Boolean> SITTING = EntityDataManager.createKey(CavemanEntity.class, DataSerializers.BOOLEAN);
 
 	private final List<CavemanTrade.TradeEntry> tradeEntries = new ArrayList<>();
+
+	private PlayerEntity tradingPlayer;
 
 	public CavemanEntity(EntityType<? extends CreatureEntity> type, World world)
 	{
@@ -162,25 +166,31 @@ public class CavemanEntity extends CreatureEntity
 	@Override
 	protected boolean processInteract(PlayerEntity player, Hand hand)
 	{
-		boolean sitting = !isSitting();
+		if (world.isRemote || tradingPlayer != null)
+		{
+			return false;
+		}
 
-		setSitting(sitting);
+		tradingPlayer = player;
 
-		if (sitting && player instanceof ServerPlayerEntity)
+		setSitting(true);
+
+		if (player instanceof ServerPlayerEntity)
 		{
 			List<CavemanTrade.TradeEntry> list = getTradeEntries();
-			int[] inactiveEntries = new int[0];
-			Miner miner = player.getCapability(CaveCapabilities.MINER).orElse(null);
+			MinerRank.RankEntry rank = player.getCapability(CaveCapabilities.MINER).map(Miner::getRank).orElse(MinerRank.BEGINNER);
+			int[] inactiveEntries;
 
-			if (miner != null)
+			if (rank != MinerRank.BEGINNER)
 			{
 				IntList inactiveList = new IntArrayList();
+				int order = MinerRank.getOrder(rank);
 
 				for (int i = 0; i < list.size(); ++i)
 				{
 					CavemanTrade.TradeEntry entry = list.get(i);
 
-					if (MinerRank.getOrder(miner.getRank()) < MinerRank.getOrder(entry.getRank()))
+					if (order < MinerRank.getOrder(entry.getRank()))
 					{
 						inactiveList.add(i);
 					}
@@ -188,11 +198,37 @@ public class CavemanEntity extends CreatureEntity
 
 				inactiveEntries = inactiveList.toIntArray();
 			}
+			else
+			{
+				inactiveEntries = new int[0];
+			}
 
 			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), list, inactiveEntries));
 		}
 
 		return true;
+	}
+
+	@Nullable
+	public PlayerEntity getTradingPlayer()
+	{
+		return tradingPlayer;
+	}
+
+	public void resetTradingPlayer()
+	{
+		tradingPlayer = null;
+	}
+
+	@Override
+	public void tick()
+	{
+		super.tick();
+
+		if (!world.isRemote && ticksExisted % 20 == 0)
+		{
+			setSitting(tradingPlayer != null);
+		}
 	}
 
 	@Override

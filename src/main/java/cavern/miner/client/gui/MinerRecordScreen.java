@@ -129,6 +129,12 @@ public class MinerRecordScreen extends Screen
 		}
 
 		@Override
+		protected void renderBackground()
+		{
+			MinerRecordScreen.this.renderBackground();
+		}
+
+		@Override
 		protected boolean isFocused()
 		{
 			return MinerRecordScreen.this.getFocused() == this;

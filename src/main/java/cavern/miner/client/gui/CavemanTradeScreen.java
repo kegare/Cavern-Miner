@@ -167,6 +167,12 @@ public class CavemanTradeScreen extends Screen
 		super.onClose();
 	}
 
+	@Override
+	public boolean isPauseScreen()
+	{
+		return false;
+	}
+
 	@OnlyIn(Dist.CLIENT)
 	protected class TradeList extends ExtendedList<TradeList.TradeEntry>
 	{
@@ -178,6 +184,12 @@ public class CavemanTradeScreen extends Screen
 			{
 				addEntry(new TradeEntry(i, CavemanTradeScreen.this.entries.get(i)));
 			}
+		}
+
+		@Override
+		protected void renderBackground()
+		{
+			CavemanTradeScreen.this.renderBackground();
 		}
 
 		@Override
