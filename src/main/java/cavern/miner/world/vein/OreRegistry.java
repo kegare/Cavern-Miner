@@ -3,6 +3,7 @@ package cavern.miner.world.vein;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import com.google.common.base.Objects;
 
@@ -191,9 +192,9 @@ public final class OreRegistry
 
 		Optional<Object> getParent();
 
-		Optional<VeinProvider.Rarity> getRarity();
+		Optional<OreRarity> getRarity();
 
-		Optional<Integer> getPoint();
+		OptionalInt getPoint();
 	}
 
 	private static class EmptyEntry implements OreEntry
@@ -205,15 +206,15 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.empty();
 		}
 
 		@Override
-		public Optional<Integer> getPoint()
+		public OptionalInt getPoint()
 		{
-			return Optional.empty();
+			return OptionalInt.empty();
 		}
 	}
 
@@ -222,18 +223,18 @@ public final class OreRegistry
 		private final Block block;
 		private final Object parentEntry;
 
-		private final VeinProvider.Rarity rarity;
-		private final Integer point;
+		private final OreRarity rarity;
+		private final int point;
 
 		public BlockEntry(Block block, Object parent)
 		{
 			this.block = block;
 			this.parentEntry = parent;
 			this.rarity = null;
-			this.point = null;
+			this.point = 0;
 		}
 
-		public BlockEntry(Block block, VeinProvider.Rarity rarity, Integer point)
+		public BlockEntry(Block block, OreRarity rarity, int point)
 		{
 			this.block = block;
 			this.parentEntry = null;
@@ -253,15 +254,15 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.ofNullable(rarity);
 		}
 
 		@Override
-		public Optional<Integer> getPoint()
+		public OptionalInt getPoint()
 		{
-			return Optional.ofNullable(point);
+			return point == 0 ? OptionalInt.empty() : OptionalInt.of(point);
 		}
 
 		@Override
@@ -299,18 +300,18 @@ public final class OreRegistry
 		private final BlockState blockState;
 		private final OreEntry parentEntry;
 
-		private final VeinProvider.Rarity rarity;
-		private final Integer point;
+		private final OreRarity rarity;
+		private final int point;
 
 		public BlockStateEntry(BlockState state, OreEntry parent)
 		{
 			this.blockState = state;
 			this.parentEntry = parent;
 			this.rarity = null;
-			this.point = null;
+			this.point = 0;
 		}
 
-		public BlockStateEntry(BlockState state, VeinProvider.Rarity rarity, Integer point)
+		public BlockStateEntry(BlockState state, OreRarity rarity, int point)
 		{
 			this.blockState = state;
 			this.parentEntry = null;
@@ -330,15 +331,15 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.ofNullable(rarity);
 		}
 
 		@Override
-		public Optional<Integer> getPoint()
+		public OptionalInt getPoint()
 		{
-			return Optional.ofNullable(point);
+			return point == 0 ? OptionalInt.empty() : OptionalInt.of(point);
 		}
 
 		@Override
@@ -376,18 +377,18 @@ public final class OreRegistry
 		private final Tag<Block> tag;
 		private final OreEntry parentEntry;
 
-		private final VeinProvider.Rarity rarity;
-		private final Integer point;
+		private final OreRarity rarity;
+		private final int point;
 
 		public TagEntry(Tag<Block> tag, OreEntry parent)
 		{
 			this.tag = tag;
 			this.parentEntry = parent;
 			this.rarity = null;
-			this.point = null;
+			this.point = 0;
 		}
 
-		public TagEntry(Tag<Block> tag, VeinProvider.Rarity rarity, Integer point)
+		public TagEntry(Tag<Block> tag, OreRarity rarity, int point)
 		{
 			this.tag = tag;
 			this.parentEntry = null;
@@ -407,15 +408,15 @@ public final class OreRegistry
 		}
 
 		@Override
-		public Optional<VeinProvider.Rarity> getRarity()
+		public Optional<OreRarity> getRarity()
 		{
 			return Optional.ofNullable(rarity);
 		}
 
 		@Override
-		public Optional<Integer> getPoint()
+		public OptionalInt getPoint()
 		{
-			return Optional.ofNullable(point);
+			return point == 0 ? OptionalInt.empty() : OptionalInt.of(point);
 		}
 
 		@Override

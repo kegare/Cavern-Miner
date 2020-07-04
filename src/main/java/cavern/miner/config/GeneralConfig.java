@@ -1,13 +1,21 @@
 package cavern.miner.config;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class GeneralConfig
 {
-	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+	public static final GeneralConfig INSTANCE;
+	public static final ForgeConfigSpec SPEC;
 
-	public static final GeneralConfig INSTANCE = new GeneralConfig(BUILDER);
-	public static final ForgeConfigSpec SPEC = BUILDER.build();
+	static
+	{
+		final Pair<GeneralConfig, ForgeConfigSpec> factory = new ForgeConfigSpec.Builder().configure(GeneralConfig::new);
+
+		INSTANCE = factory.getLeft();
+		SPEC = factory.getRight();
+	}
 
 	public final ForgeConfigSpec.BooleanValue updateNotification;
 
@@ -18,12 +26,15 @@ public class GeneralConfig
 
 	public final ForgeConfigSpec.BooleanValue disableMiner;
 
+	public final ForgeConfigSpec.BooleanValue includeRandomite;
+
 	public final CavebornConfig cavebornItems = new CavebornConfig();
 	public final OreEntryConfig oreEntries = new OreEntryConfig();
 	public final MinerRankConfig minerRanks = new MinerRankConfig();
 	public final RandomiteDropConfig randomiteDrops = new RandomiteDropConfig();
+	public final CavemanTradeConfig cavemanTrades = new CavemanTradeConfig();
 
-	public GeneralConfig(final ForgeConfigSpec.Builder builder)
+	private GeneralConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
 
@@ -41,6 +52,10 @@ public class GeneralConfig
 		builder.push("miner");
 		disableMiner = builder.comment("If disable the miner status for all players.").define("disable_miner", false);
 		builder.pop();
+
+		builder.push("caveman");
+		includeRandomite = builder.comment("If randomite drops will include to trade entries.").define("include_randomite", true);
+		builder.pop();
 	}
 
 	public void load()
@@ -49,5 +64,6 @@ public class GeneralConfig
 		oreEntries.load();
 		minerRanks.load();
 		randomiteDrops.load();
+		cavemanTrades.load();
 	}
 }

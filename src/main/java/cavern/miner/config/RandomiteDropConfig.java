@@ -2,6 +2,7 @@ package cavern.miner.config;
 
 import java.io.File;
 import java.io.Reader;
+import java.util.Random;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -10,6 +11,7 @@ import com.google.gson.JsonParseException;
 import cavern.miner.block.RandomiteDrop;
 import cavern.miner.config.json.RandomiteDropSerializer;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.WeightedRandom;
 import net.minecraftforge.common.Tags;
 
 public class RandomiteDropConfig extends AbstractEntryConfig
@@ -103,11 +105,13 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.DYES, 10, 2, 5));
 	}
 
-	@Override
-	public void load()
+	public RandomiteDrop.DropEntry getRandomDrop(Random random)
 	{
-		super.load();
+		if (entries.isEmpty())
+		{
+			return RandomiteDrop.EMPTY;
+		}
 
-		RandomiteDrop.set(entries);
+		return WeightedRandom.getRandomItem(random, entries);
 	}
 }

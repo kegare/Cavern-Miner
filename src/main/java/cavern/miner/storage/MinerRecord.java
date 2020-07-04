@@ -1,8 +1,11 @@
 package cavern.miner.storage;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.collect.ImmutableSortedSet;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
@@ -12,7 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class MinerRecord implements INBTSerializable<CompoundNBT>
+public class MinerRecord implements INBTSerializable<CompoundNBT>, Comparator<Map.Entry<Block, Integer>>
 {
 	private final Map<Block, Integer> entries = new HashMap<>();
 
@@ -51,7 +54,20 @@ public class MinerRecord implements INBTSerializable<CompoundNBT>
 
 	public Set<Map.Entry<Block, Integer>> getEntries()
 	{
-		return entries.entrySet();
+		return ImmutableSortedSet.copyOf(this, entries.entrySet());
+	}
+
+	@Override
+	public int compare(Map.Entry<Block, Integer> o1, Map.Entry<Block, Integer> o2)
+	{
+		int i = o2.getValue().compareTo(o1.getValue());
+
+		if (i == 0)
+		{
+			i = o1.getKey().getRegistryName().compareTo(o2.getKey().getRegistryName());
+		}
+
+		return i;
 	}
 
 	@Override

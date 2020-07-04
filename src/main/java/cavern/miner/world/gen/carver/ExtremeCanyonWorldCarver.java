@@ -13,9 +13,9 @@ import net.minecraft.world.gen.feature.ProbabilityConfig;
 
 public class ExtremeCanyonWorldCarver extends CavernCanyonWorldCarver
 {
-	public ExtremeCanyonWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> config)
+	public ExtremeCanyonWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> factory)
 	{
-		super(config);
+		super(factory);
 	}
 
 	@Override

@@ -22,6 +22,7 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer;
@@ -34,8 +35,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -43,8 +44,6 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
 
 public class CavernPortalBlock extends Block
 {
@@ -76,7 +75,7 @@ public class CavernPortalBlock extends Block
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
+	public VoxelShape getShape(BlockState state, IBlockReader reader, BlockPos pos, ISelectionContext context)
 	{
 		switch (state.get(AXIS))
 		{
@@ -95,7 +94,7 @@ public class CavernPortalBlock extends Block
 		{
 			case COUNTERCLOCKWISE_90:
 			case CLOCKWISE_90:
-				switch(state.get(AXIS))
+				switch (state.get(AXIS))
 				{
 					case Z:
 						return state.with(AXIS, Direction.Axis.X);
@@ -113,6 +112,12 @@ public class CavernPortalBlock extends Block
 	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder)
 	{
 		builder.add(AXIS);
+	}
+
+	@Override
+	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader reader, BlockPos pos, PlayerEntity player)
+	{
+		return ItemStack.EMPTY;
 	}
 
 	public boolean trySpawnPortal(IWorld world, BlockPos pos)
@@ -146,18 +151,18 @@ public class CavernPortalBlock extends Block
 
 	@SuppressWarnings("deprecation")
 	@Override
-	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos)
+	public BlockState updatePostPlacement(BlockState state, Direction facing, BlockState facingState, IWorld world, BlockPos currentPos, BlockPos facingPos)
 	{
 		Direction.Axis axis = facing.getAxis();
 		Direction.Axis stateAxis = state.get(AXIS);
 		boolean flag = stateAxis != axis && axis.isHorizontal();
 
-		if (!flag && facingState.getBlock() != this && !(new Size(worldIn, currentPos, stateAxis)).isAlreadyValid())
+		if (!flag && facingState.getBlock() != this && !new Size(world, currentPos, stateAxis).isAlreadyValid())
 		{
 			return Blocks.AIR.getDefaultState();
 		}
 
-		return super.updatePostPlacement(state, facing, facingState, worldIn, currentPos, facingPos);
+		return super.updatePostPlacement(state, facing, facingState, world, currentPos, facingPos);
 	}
 
 	@Override
@@ -200,11 +205,18 @@ public class CavernPortalBlock extends Block
 			return;
 		}
 
+		MinecraftServer server = entity.getServer();
+
+		if (server == null)
+		{
+			return;
+		}
+
 		DimensionType currentDim = world.getDimension().getType();
 		DimensionType destDim = currentDim != getDimension() ? getDimension() : DimensionType.OVERWORLD;
 
 		TeleporterCache cache = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).orElse(null);
-		BlockPos prevPos = null;
+		BlockPos destPos = null;
 
 		if (cache != null)
 		{
@@ -218,42 +230,27 @@ public class CavernPortalBlock extends Block
 				destDim = prevDim;
 			}
 
-			prevPos = cache.getLastPos(key, destDim).orElse(null);
+			destPos = cache.getLastPos(key, destDim).orElse(null);
 
 			cache.setLastDim(key, currentDim);
-			cache.setLastPos(key, currentDim, entity.getPosition());
+			cache.setLastPos(key, currentDim, pos);
 		}
 
-		MinecraftServer server = entity.getServer();
-
-		if (server != null)
+		if (destPos == null || !GeneralConfig.INSTANCE.posCache.get())
 		{
-			ServerWorld destWorld = server.getWorld(destDim);
-
-			if (destWorld == null)
-			{
-				return;
-			}
-
-			BlockPos destPos = GeneralConfig.INSTANCE.posCache.get() && prevPos != null ? prevPos : entity.getPosition();
-			ChunkPos chunkPos = new ChunkPos(destPos);
-
-			if (!destWorld.getChunkProvider().isChunkLoaded(chunkPos))
-			{
-				destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, chunkPos, 3, destPos);
-			}
+			destPos = entity.getPosition();
 		}
 
 		world.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).ifPresent(o -> o.addPortal(this, pos));
 
-		BlockPos floorPos = pos;
+		BlockPos.Mutable floorPos = new BlockPos.Mutable(pos);
 
 		while (world.getBlockState(floorPos).getBlock() == this)
 		{
-			floorPos = floorPos.down();
+			floorPos.move(Direction.DOWN);
 		}
 
-		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)));
+		entity.changeDimension(destDim, createTeleporter(world, pos, entity, world.getBlockState(floorPos)).setDestPos(destPos));
 	}
 
 	public CavernTeleporter createTeleporter(IWorld world, BlockPos pos, Entity entity, @Nullable BlockState frame)
@@ -291,15 +288,23 @@ public class CavernPortalBlock extends Block
 		{
 			int[] aint = new int[Direction.AxisDirection.values().length];
 			Direction direction = size.rightDir.rotateYCCW();
-			BlockPos blockPos = size.bottomLeft.up(size.getHeight() - 1);
+			BlockPos originPos = size.bottomLeft.up(size.height - 1);
+			BlockPos.Mutable blockPos = new BlockPos.Mutable();
 
 			for (Direction.AxisDirection d : Direction.AxisDirection.values())
 			{
-				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(direction.getAxisDirection() == d ? blockPos : blockPos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
+				blockPos.setPos(originPos);
 
-				for (int i = 0; i < size.getWidth(); ++i)
+				if (direction.getAxisDirection() != d)
 				{
-					for (int j = 0; j < size.getHeight(); ++j)
+					blockPos.move(size.rightDir, size.width - 1);
+				}
+
+				BlockPattern.PatternHelper helper = new BlockPattern.PatternHelper(blockPos, Direction.getFacingFromAxis(d, axis), Direction.UP, cache, size.width, size.height, 1);
+
+				for (int i = 0; i < size.width; ++i)
+				{
+					for (int j = 0; j < size.height; ++j)
 					{
 						CachedBlockInfo cachedInfo = helper.translateOffset(i, j, 1);
 
@@ -321,7 +326,14 @@ public class CavernPortalBlock extends Block
 				}
 			}
 
-			return new BlockPattern.PatternHelper(direction.getAxisDirection() == ax ? blockPos : blockPos.offset(size.rightDir, size.getWidth() - 1), Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.getWidth(), size.getHeight(), 1);
+			blockPos.setPos(originPos);
+
+			if (direction.getAxisDirection() != ax)
+			{
+				blockPos.move(size.rightDir, size.width - 1);
+			}
+
+			return new BlockPattern.PatternHelper(blockPos, Direction.getFacingFromAxis(ax, axis), Direction.UP, cache, size.width, size.height, 1);
 		}
 	}
 
@@ -354,10 +366,17 @@ public class CavernPortalBlock extends Block
 				this.rightDir = Direction.SOUTH;
 			}
 
-			for (BlockPos blockPos = pos; pos.getY() > blockPos.getY() - 21 && pos.getY() > 0 && isEmptyBlock(pos.down()); pos = pos.down())
+			BlockPos.Mutable checkPos = new BlockPos.Mutable(pos);
+
+			while (checkPos.getY() > 0 && checkPos.getY() > pos.getY() - 21)
 			{
-				;
+				if (!isEmptyBlock(checkPos.move(Direction.DOWN)))
+				{
+					break;
+				}
 			}
+
+			pos = checkPos.up();
 
 			int i = getDistanceUntilEdge(pos, leftDir) - 1;
 
@@ -379,42 +398,32 @@ public class CavernPortalBlock extends Block
 			}
 		}
 
-		protected int getDistanceUntilEdge(BlockPos pos, Direction face)
+		protected int getDistanceUntilEdge(BlockPos pos, Direction facing)
 		{
 			int i;
 
+			BlockPos.Mutable checkPos = new BlockPos.Mutable();
+
 			for (i = 0; i < 22; ++i)
 			{
-				BlockPos pos1 = pos.offset(face, i);
-
-				if (!isEmptyBlock(pos1) || !isFrameBlock(pos1.down()))
+				if (!isEmptyBlock(checkPos.setPos(pos).move(facing, i)) || !isFrameBlock(checkPos.move(Direction.DOWN)))
 				{
 					break;
 				}
 			}
 
-			return isFrameBlock(pos.offset(face, i)) ? i : 0;
-		}
-
-		public int getHeight()
-		{
-			return height;
-		}
-
-		public int getWidth()
-		{
-			return width;
+			return isFrameBlock(pos.offset(facing, i)) ? i : 0;
 		}
 
 		protected int calculatePortalHeight()
 		{
+			BlockPos.Mutable pos = new BlockPos.Mutable();
+
 			outside: for (height = 0; height < 21; ++height)
 			{
 				for (int i = 0; i < width; ++i)
 				{
-					BlockPos pos = bottomLeft.offset(rightDir, i).up(height);
-
-					if (!isEmptyBlock(pos))
+					if (!isEmptyBlock(pos.setPos(bottomLeft).move(rightDir, i).move(Direction.UP, height)))
 					{
 						break outside;
 					}
@@ -426,14 +435,14 @@ public class CavernPortalBlock extends Block
 
 					if (i == 0)
 					{
-						if (!isFrameBlock(pos.offset(leftDir)))
+						if (!isFrameBlock(pos.move(leftDir)))
 						{
 							break outside;
 						}
 					}
 					else if (i == width - 1)
 					{
-						if (!isFrameBlock(pos.offset(rightDir)))
+						if (!isFrameBlock(pos.move(rightDir)))
 						{
 							break outside;
 						}
@@ -443,7 +452,7 @@ public class CavernPortalBlock extends Block
 
 			for (int i = 0; i < width; ++i)
 			{
-				if (!isFrameBlock(bottomLeft.offset(rightDir, i).up(height)))
+				if (!isFrameBlock(pos.setPos(bottomLeft).move(rightDir, i).move(Direction.UP, height)))
 				{
 					height = 0;
 
@@ -494,13 +503,13 @@ public class CavernPortalBlock extends Block
 
 		public void placePortalBlocks()
 		{
+			BlockPos.Mutable pos = new BlockPos.Mutable();
+
 			for (int i = 0; i < width; ++i)
 			{
-				BlockPos pos = bottomLeft.offset(rightDir, i);
-
 				for (int j = 0; j < height; ++j)
 				{
-					world.setBlockState(pos.up(j), CavernPortalBlock.this.getDefaultState().with(AXIS, axis), 18);
+					world.setBlockState(pos.setPos(bottomLeft).move(rightDir, i).move(Direction.UP, j), CavernPortalBlock.this.getDefaultState().with(AXIS, axis), 18);
 				}
 			}
 		}

@@ -21,7 +21,7 @@ public class NBTSerializableCapability<E> implements ICapabilitySerializable<INB
 	}
 
 	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, final Direction side)
+	public <T> LazyOptional<T> getCapability(final Capability<T> cap, final Direction side)
 	{
 		return capability.orEmpty(cap, instance);
 	}
@@ -29,7 +29,7 @@ public class NBTSerializableCapability<E> implements ICapabilitySerializable<INB
 	@Override
 	public INBT serializeNBT()
 	{
-		return instance.map(o -> capability.writeNBT(o, null)).orElse(new CompoundNBT());
+		return instance.map(o -> capability.writeNBT(o, null)).orElseGet(CompoundNBT::new);
 	}
 
 	@Override

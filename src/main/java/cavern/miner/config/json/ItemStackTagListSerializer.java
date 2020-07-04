@@ -18,9 +18,9 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 
-public class ItemStackTagListSerializer implements JsonSerializer<ItemStackTagList>, JsonDeserializer<ItemStackTagList>
+public enum ItemStackTagListSerializer implements JsonSerializer<ItemStackTagList>, JsonDeserializer<ItemStackTagList>
 {
-	public static final ItemStackTagListSerializer INSTANCE = new ItemStackTagListSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(ItemStackTagList src, Type typeOfSrc, JsonSerializationContext context)

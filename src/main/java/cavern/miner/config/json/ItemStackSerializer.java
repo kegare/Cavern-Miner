@@ -19,9 +19,9 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.util.math.MathHelper;
 
-public class ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack>
+public enum ItemStackSerializer implements JsonSerializer<ItemStack>, JsonDeserializer<ItemStack>
 {
-	public static final ItemStackSerializer INSTANCE = new ItemStackSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(ItemStack src, Type typeOfSrc, JsonSerializationContext context)

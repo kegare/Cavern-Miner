@@ -3,6 +3,8 @@ package cavern.miner.config.dimension;
 import java.io.File;
 import java.util.Arrays;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import cavern.miner.config.CavernModConfig;
 import cavern.miner.init.CaveBiomes;
 import cavern.miner.world.spawner.NaturalSpawnerType;
@@ -11,10 +13,16 @@ import net.minecraftforge.common.Tags;
 
 public class CavernConfig
 {
-	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+	public static final CavernConfig INSTANCE;
+	public static final ForgeConfigSpec SPEC;
 
-	public static final CavernConfig INSTANCE = new CavernConfig(BUILDER);
-	public static final ForgeConfigSpec SPEC = BUILDER.build();
+	static
+	{
+		final Pair<CavernConfig, ForgeConfigSpec> factory = new ForgeConfigSpec.Builder().configure(CavernConfig::new);
+
+		INSTANCE = factory.getLeft();
+		SPEC = factory.getRight();
+	}
 
 	public final ForgeConfigSpec.DoubleValue lightBrightness;
 
@@ -48,7 +56,7 @@ public class CavernConfig
 	public final NaturalSpawnConfig naturalSpawns = new NaturalSpawnConfig(getConfigDir(), () -> Arrays.asList(CaveBiomes.CAVERN.get()));
 	public final TowerDungeonMobConfig towerDungeonMobs = new TowerDungeonMobConfig(getConfigDir());
 
-	public CavernConfig(final ForgeConfigSpec.Builder builder)
+	private CavernConfig(final ForgeConfigSpec.Builder builder)
 	{
 		String serverSide = "Note: If multiplayer, server-side only.";
 

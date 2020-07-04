@@ -15,15 +15,15 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import cavern.miner.world.vein.OreRarity;
 import cavern.miner.world.vein.OreRegistry;
-import cavern.miner.world.vein.VeinProvider;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
-public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>, JsonDeserializer<OreRegistry.OreEntry>
+public enum OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>, JsonDeserializer<OreRegistry.OreEntry>
 {
-	public static final OreEntrySerializer INSTANCE = new OreEntrySerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(OreRegistry.OreEntry src, Type typeOfSrc, JsonSerializationContext context)
@@ -60,7 +60,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 		JsonObject object = json.getAsJsonObject();
 
 		OreRegistry.OreEntry parent = null;
-		VeinProvider.Rarity rarity = null;
+		OreRarity rarity = null;
 		Integer point = null;
 
 		if (object.has("parent"))
@@ -72,7 +72,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 		{
 			if (object.has("rarity"))
 			{
-				rarity = VeinProvider.Rarity.valueOf(object.get("rarity").getAsString().toUpperCase());
+				rarity = OreRarity.valueOf(object.get("rarity").getAsString().toUpperCase());
 			}
 
 			if (object.has("point"))
@@ -111,7 +111,7 @@ public class OreEntrySerializer implements JsonSerializer<OreRegistry.OreEntry>,
 	}
 
 	@Nullable
-	private OreRegistry.OreEntry deserializeEntry(JsonObject object, VeinProvider.Rarity rarity, Integer point)
+	private OreRegistry.OreEntry deserializeEntry(JsonObject object, OreRarity rarity, Integer point)
 	{
 		if (object.has("name"))
 		{

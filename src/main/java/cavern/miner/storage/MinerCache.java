@@ -1,5 +1,7 @@
 package cavern.miner.storage;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Util;
 
@@ -12,6 +14,7 @@ public class MinerCache
 
 	private int combo;
 
+	@Nullable
 	public BlockState getLastBlock()
 	{
 		return lastBlock;

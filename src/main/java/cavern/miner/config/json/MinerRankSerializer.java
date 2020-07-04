@@ -14,9 +14,9 @@ import cavern.miner.storage.MinerRank;
 import cavern.miner.storage.MinerRank.RankEntry;
 import net.minecraft.item.ItemStack;
 
-public class MinerRankSerializer implements JsonSerializer<MinerRank.RankEntry>, JsonDeserializer<MinerRank.RankEntry>
+public enum MinerRankSerializer implements JsonSerializer<MinerRank.RankEntry>, JsonDeserializer<MinerRank.RankEntry>
 {
-	public static final MinerRankSerializer INSTANCE = new MinerRankSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(RankEntry src, Type typeOfSrc, JsonSerializationContext context)

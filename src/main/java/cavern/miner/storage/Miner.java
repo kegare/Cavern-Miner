@@ -2,8 +2,8 @@ package cavern.miner.storage;
 
 import cavern.miner.enchantment.MinerUnit;
 import cavern.miner.init.CaveCriteriaTriggers;
+import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.init.CaveSounds;
-import cavern.miner.network.CaveNetworkConstants;
 import cavern.miner.network.MinerPointMessage;
 import cavern.miner.network.MinerRecordMessage;
 import cavern.miner.network.MinerUpdateMessage;
@@ -12,6 +12,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -49,7 +50,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 	public Miner setPoint(int value)
 	{
-		point = Math.max(value, 0);
+		point = MathHelper.clamp(value, 0, 9999999);
 
 		return this;
 	}
@@ -71,9 +72,9 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
-	public Miner setRank(String value)
+	public Miner setRank(String name)
 	{
-		setRank(MinerRank.get(value, getRank()));
+		setRank(MinerRank.byName(name).orElse(getRank()));
 
 		return this;
 	}
@@ -110,9 +111,9 @@ public class Miner implements INBTSerializable<CompoundNBT>
 		return this;
 	}
 
-	public Miner promoteRank(String value)
+	public Miner promoteRank(String name)
 	{
-		promoteRank(MinerRank.get(value, getRank()));
+		promoteRank(MinerRank.byName(name).orElse(getRank()));
 
 		return this;
 	}
@@ -147,7 +148,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 		if (positive)
 		{
-			MinerRank.RankEntry next = MinerRank.getNextEntry(getRank());
+			MinerRank.RankEntry next = MinerRank.getNextRank(getRank());
 
 			if (!getRank().equals(next) && getPoint() >= next.getPhase())
 			{
@@ -219,7 +220,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 	public void deserializeNBT(CompoundNBT nbt)
 	{
 		setPoint(nbt.getInt("Point"));
-		setRank(MinerRank.get(nbt.getString("Rank")));
+		setRank(MinerRank.byName(nbt.getString("Rank")).orElse(MinerRank.BEGINNER));
 		getRecord().deserializeNBT(nbt.getCompound("Record"));
 	}
 

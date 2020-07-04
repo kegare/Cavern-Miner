@@ -108,7 +108,7 @@ public class CavebornEventHandler
 		world.playSound(null, posX, posY, posZ, SoundEvents.AMBIENT_CAVE, SoundCategory.AMBIENT, 0.7F, 0.8F + world.rand.nextFloat() * 0.2F);
 	}
 
-	public static boolean placeEntity(IWorldReader world, BlockPos originPos, Entity entity)
+	public static boolean placeEntity(final IWorldReader world, final BlockPos originPos, final Entity entity)
 	{
 		BlockPos resultPos = BlockPosHelper.findPos(world, originPos, 128, pos ->
 		{

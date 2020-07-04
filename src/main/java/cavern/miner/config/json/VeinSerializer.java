@@ -15,9 +15,9 @@ import com.google.gson.JsonSerializer;
 import cavern.miner.world.vein.Vein;
 import net.minecraft.block.BlockState;
 
-public class VeinSerializer implements JsonSerializer<Vein>, JsonDeserializer<Vein>
+public enum VeinSerializer implements JsonSerializer<Vein>, JsonDeserializer<Vein>
 {
-	public static final VeinSerializer INSTANCE = new VeinSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(Vein src, Type typeOfSrc, JsonSerializationContext context)

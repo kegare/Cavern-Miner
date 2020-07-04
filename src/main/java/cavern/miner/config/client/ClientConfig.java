@@ -1,13 +1,21 @@
 package cavern.miner.config.client;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class ClientConfig
 {
-	private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+	public static final ClientConfig INSTANCE;
+	public static final ForgeConfigSpec SPEC;
 
-	public static final ClientConfig INSTANCE = new ClientConfig(BUILDER);
-	public static final ForgeConfigSpec SPEC = BUILDER.build();
+	static
+	{
+		final Pair<ClientConfig, ForgeConfigSpec> factory = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+
+		INSTANCE = factory.getLeft();
+		SPEC = factory.getRight();
+	}
 
 	public final ForgeConfigSpec.EnumValue<DisplayType> displayType;
 	public final ForgeConfigSpec.EnumValue<DisplayCorner> displayConer;
@@ -16,7 +24,7 @@ public class ClientConfig
 	public final ForgeConfigSpec.BooleanValue caveFog;
 	public final ForgeConfigSpec.BooleanValue caveMusic;
 
-	public ClientConfig(final ForgeConfigSpec.Builder builder)
+	private ClientConfig(final ForgeConfigSpec.Builder builder)
 	{
 		builder.push("miner");
 		displayType = builder.comment("The display type of miner status.").defineEnum("display_type", DisplayType.HOLD);

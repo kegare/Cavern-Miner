@@ -15,9 +15,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class SpawnListEntrySerializer implements JsonSerializer<Biome.SpawnListEntry>, JsonDeserializer<Biome.SpawnListEntry>
+public enum SpawnListEntrySerializer implements JsonSerializer<Biome.SpawnListEntry>, JsonDeserializer<Biome.SpawnListEntry>
 {
-	public static final SpawnListEntrySerializer INSTANCE = new SpawnListEntrySerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(Biome.SpawnListEntry src, Type typeOfSrc, JsonSerializationContext context)

@@ -16,9 +16,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
-public class RandomiteDropSerializer implements JsonSerializer<RandomiteDrop.DropEntry>, JsonDeserializer<RandomiteDrop.DropEntry>
+public enum RandomiteDropSerializer implements JsonSerializer<RandomiteDrop.DropEntry>, JsonDeserializer<RandomiteDrop.DropEntry>
 {
-	public static final RandomiteDropSerializer INSTANCE = new RandomiteDropSerializer();
+	INSTANCE;
 
 	@Override
 	public JsonElement serialize(RandomiteDrop.DropEntry src, Type typeOfSrc, JsonSerializationContext context)

@@ -77,7 +77,19 @@ public class DownloadCaveTerrainScreen extends DownloadTerrainScreen
 
 	public boolean isLoaded()
 	{
-		return loaded || Util.milliTime() - firstRenderTime > 10000L;
+		if (loaded)
+		{
+			return true;
+		}
+
+		if (minecraft.player != null && minecraft.player.addedToChunk)
+		{
+			loaded = true;
+
+			return true;
+		}
+
+		return Util.milliTime() - firstRenderTime > 10000L;
 	}
 
 	public void setLoaded()

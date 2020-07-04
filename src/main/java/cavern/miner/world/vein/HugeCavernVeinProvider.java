@@ -9,7 +9,7 @@ import net.minecraft.block.BlockState;
 public class HugeCavernVeinProvider extends VeinProvider
 {
 	@Override
-	public List<Vein> getVeins()
+	public List<Vein> getConfigVeins()
 	{
 		return HugeCavernConfig.INSTANCE.veins.getVeins();
 	}
@@ -33,7 +33,7 @@ public class HugeCavernVeinProvider extends VeinProvider
 	}
 
 	@Override
-	protected Vein createVein(BlockState state, Rarity rarity)
+	protected Vein createVein(BlockState state, OreRarity rarity)
 	{
 		Vein.Properties properties = new Vein.Properties();
 
@@ -83,7 +83,7 @@ public class HugeCavernVeinProvider extends VeinProvider
 	}
 
 	@Override
-	protected Vein createVariousVein(BlockState state, Rarity rarity)
+	protected Vein createVariousVein(BlockState state, OreRarity rarity)
 	{
 		switch (rarity)
 		{

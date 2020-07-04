@@ -19,6 +19,7 @@ public class BlockPosHelper
 	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, int min, int max, Predicate<BlockPos.Mutable> predicate)
 	{
 		BlockPos.Mutable findPos = new BlockPos.Mutable(originPos);
+		int maxHeight = reader.getHeight();
 
 		for (int i = 1; i <= radius; ++i)
 		{
@@ -30,17 +31,42 @@ public class BlockPosHelper
 
 					int x = originPos.getX() + j;
 					int z = originPos.getZ() + k;
+					int dist = 0;
+					boolean minFlag = false;
+					boolean maxFlag = false;
 
-					for (int y = originPos.getY(); y <= max; ++y)
+					while (!minFlag || !maxFlag)
 					{
-						if (predicate.test(findPos.setPos(x, y, z)))
+						if (dist <= 0)
 						{
-							return findPos.toImmutable();
+							dist = -dist + 1;
 						}
-					}
+						else
+						{
+							dist = -dist;
+						}
 
-					for (int y = originPos.getY(); y >= min; --y)
-					{
+						if (dist > maxHeight)
+						{
+							break;
+						}
+
+						int y = originPos.getY() + dist;
+
+						if (y < min)
+						{
+							minFlag = true;
+
+							continue;
+						}
+
+						if (y > max)
+						{
+							maxFlag = true;
+
+							continue;
+						}
+
 						if (predicate.test(findPos.setPos(x, y, z)))
 						{
 							return findPos.toImmutable();

@@ -20,9 +20,9 @@ public class CavernCanyonWorldCarver extends CanyonWorldCarver
 {
 	private final float[] heightToHorizontalStretchFactor = new float[1024];
 
-	public CavernCanyonWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> config)
+	public CavernCanyonWorldCarver(Function<Dynamic<?>, ? extends ProbabilityConfig> factory)
 	{
-		super(config);
+		super(factory);
 	}
 
 	@Override

@@ -1,9 +1,5 @@
 package cavern.miner.block;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import com.google.common.base.Objects;
@@ -16,44 +12,11 @@ import net.minecraft.util.math.MathHelper;
 
 public final class RandomiteDrop
 {
-	private static final List<DropEntry> ENTRIES = new ArrayList<>();
-
 	private static final Random RANDOM = new Random();
 
 	public static final DropEntry EMPTY = new EmptyEntry();
 
 	private RandomiteDrop() {}
-
-	public static void set(Collection<DropEntry> entries)
-	{
-		clear();
-
-		Iterator<DropEntry> iterator = entries.iterator();
-
-		while (iterator.hasNext())
-		{
-			DropEntry entry = iterator.next();
-
-			if (entry.getMinCount() <= 0 && entry.getMaxCount() <= 0)
-			{
-				iterator.remove();
-			}
-			else if (ENTRIES.contains(entry) || !ENTRIES.add(entry))
-			{
-				iterator.remove();
-			}
-		}
-	}
-
-	public static DropEntry get()
-	{
-		return WeightedRandom.getRandomItem(RANDOM, ENTRIES);
-	}
-
-	public static void clear()
-	{
-		ENTRIES.clear();
-	}
 
 	public static abstract class DropEntry extends WeightedRandom.Item
 	{
@@ -69,7 +32,7 @@ public final class RandomiteDrop
 		public abstract ItemStack getDropItem();
 	}
 
-	public static class EmptyEntry extends DropEntry
+	private static class EmptyEntry extends DropEntry
 	{
 		private EmptyEntry()
 		{

@@ -125,7 +125,7 @@ public abstract class AbstractEntryConfig
 
 	public void load()
 	{
-		if (!loadFromFile() || (!isAllowEmpty() && isEmpty()))
+		if (!loadFromFile() || !isAllowEmpty() && isEmpty())
 		{
 			setToDefault();
 			saveToFile();

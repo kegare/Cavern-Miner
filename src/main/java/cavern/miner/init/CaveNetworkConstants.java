@@ -1,11 +1,18 @@
-package cavern.miner.network;
+package cavern.miner.init;
 
+import cavern.miner.network.CavemanTradeMessage;
+import cavern.miner.network.CavemanTradingMessage;
+import cavern.miner.network.LoadingScreenMessage;
+import cavern.miner.network.MinerPointMessage;
+import cavern.miner.network.MinerRecordMessage;
+import cavern.miner.network.MinerUpdateMessage;
+import cavern.miner.network.MiningInteractMessage;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-public class CaveNetworkConstants
+public final class CaveNetworkConstants
 {
 	public static final String NET_MARKER = "CAVERN";
 	public static final int NET_VERSION = 3;
@@ -33,6 +40,11 @@ public class CaveNetworkConstants
 			.decoder(MinerRecordMessage::decode).encoder(MinerRecordMessage::encode).consumer(MinerRecordMessage::handle).add();
 		channel.messageBuilder(MiningInteractMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
 			.decoder(MiningInteractMessage::decode).encoder(MiningInteractMessage::encode).consumer(MiningInteractMessage::handle).add();
+		channel.messageBuilder(CavemanTradeMessage.class, i++, NetworkDirection.PLAY_TO_CLIENT)
+			.decoder(CavemanTradeMessage::decode).encoder(CavemanTradeMessage::encode).consumer(CavemanTradeMessage::handle).add();
+
+		channel.messageBuilder(CavemanTradingMessage.class, i++, NetworkDirection.PLAY_TO_SERVER)
+			.decoder(CavemanTradingMessage::decode).encoder(CavemanTradingMessage::encode).consumer(CavemanTradingMessage::handle).add();
 
 		return channel;
 	}

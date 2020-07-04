@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import cavern.miner.util.BlockStateTagList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -23,38 +21,22 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public class VeinProvider
+public abstract class VeinProvider
 {
-	private static final Map<Block, Rarity> RARITY_CACHE = new HashMap<>();
-
+	protected final Map<Block, OreRarity> rarityCache = new HashMap<>();
 	protected final List<Vein> autoEntries = new ArrayList<>();
 
-	public List<Vein> getVeins()
-	{
-		return Collections.emptyList();
-	}
+	public abstract List<Vein> getConfigVeins();
 
-	@Nullable
-	public BlockStateTagList getWhitelist()
-	{
-		return null;
-	}
+	public abstract BlockStateTagList getWhitelist();
 
-	@Nullable
-	public BlockStateTagList getBlacklist()
-	{
-		return null;
-	}
+	public abstract BlockStateTagList getBlacklist();
 
-	@Nullable
-	public List<String> getBlacklistMods()
-	{
-		return null;
-	}
+	public abstract List<String> getBlacklistMods();
 
-	protected Rarity getOreRarity(BlockState state)
+	protected OreRarity getOreRarity(BlockState state)
 	{
-		Rarity rarity = OreRegistry.getEntry(state).getRarity().orElse(null);
+		OreRarity rarity = OreRegistry.getEntry(state).getRarity().orElse(null);
 
 		if (rarity != null)
 		{
@@ -63,16 +45,16 @@ public class VeinProvider
 
 		Block block = state.getBlock();
 
-		if (RARITY_CACHE.containsKey(block))
+		if (rarityCache.containsKey(block))
 		{
-			return RARITY_CACHE.get(block);
+			return rarityCache.get(block);
 		}
 
 		int harvestLevel = state.getHarvestLevel();
 
 		if (harvestLevel < 0 || state.getHarvestTool() != ToolType.PICKAXE)
 		{
-			return Rarity.UNKNOWN;
+			return OreRarity.UNKNOWN;
 		}
 
 		int level = harvestLevel;
@@ -109,60 +91,55 @@ public class VeinProvider
 
 		if (level > 3)
 		{
-			rarity = Rarity.EPIC;
+			rarity = OreRarity.EPIC;
 		}
 		else if (level > 2)
 		{
-			rarity = Rarity.RARE;
+			rarity = OreRarity.RARE;
 		}
 		else if (level > 1)
 		{
-			rarity = Rarity.UNCOMMON;
+			rarity = OreRarity.UNCOMMON;
 		}
 		else
 		{
-			rarity = Rarity.COMMON;
+			rarity = OreRarity.COMMON;
 		}
 
-		RARITY_CACHE.put(block, rarity);
+		rarityCache.put(block, rarity);
 
 		return rarity;
 	}
 
-	protected Rarity getVariousRarity(BlockState state)
+	protected OreRarity getVariousRarity(BlockState state)
 	{
 		if (state.hasTileEntity() || !state.isSolid())
 		{
-			return Rarity.UNKNOWN;
+			return OreRarity.UNKNOWN;
 		}
 
 		Block block = state.getBlock();
 
 		if (block instanceof IGrowable)
 		{
-			return Rarity.UNKNOWN;
+			return OreRarity.UNKNOWN;
 		}
 
 		if (block.isIn(Tags.Blocks.STONE) || block.isIn(Tags.Blocks.DIRT))
 		{
-			return Rarity.COMMON;
+			return OreRarity.COMMON;
 		}
 
 		if (block.isIn(Tags.Blocks.GRAVEL) || block.isIn(Tags.Blocks.SAND))
 		{
-			return Rarity.UNCOMMON;
+			return OreRarity.UNCOMMON;
 		}
 
-		return Rarity.RARE;
+		return OreRarity.RARE;
 	}
 
 	public List<Vein> getAutoEntries()
 	{
-		if (getWhitelist() == null)
-		{
-			return Collections.emptyList();
-		}
-
 		if (autoEntries.isEmpty())
 		{
 			setupAutoEntries();
@@ -175,30 +152,25 @@ public class VeinProvider
 	{
 		autoEntries.clear();
 
-		if (getWhitelist() == null)
-		{
-			return;
-		}
-
 		for (BlockState state : getWhitelist())
 		{
-			if (getBlacklist() != null && getBlacklist().contains(state))
+			if (getBlacklist().contains(state))
 			{
 				continue;
 			}
 
 			Block block = state.getBlock();
 
-			if (getBlacklistMods() != null && getBlacklistMods().contains(block.getRegistryName().getNamespace()))
+			if (getBlacklistMods().contains(block.getRegistryName().getNamespace()))
 			{
 				continue;
 			}
 
 			if (block.isIn(Tags.Blocks.ORES) || block instanceof OreBlock || block instanceof RedstoneOreBlock)
 			{
-				Rarity rarity = getOreRarity(state);
+				OreRarity rarity = getOreRarity(state);
 
-				if (rarity == Rarity.UNKNOWN)
+				if (rarity == OreRarity.UNKNOWN)
 				{
 					continue;
 				}
@@ -224,9 +196,9 @@ public class VeinProvider
 			}
 			else
 			{
-				Rarity rarity = getVariousRarity(state);
+				OreRarity rarity = getVariousRarity(state);
 
-				if (rarity == Rarity.UNKNOWN)
+				if (rarity == OreRarity.UNKNOWN)
 				{
 					continue;
 				}
@@ -253,7 +225,7 @@ public class VeinProvider
 		}
 	}
 
-	protected Vein createVein(BlockState state, Rarity rarity)
+	protected Vein createVein(BlockState state, OreRarity rarity)
 	{
 		Vein.Properties properties = new Vein.Properties();
 
@@ -302,12 +274,12 @@ public class VeinProvider
 		return new Vein(state, properties);
 	}
 
-	protected List<Vein> createVeins(BlockState state, Rarity rarity)
+	protected List<Vein> createVeins(BlockState state, OreRarity rarity)
 	{
 		return Collections.emptyList();
 	}
 
-	protected Vein createVariousVein(BlockState state, Rarity rarity)
+	protected Vein createVariousVein(BlockState state, OreRarity rarity)
 	{
 		switch (rarity)
 		{
@@ -320,21 +292,8 @@ public class VeinProvider
 		}
 	}
 
-	protected List<Vein> createVariousVeins(BlockState state, Rarity rarity)
+	protected List<Vein> createVariousVeins(BlockState state, OreRarity rarity)
 	{
 		return Collections.emptyList();
-	}
-
-	public enum Rarity
-	{
-		UNKNOWN,
-		COMMON,
-		UNCOMMON,
-		RARE,
-		EPIC,
-		EMERALD,
-		DIAMOND,
-		AQUA,
-		RANDOMITE;
 	}
 }

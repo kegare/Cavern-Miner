@@ -29,8 +29,8 @@ public final class CaveDimensions
 {
 	public static final DeferredRegister<ModDimension> REGISTRY = DeferredRegister.create(ForgeRegistries.MOD_DIMENSIONS, "cavern");
 
-	public static final RegistryObject<ModDimension> CAVERN = REGISTRY.register("cavern", () -> new CavernModDimension());
-	public static final RegistryObject<ModDimension> HUGE_CAVERN = REGISTRY.register("huge_cavern", () -> new HugeCavernModDimension());
+	public static final RegistryObject<ModDimension> CAVERN = REGISTRY.register("cavern", CavernModDimension::new);
+	public static final RegistryObject<ModDimension> HUGE_CAVERN = REGISTRY.register("huge_cavern", HugeCavernModDimension::new);
 
 	public static final DimensionType CAVERN_TYPE = null;
 	public static final DimensionType HUGE_CAVERN_TYPE = null;
