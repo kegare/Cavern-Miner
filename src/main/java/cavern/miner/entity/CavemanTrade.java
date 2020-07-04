@@ -18,6 +18,46 @@ public final class CavemanTrade
 
 	private CavemanTrade() {}
 
+	public static CompoundNBT write(TradeEntry entry)
+	{
+		CompoundNBT nbt = entry.serializeNBT();
+
+		if (entry instanceof ItemStackEntry)
+		{
+			nbt.putString("EntryType", "Item");
+		}
+		else if (entry instanceof EnchantedBookEntry)
+		{
+			nbt.putString("EntryType", "EnchantedBook");
+		}
+		else if (entry instanceof EffectEntry)
+		{
+			nbt.putString("EntryType", "Effect");
+		}
+
+		return nbt;
+	}
+
+	public static TradeEntry read(CompoundNBT nbt)
+	{
+		String type = nbt.getString("EntryType");
+
+		if (type.equals("Item"))
+		{
+			return new ItemStackEntry(nbt);
+		}
+		else if (type.equals("EnchantedBook"))
+		{
+			return new EnchantedBookEntry(nbt);
+		}
+		else if (type.equals("Effect"))
+		{
+			return new EffectEntry(nbt);
+		}
+
+		return EMPTY;
+	}
+
 	public static abstract class TradeEntry
 	{
 		private final int cost;

@@ -10,7 +10,6 @@ import cavern.miner.client.handler.network.CavemanTradeMessageHandler;
 import cavern.miner.entity.CavemanTrade;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,26 +32,7 @@ public class CavemanTradeMessage
 	{
 		this(entityId, new ArrayList<>());
 
-		ListNBT listNBT = nbt.getList("Entries", Constants.NBT.TAG_COMPOUND);
-
-		for (INBT entry : listNBT)
-		{
-			CompoundNBT entryNBT = (CompoundNBT)entry;
-			String type = entryNBT.getString("EntryType");
-
-			if (type.equals("Item"))
-			{
-				entries.add(new CavemanTrade.ItemStackEntry(entryNBT));
-			}
-			else if (type.equals("EnchantedBook"))
-			{
-				entries.add(new CavemanTrade.EnchantedBookEntry(entryNBT));
-			}
-			else if (type.equals("Effect"))
-			{
-				entries.add(new CavemanTrade.EffectEntry(entryNBT));
-			}
-		}
+		nbt.getList("Entries", Constants.NBT.TAG_COMPOUND).forEach(o -> entries.add(CavemanTrade.read((CompoundNBT)o)));
 	}
 
 	public int getEntityId()
@@ -70,25 +50,7 @@ public class CavemanTradeMessage
 		CompoundNBT nbt = new CompoundNBT();
 		ListNBT listNBT = new ListNBT();
 
-		for (CavemanTrade.TradeEntry entry : entries)
-		{
-			CompoundNBT entryNBT = entry.serializeNBT();
-
-			if (entry instanceof CavemanTrade.ItemStackEntry)
-			{
-				entryNBT.putString("EntryType", "Item");
-			}
-			else if (entry instanceof CavemanTrade.EnchantedBookEntry)
-			{
-				entryNBT.putString("EntryType", "EnchantedBook");
-			}
-			else if (entry instanceof CavemanTrade.EffectEntry)
-			{
-				entryNBT.putString("EntryType", "Effect");
-			}
-
-			listNBT.add(entryNBT);
-		}
+		entries.forEach(o -> listNBT.add(CavemanTrade.write(o)));
 
 		nbt.put("Entries", listNBT);
 

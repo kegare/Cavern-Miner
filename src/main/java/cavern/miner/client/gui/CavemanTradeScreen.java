@@ -25,6 +25,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -60,7 +62,7 @@ public class CavemanTradeScreen extends Screen
 		list = new TradeList(minecraft);
 		children.add(list);
 
-		addButton(new Button(width / 2 + 10, height - 20 - 4, 145, 20, I18n.format("gui.done"), o -> onClose()));
+		addButton(new Button(width / 2 - 70, height - 20 - 4, 150, 20, I18n.format("gui.done"), o -> onClose()));
 
 		super.init();
 	}
@@ -74,16 +76,36 @@ public class CavemanTradeScreen extends Screen
 
 		drawCenteredString(font, title.getFormattedText(), width / 2, 16, 0xFFFFFF);
 
-		Integer point = null;
+		Miner miner = null;
 
 		if (minecraft.player != null)
 		{
-			point = minecraft.player.getCapability(CaveCapabilities.MINER).map(Miner::getPoint).orElse(null);
+			miner = minecraft.player.getCapability(CaveCapabilities.MINER).orElse(null);
 		}
 
-		if (point != null)
+		if (miner != null)
 		{
-			drawString(font, String.format("%s: %d", I18n.format("cavern.miner.point"), point.intValue()), width / 2 - 155, height - 18, 0xEEEEEE);
+			int x = width - 28;
+			int y = height - 22;
+			int cost = list.getSelected() == null ? 0 : list.getSelected().entry.getCost();
+			String point = Integer.toString(miner.getPoint() - cost);
+
+			if (point.length() <= 1)
+			{
+				point = " " + point;
+			}
+
+			if (cost != 0)
+			{
+				point = TextFormatting.GRAY + point;
+			}
+
+			ItemStack stack = miner.getDisplayRank().getIconItem();
+
+			RenderSystem.enableRescaleNormal();
+			itemRenderer.renderItemIntoGUI(stack, x, y);
+			itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, point);
+			RenderSystem.disableRescaleNormal();
 		}
 
 		InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
@@ -124,16 +146,44 @@ public class CavemanTradeScreen extends Screen
 			private final int entryId;
 			private final CavemanTrade.TradeEntry entry;
 
+			private ITextComponent displayNameText;
+
 			protected TradeEntry(int id, CavemanTrade.TradeEntry entry)
 			{
 				this.entryId = id;
 				this.entry = entry;
 			}
 
+			public ITextComponent getDisplayName()
+			{
+				if (displayNameText != null)
+				{
+					return displayNameText;
+				}
+
+				ITextComponent result = entry.getDisplayName().setStyle(new Style());
+				Minecraft mc = CavemanTradeScreen.this.minecraft;
+
+				if (mc.player != null)
+				{
+					mc.player.getCapability(CaveCapabilities.MINER).ifPresent(o ->
+					{
+						if (o.getPoint() < entry.getCost())
+						{
+							result.applyTextStyle(TextFormatting.GRAY);
+						}
+					});
+				}
+
+				displayNameText = result;
+
+				return result;
+			}
+
 			@Override
 			public void render(int entryID, int top, int left, int right, int bottom, int mouseX, int mouseY, boolean mouseOver, float particalTicks)
 			{
-				ITextComponent name = entry.getDisplayName();
+				ITextComponent name = getDisplayName();
 				FontRenderer font = CavemanTradeScreen.this.font;
 				int x = TradeList.this.width / 2;
 				int y = top + 1;
