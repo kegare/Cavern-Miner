@@ -26,6 +26,8 @@ public class GeneralConfig
 
 	public final ForgeConfigSpec.BooleanValue disableMiner;
 
+	public final ForgeConfigSpec.BooleanValue includeRandomite;
+
 	public final CavebornConfig cavebornItems = new CavebornConfig();
 	public final OreEntryConfig oreEntries = new OreEntryConfig();
 	public final MinerRankConfig minerRanks = new MinerRankConfig();
@@ -49,6 +51,10 @@ public class GeneralConfig
 
 		builder.push("miner");
 		disableMiner = builder.comment("If disable the miner status for all players.").define("disable_miner", false);
+		builder.pop();
+
+		builder.push("caveman");
+		includeRandomite = builder.comment("If randomite drops will include to trade entries.").define("include_randomite", true);
 		builder.pop();
 	}
 

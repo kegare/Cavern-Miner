@@ -7,8 +7,10 @@ import java.util.Random;
 
 import javax.annotation.Nullable;
 
+import cavern.miner.block.RandomiteDrop;
 import cavern.miner.config.GeneralConfig;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveItems;
 import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.CavemanTradeMessage;
 import cavern.miner.storage.Miner;
@@ -33,6 +35,7 @@ import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -41,6 +44,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.Hand;
 import net.minecraft.util.WeightedRandom;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -151,6 +155,19 @@ public class CavemanEntity extends CreatureEntity
 		{
 			tradeEntries.add(WeightedRandom.getRandomItem(rand, list));
 		}
+
+		if (GeneralConfig.INSTANCE.includeRandomite.get())
+		{
+			for (int i = 0, count = 5 + rand.nextInt(5); i < count; ++i)
+			{
+				RandomiteDrop.DropEntry entry = GeneralConfig.INSTANCE.randomiteDrops.getRandomDrop(rand);
+
+				if (entry != RandomiteDrop.EMPTY)
+				{
+					tradeEntries.add(new CavemanTrade.ItemStackEntry(entry.getDropItem(), entry.itemWeight, 30 + 10 * rand.nextInt(3), "STONE"));
+				}
+			}
+		}
 	}
 
 	@Override
@@ -224,6 +241,12 @@ public class CavemanEntity extends CreatureEntity
 	public int getMaxSpawnedInChunk()
 	{
 		return 1;
+	}
+
+	@Override
+	public ItemStack getPickedResult(RayTraceResult target)
+	{
+		return new ItemStack(CaveItems.CAVEMAN_SPAWN_EGG.get());
 	}
 
 	@Override

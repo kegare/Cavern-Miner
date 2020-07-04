@@ -10,7 +10,6 @@ import com.google.gson.JsonParseException;
 
 import cavern.miner.block.RandomiteDrop;
 import cavern.miner.config.json.RandomiteDropSerializer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.WeightedRandom;
 import net.minecraftforge.common.Tags;
@@ -106,13 +105,13 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.DYES, 10, 2, 5));
 	}
 
-	public ItemStack getRandomDropItem(Random random)
+	public RandomiteDrop.DropEntry getRandomDrop(Random random)
 	{
 		if (entries.isEmpty())
 		{
-			return ItemStack.EMPTY;
+			return RandomiteDrop.EMPTY;
 		}
 
-		return WeightedRandom.getRandomItem(random, entries).getDropItem();
+		return WeightedRandom.getRandomItem(random, entries);
 	}
 }

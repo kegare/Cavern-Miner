@@ -53,7 +53,7 @@ public class RandomiteOreBlock extends CaveOreBlock
 
 		for (int i = 0; i <= fortune; ++i)
 		{
-			ItemStack drop = GeneralConfig.INSTANCE.randomiteDrops.getRandomDropItem(RANDOM);
+			ItemStack drop = GeneralConfig.INSTANCE.randomiteDrops.getRandomDrop(RANDOM).getDropItem();
 
 			if (!drop.isEmpty())
 			{
