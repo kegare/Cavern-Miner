@@ -83,9 +83,13 @@ public class CavemanTradeScreen extends Screen
 		searchBar = new TextFieldWidget(font, width / 2 - fieldWidth - 5, height - 16 - 6, fieldWidth, 16, searchBar, I18n.format("itemGroup.search"));
 		searchBar.setFocused2(false);
 
-		if (!searchBar.getText().isEmpty())
+		String text = searchBar.getText();
+
+		if (!text.isEmpty())
 		{
-			list.filterEntries(searchBar.getText());
+			list.filterEntries(text);
+
+			lastFilterText = text;
 		}
 
 		doneButton = addButton(new Button(width / 2 + 5, height - 20 - 4, fieldWidth, 20, I18n.format("gui.done"), o ->
@@ -104,8 +108,6 @@ public class CavemanTradeScreen extends Screen
 
 		children.add(list);
 		children.add(searchBar);
-
-		super.init();
 	}
 
 	@Override
