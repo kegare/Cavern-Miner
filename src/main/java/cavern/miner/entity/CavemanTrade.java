@@ -269,6 +269,8 @@ public final class CavemanTrade
 	{
 		private final EffectInstance effect;
 
+		private ITextComponent displayNameText;
+
 		public EffectEntry(EffectInstance effect, int weight, int cost, @Nullable String rank)
 		{
 			super(weight, cost, rank);
@@ -289,7 +291,72 @@ public final class CavemanTrade
 		@Override
 		public ITextComponent getDisplayName()
 		{
-			return effect.getPotion().getDisplayName();
+			if (displayNameText != null)
+			{
+				return displayNameText;
+			}
+
+			ITextComponent name = effect.getPotion().getDisplayName();
+			int duration = effect.getDuration();
+			String durationText;
+
+			if (duration >= 20)
+			{
+				int i = duration / 20;
+				int hour = i / 3600;
+				int min = (i % 3600) / 60;
+				int sec = i % 60;
+
+				if (hour > 0)
+				{
+					durationText = String.format("%d:%d:%d", hour, min, sec);
+				}
+				else
+				{
+					durationText = String.format("%d:%d", min, sec);
+				}
+			}
+			else if (duration > 0)
+			{
+				durationText = String.format("%.2f", duration / 20.0F) + " sec";
+			}
+			else
+			{
+				durationText = null;
+			}
+
+			String desc;
+			int amplifer = effect.getAmplifier();
+
+			if (amplifer > 0)
+			{
+				desc = "x" + (amplifer + 1);
+			}
+			else
+			{
+				desc = null;
+			}
+
+			if (durationText != null)
+			{
+				if (desc != null)
+				{
+					desc += ", " + durationText;
+				}
+				else
+				{
+					desc = durationText;
+				}
+			}
+
+			if (desc != null && desc.length() > 0)
+			{
+				name.appendText(String.format(" (%s)", desc));
+			}
+
+			displayNameText = name;
+
+			return name;
 		}
 
 		@Override

@@ -104,19 +104,26 @@ public class CavemanTradeScreen extends Screen
 			miner = minecraft.player.getCapability(CaveCapabilities.MINER).orElse(null);
 		}
 
+		TradeList.TradeEntry selected = list.getSelected();
+
 		if (miner != null)
 		{
 			int x = width - 28;
 			int y = height - 22;
-			int cost = list.getSelected() == null ? 0 : list.getSelected().entry.getCost();
-			String point = Integer.toString(miner.getPoint() - cost);
+			int cost = selected == null ? 0 : selected.entry.getCost();
+			int result = miner.getPoint() - cost;
+			String point = Integer.toString(result);
 
 			if (point.length() <= 1)
 			{
 				point = " " + point;
 			}
 
-			if (cost != 0)
+			if (result < 0)
+			{
+				point = TextFormatting.RED + point;
+			}
+			else if (cost != 0)
 			{
 				point = TextFormatting.GRAY + point;
 			}
@@ -136,13 +143,15 @@ public class CavemanTradeScreen extends Screen
 
 	public void updateSelection()
 	{
-		if (list.getSelected() == null)
+		TradeList.TradeEntry selected = list.getSelected();
+
+		if (selected == null)
 		{
 			doneButton.active = true;
 		}
 		else
 		{
-			CavemanTrade.TradeEntry entry = list.getSelected().entry;
+			CavemanTrade.TradeEntry entry = selected.entry;
 			Miner miner = null;
 
 			if (minecraft.player != null)
@@ -154,7 +163,7 @@ public class CavemanTradeScreen extends Screen
 
 			if (doneButton.active)
 			{
-				doneButton.active = !ArrayUtils.contains(inactiveEntries, list.getSelected().entryId);
+				doneButton.active = !ArrayUtils.contains(inactiveEntries, selected.entryId);
 			}
 		}
 	}
