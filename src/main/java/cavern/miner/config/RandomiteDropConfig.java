@@ -23,11 +23,6 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		super(new File(CavernModConfig.getConfigDir(), "randomite_drops.json"));
 	}
 
-	public NonNullList<RandomiteDrop.DropEntry> getEntries()
-	{
-		return entries;
-	}
-
 	@Override
 	public boolean isEmpty()
 	{

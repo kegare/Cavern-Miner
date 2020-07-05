@@ -7,7 +7,6 @@ import cavern.miner.entity.CavemanEntity;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
 import cavern.miner.storage.Miner;
-import cavern.miner.storage.MinerRank;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
@@ -100,7 +99,7 @@ public class CavemanTradingMessage
 					return;
 				}
 
-				if (MinerRank.getOrder(miner.getRank()) < MinerRank.getOrder(entry.getRank()))
+				if (miner.getRank().getEntryOrder() < entry.getRank().getEntryOrder())
 				{
 					return;
 				}

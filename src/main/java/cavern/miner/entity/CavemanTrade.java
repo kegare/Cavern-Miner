@@ -64,7 +64,7 @@ public final class CavemanTrade
 		return EMPTY;
 	}
 
-	public static abstract class TradeEntry extends WeightedRandom.Item
+	public static abstract class TradeEntry extends WeightedRandom.Item implements Comparable<TradeEntry>
 	{
 		private final int cost;
 		private final String rank;
@@ -151,6 +151,24 @@ public final class CavemanTrade
 			nbt.put("RankIcon", getRankIconItem().write(new CompoundNBT()));
 
 			return nbt;
+		}
+
+		@Override
+		public int compareTo(TradeEntry o)
+		{
+			int i = getRank().compareTo(o.getRank());
+
+			if (i == 0)
+			{
+				i = Integer.compare(getCost(), o.getCost());
+
+				if (i == 0)
+				{
+					i = Integer.compare(itemWeight, o.itemWeight);
+				}
+			}
+
+			return i;
 		}
 	}
 

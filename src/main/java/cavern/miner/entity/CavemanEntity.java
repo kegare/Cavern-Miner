@@ -168,6 +168,8 @@ public class CavemanEntity extends CreatureEntity
 				}
 			}
 		}
+
+		Collections.sort(tradeEntries);
 	}
 
 	@Override
@@ -197,13 +199,12 @@ public class CavemanEntity extends CreatureEntity
 			List<CavemanTrade.TradeEntry> list = getTradeEntries();
 			MinerRank.RankEntry rank = player.getCapability(CaveCapabilities.MINER).map(Miner::getRank).orElse(MinerRank.BEGINNER);
 			IntList inactived = new IntArrayList();
-			int order = MinerRank.getOrder(rank);
 
 			for (int i = 0; i < list.size(); ++i)
 			{
 				CavemanTrade.TradeEntry entry = list.get(i);
 
-				if (order < MinerRank.getOrder(entry.getRank()))
+				if (rank.getEntryOrder() < entry.getRank().getEntryOrder())
 				{
 					inactived.add(i);
 				}

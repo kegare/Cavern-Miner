@@ -23,11 +23,6 @@ public class MinerRankConfig extends AbstractEntryConfig
 		super(new File(CavernModConfig.getConfigDir(), "miner_ranks.json"));
 	}
 
-	public NonNullList<MinerRank.RankEntry> getEntries()
-	{
-		return entries;
-	}
-
 	@Override
 	public boolean isEmpty()
 	{

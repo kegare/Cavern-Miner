@@ -24,11 +24,6 @@ public class OreEntryConfig extends AbstractEntryConfig
 		super(new File(CavernModConfig.getConfigDir(), "ore_entries.json"));
 	}
 
-	public NonNullList<OreRegistry.OreEntry> getEntries()
-	{
-		return entries;
-	}
-
 	@Override
 	public boolean isEmpty()
 	{

@@ -148,7 +148,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 
 		if (positive)
 		{
-			MinerRank.RankEntry next = MinerRank.getNextRank(getRank());
+			MinerRank.RankEntry next = getRank().getNextEntry();
 
 			if (!getRank().equals(next) && getPoint() >= next.getPhase())
 			{
