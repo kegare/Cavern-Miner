@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import cavern.miner.client.ItemStackCache;
@@ -79,10 +82,7 @@ public class MinerRecordScreen extends Screen
 		list.render(mouseX, mouseY, particalTicks);
 
 		drawCenteredString(font, title.getFormattedText(), width / 2, 16, 0xFFFFFF);
-
-		String text = String.format("%s: %s (%d)", I18n.format("cavern.miner.score"), list.getScoreRank(), list.totalScore);
-
-		drawString(font, text, width - font.getStringWidth(text) - 12, 16, 0xEEEEEE);
+		drawRightAlignedString(font, String.format("%s: %s (%d)", I18n.format("cavern.miner.score"), list.getScoreRank(), list.totalScore), width - 12, 16, 0xC0C0C0);
 
 		super.render(mouseX, mouseY, particalTicks);
 
@@ -113,8 +113,17 @@ public class MinerRecordScreen extends Screen
 	@OnlyIn(Dist.CLIENT)
 	protected class RecordList extends ExtendedList<RecordList.RecordEntry>
 	{
-		protected final List<RecordList.RecordEntry> entries = new ArrayList<>();
-		protected final List<RecordList.RecordEntry> filteredEntries = new ArrayList<>();
+		protected final List<RecordEntry> entries = new ArrayList<>();
+
+		protected final LoadingCache<String, List<RecordEntry>>  filterCache = CacheBuilder.newBuilder().build(new CacheLoader<String, List<RecordEntry>>()
+		{
+			@Override
+			public List<RecordEntry> load(final String key) throws Exception
+			{
+				return RecordList.this.entries.stream()
+					.filter(o -> StringUtils.containsIgnoreCase(o.getDisplayName().getUnformattedComponentText(), key)).collect(Collectors.toList());
+			}
+		});
 
 		private final int totalCount;
 		private final int totalScore;
@@ -151,17 +160,13 @@ public class MinerRecordScreen extends Screen
 
 		protected void filterEntries(final String text)
 		{
-			filteredEntries.clear();
-
 			if (text.isEmpty())
 			{
 				replaceEntries(entries);
 			}
 			else
 			{
-				replaceEntries(entries.stream()
-					.filter(o -> StringUtils.containsIgnoreCase(o.getDisplayName().getUnformattedComponentText(), text))
-					.collect(Collectors.toCollection(() -> filteredEntries)));
+				replaceEntries(filterCache.getUnchecked(text));
 			}
 		}
 

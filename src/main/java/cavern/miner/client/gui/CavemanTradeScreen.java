@@ -9,6 +9,9 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import cavern.miner.entity.CavemanEntity;
@@ -230,8 +233,17 @@ public class CavemanTradeScreen extends Screen
 	@OnlyIn(Dist.CLIENT)
 	protected class TradeList extends ExtendedList<TradeList.TradeEntry>
 	{
-		protected final List<TradeList.TradeEntry> entries = new ArrayList<>();
-		protected final List<TradeList.TradeEntry> filteredEntries = new ArrayList<>();
+		protected final List<TradeEntry> entries = new ArrayList<>();
+
+		protected final LoadingCache<String, List<TradeEntry>>  filterCache = CacheBuilder.newBuilder().build(new CacheLoader<String, List<TradeEntry>>()
+		{
+			@Override
+			public List<TradeEntry> load(final String key) throws Exception
+			{
+				return TradeList.this.entries.stream()
+					.filter(o -> StringUtils.containsIgnoreCase(o.getDisplayName().getUnformattedComponentText(), key)).collect(Collectors.toList());
+			}
+		});
 
 		protected TradeList(Minecraft mc)
 		{
@@ -247,17 +259,13 @@ public class CavemanTradeScreen extends Screen
 
 		protected void filterEntries(final String text)
 		{
-			filteredEntries.clear();
-
 			if (text.isEmpty())
 			{
 				replaceEntries(entries);
 			}
 			else
 			{
-				replaceEntries(entries.stream()
-					.filter(o -> StringUtils.containsIgnoreCase(o.getDisplayName().getUnformattedComponentText(), text))
-					.collect(Collectors.toCollection(() -> filteredEntries)));
+				replaceEntries(filterCache.getUnchecked(text));
 			}
 		}
 
