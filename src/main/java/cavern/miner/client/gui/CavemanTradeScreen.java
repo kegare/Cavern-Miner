@@ -1,10 +1,13 @@
 package cavern.miner.client.gui;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -19,6 +22,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -40,7 +44,11 @@ public class CavemanTradeScreen extends Screen
 	private final int[] inactiveEntries;
 
 	private TradeList list;
+	private TextFieldWidget searchBar;
 	private Button doneButton;
+
+	private String lastFilterText = "";
+	private boolean filtered = true;
 
 	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries, int[] inactiveEntries)
 	{
@@ -69,9 +77,18 @@ public class CavemanTradeScreen extends Screen
 	protected void init()
 	{
 		list = new TradeList(minecraft);
-		children.add(list);
 
-		doneButton = addButton(new Button(width / 2 - 70, height - 20 - 4, 150, 20, I18n.format("gui.done"), o ->
+		int fieldWidth = 135;
+
+		searchBar = new TextFieldWidget(font, width / 2 - fieldWidth - 5, height - 16 - 6, fieldWidth, 16, searchBar, I18n.format("itemGroup.search"));
+		searchBar.setFocused2(false);
+
+		if (!searchBar.getText().isEmpty())
+		{
+			list.filterEntries(searchBar.getText());
+		}
+
+		doneButton = addButton(new Button(width / 2 + 5, height - 20 - 4, fieldWidth, 20, I18n.format("gui.done"), o ->
 		{
 			int id = -1;
 
@@ -84,6 +101,9 @@ public class CavemanTradeScreen extends Screen
 
 			minecraft.displayGuiScreen(null);
 		}));
+
+		children.add(list);
+		children.add(searchBar);
 
 		super.init();
 	}
@@ -139,6 +159,29 @@ public class CavemanTradeScreen extends Screen
 		InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
 
 		super.render(mouseX, mouseY, particalTicks);
+
+		searchBar.render(mouseX, mouseY, particalTicks);
+	}
+
+	@Override
+	public void tick()
+	{
+		searchBar.tick();
+
+		final String text = searchBar.getText();
+
+		if (!text.equalsIgnoreCase(lastFilterText))
+		{
+			filtered = false;
+		}
+
+		if (!filtered)
+		{
+			list.filterEntries(text);
+
+			lastFilterText = text;
+			filtered = true;
+		}
 	}
 
 	public void updateSelection()
@@ -185,13 +228,34 @@ public class CavemanTradeScreen extends Screen
 	@OnlyIn(Dist.CLIENT)
 	protected class TradeList extends ExtendedList<TradeList.TradeEntry>
 	{
+		protected final List<TradeList.TradeEntry> entries = new ArrayList<>();
+		protected final List<TradeList.TradeEntry> filteredEntries = new ArrayList<>();
+
 		protected TradeList(Minecraft mc)
 		{
 			super(mc, CavemanTradeScreen.this.width, CavemanTradeScreen.this.height, 32, CavemanTradeScreen.this.height - 20 - 8, 18);
 
 			for (int i = 0; i < CavemanTradeScreen.this.entries.size(); ++i)
 			{
-				addEntry(new TradeEntry(i, CavemanTradeScreen.this.entries.get(i)));
+				entries.add(new TradeEntry(i, CavemanTradeScreen.this.entries.get(i)));
+			}
+
+			replaceEntries(entries);
+		}
+
+		protected void filterEntries(final String text)
+		{
+			filteredEntries.clear();
+
+			if (text.isEmpty())
+			{
+				replaceEntries(entries);
+			}
+			else
+			{
+				replaceEntries(entries.stream()
+					.filter(o -> StringUtils.containsIgnoreCase(o.getDisplayName().getUnformattedComponentText(), text))
+					.collect(Collectors.toCollection(() -> filteredEntries)));
 			}
 		}
 
@@ -213,6 +277,19 @@ public class CavemanTradeScreen extends Screen
 			super.moveSelection(diff);
 
 			CavemanTradeScreen.this.updateSelection();
+		}
+
+		@Override
+		public boolean mouseClicked(double mouseX, double mouseY, int particalTicks)
+		{
+			if (super.mouseClicked(mouseX, mouseY, particalTicks))
+			{
+				CavemanTradeScreen.this.searchBar.setFocused2(false);
+
+				return true;
+			}
+
+			return false;
 		}
 
 		@OnlyIn(Dist.CLIENT)
