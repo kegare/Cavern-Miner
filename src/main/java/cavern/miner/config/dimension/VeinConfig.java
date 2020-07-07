@@ -28,8 +28,8 @@ public class VeinConfig extends AbstractEntryConfig
 {
 	private final NonNullList<Vein> veins = NonNullList.create();
 
-	private final BlockStateTagList whitelist = BlockStateTagList.create();
-	private final BlockStateTagList blacklist = BlockStateTagList.create();
+	private final BlockStateTagList whitelist = new BlockStateTagList();
+	private final BlockStateTagList blacklist = new BlockStateTagList();
 	private final List<String> blacklistMods = new ArrayList<>();
 
 	public VeinConfig(File dir)

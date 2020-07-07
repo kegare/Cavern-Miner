@@ -257,7 +257,7 @@ public class CavernPortalBlock extends Block
 	{
 		if (frame == null || !getFrameBlocks().contains(frame))
 		{
-			frame = getFrameBlocks().getCachedList().get(0);
+			frame = getFrameBlocks().getAll().get(0);
 		}
 
 		BlockPattern.PatternHelper pattern = createPatternHelper(world, pos);

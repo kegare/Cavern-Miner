@@ -16,8 +16,8 @@ import net.minecraft.block.Blocks;
 
 public class PortalConfig extends AbstractEntryConfig
 {
-	private final ItemStackTagList triggerItems = ItemStackTagList.create();
-	private final BlockStateTagList frameBlocks = BlockStateTagList.create();
+	private final ItemStackTagList triggerItems = new ItemStackTagList();
+	private final BlockStateTagList frameBlocks = new BlockStateTagList();
 
 	public PortalConfig(File dir)
 	{

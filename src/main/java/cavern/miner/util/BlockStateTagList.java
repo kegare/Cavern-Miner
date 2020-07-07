@@ -15,30 +15,17 @@ public class BlockStateTagList implements Iterable<BlockState>
 	private final NonNullList<BlockState> entryList;
 	private final NonNullList<Tag<Block>> tagList;
 
-	private boolean changed = true;
+	private NonNullList<BlockState> allList;
 
-	private NonNullList<BlockState> cachedList;
-
-	public static BlockStateTagList create()
+	public BlockStateTagList()
 	{
-		return new BlockStateTagList();
+		this(NonNullList.create(), NonNullList.create());
 	}
 
-	public static BlockStateTagList from(BlockStateTagList list)
+	public BlockStateTagList(NonNullList<BlockState> entries, NonNullList<Tag<Block>> tags)
 	{
-		return new BlockStateTagList(list);
-	}
-
-	protected BlockStateTagList()
-	{
-		this.entryList = NonNullList.create();
-		this.tagList = NonNullList.create();
-	}
-
-	protected BlockStateTagList(BlockStateTagList list)
-	{
-		this.entryList = list.entryList;
-		this.tagList = list.tagList;
+		this.entryList = entries;
+		this.tagList = tags;
 	}
 
 	public NonNullList<BlockState> getEntryList()
@@ -53,40 +40,59 @@ public class BlockStateTagList implements Iterable<BlockState>
 
 	public BlockStateTagList add(BlockState entry)
 	{
-		changed = entryList.add(entry);
+		if (entryList.add(entry))
+		{
+			allList = null;
+		}
 
 		return this;
 	}
 
 	public BlockStateTagList add(Block entry)
 	{
-		changed = entryList.add(entry.getDefaultState());
+		if (entryList.add(entry.getDefaultState()))
+		{
+			allList = null;
+		}
 
 		return this;
 	}
 
 	public BlockStateTagList add(Tag<Block> tag)
 	{
-		changed = tagList.add(tag);
+		if (tagList.add(tag))
+		{
+			allList = null;
+		}
 
 		return this;
 	}
 
-	public boolean addEntries(Collection<BlockState> entries)
+	public BlockStateTagList addEntries(Collection<BlockState> entries)
 	{
-		return entryList.addAll(entries);
+		if (entryList.addAll(entries))
+		{
+			allList = null;
+		}
+
+		return this;
 	}
 
-	public boolean addTags(Collection<Tag<Block>> tags)
+	public BlockStateTagList addTags(Collection<Tag<Block>> tags)
 	{
-		return tagList.addAll(tags);
+		if (tagList.addAll(tags))
+		{
+			allList = null;
+		}
+
+		return this;
 	}
 
 	public boolean remove(BlockState entry)
 	{
 		if (entryList.remove(entry))
 		{
-			changed = true;
+			allList = null;
 
 			return true;
 		}
@@ -98,7 +104,7 @@ public class BlockStateTagList implements Iterable<BlockState>
 	{
 		if (tagList.remove(tag))
 		{
-			changed = true;
+			allList = null;
 
 			return true;
 		}
@@ -136,7 +142,7 @@ public class BlockStateTagList implements Iterable<BlockState>
 
 		for (Tag<Block> tag : tagList)
 		{
-			if (entry.getBlock().isIn(tag))
+			if (entry.isIn(tag))
 			{
 				return true;
 			}
@@ -155,56 +161,28 @@ public class BlockStateTagList implements Iterable<BlockState>
 		entryList.clear();
 		tagList.clear();
 
-		changed = true;
+		allList = null;
 	}
 
 	public NonNullList<BlockState> toList()
 	{
-		if (tagList.isEmpty())
-		{
-			return entryList;
-		}
-
-		NonNullList<BlockState> list = NonNullList.create();
-
-		if (!entryList.isEmpty())
-		{
-			list.addAll(entryList);
-		}
-
-		for (Tag<Block> tag : tagList)
-		{
-			list.addAll(tag.getAllElements().stream().map(Block::getDefaultState).collect(Collectors.toList()));
-		}
-
-		return list;
+		return tagList.isEmpty() ? entryList :
+			Stream.concat(entryList.stream(), tagList.stream().flatMap(o -> o.getAllElements().stream()).map(Block::getDefaultState)).collect(Collectors.toCollection(NonNullList::create));
 	}
 
-	public NonNullList<BlockState> getCachedList()
+	public NonNullList<BlockState> getAll()
 	{
-		if (changed)
+		if (allList == null)
 		{
-			cachedList = toList();
-
-			changed = false;
+			allList = toList();
 		}
 
-		return cachedList;
+		return allList;
 	}
 
 	@Override
 	public Iterator<BlockState> iterator()
 	{
-		return getCachedList().iterator();
-	}
-
-	public Stream<BlockState> stream()
-	{
-		return getCachedList().stream();
-	}
-
-	public Stream<BlockState> parallelStream()
-	{
-		return getCachedList().parallelStream();
+		return getAll().iterator();
 	}
 }

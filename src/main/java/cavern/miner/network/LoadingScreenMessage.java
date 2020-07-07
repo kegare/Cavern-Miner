@@ -28,7 +28,7 @@ public class LoadingScreenMessage
 	{
 		try
 		{
-			return Stage.valueOf(buf.readString()).create();
+			return buf.readEnumValue(Stage.class).create();
 		}
 		catch (IndexOutOfBoundsException e)
 		{
@@ -40,7 +40,7 @@ public class LoadingScreenMessage
 
 	public static void encode(final LoadingScreenMessage msg, final PacketBuffer buf)
 	{
-		buf.writeString(msg.stage.name());
+		buf.writeEnumValue(msg.stage);
 	}
 
 	public static void handle(final LoadingScreenMessage msg, final Supplier<NetworkEvent.Context> ctx)

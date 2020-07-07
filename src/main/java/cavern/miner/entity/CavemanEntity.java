@@ -107,7 +107,7 @@ public class CavemanEntity extends CreatureEntity
 
 			goalSelector.getRunningGoals().forEach(PrioritizedGoal::resetTask);
 
-			getNavigator().setPath(null, 0.0D);
+			getNavigator().clearPath();
 		}
 	}
 
@@ -204,7 +204,7 @@ public class CavemanEntity extends CreatureEntity
 			{
 				CavemanTrade.TradeEntry entry = list.get(i);
 
-				if (rank.getEntryOrder() < entry.getRank().getEntryOrder())
+				if (rank.getIndex() < entry.getRank().getIndex())
 				{
 					inactived.add(i);
 				}

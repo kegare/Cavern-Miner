@@ -6,10 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -23,22 +24,22 @@ public final class MinerRank
 	public static final RankEntry BEGINNER = new RankEntry("BEGINNER", 0, new ItemStack(Items.WOODEN_PICKAXE));
 
 	private static final List<RankEntry> ENTRIES = new ArrayList<>();
-	private static final Map<String, RankEntry> ENTRY_MAP = new HashMap<>();
+	private static final Map<String, RankEntry> NAME_LOOKUP = new HashMap<>();
 
 	private MinerRank() {}
 
 	public static void load(Iterable<RankEntry> entries)
 	{
 		ENTRIES.clear();
-		ENTRY_MAP.clear();
+		NAME_LOOKUP.clear();
 
-		int order = 0;
+		int index = 0;
 		RankEntry prevEntry = BEGINNER;
 
 		ENTRIES.add(prevEntry);
-		ENTRY_MAP.put(prevEntry.getName().toUpperCase(), prevEntry);
+		NAME_LOOKUP.put(prevEntry.getName().toUpperCase(), prevEntry);
 
-		prevEntry.entryOrder = order;
+		prevEntry.index = index;
 
 		Iterator<RankEntry> iterator = entries.iterator();
 
@@ -52,24 +53,29 @@ public final class MinerRank
 			}
 			else
 			{
-				entry.entryOrder = ++order;
+				entry.index = ++index;
 				prevEntry.nextEntry = entry;
 
 				prevEntry = entry;
 
-				ENTRY_MAP.put(entry.getName().toUpperCase(), entry);
+				NAME_LOOKUP.put(entry.getName().toUpperCase(), entry);
 			}
 		}
 	}
 
-	public static Optional<RankEntry> byName(String name)
+	public static Optional<RankEntry> byIndex(int index)
 	{
-		return Optional.ofNullable(ENTRY_MAP.get(name.toUpperCase()));
+		return index < 0 || index >= ENTRIES.size() ? Optional.empty() : Optional.ofNullable(ENTRIES.get(index));
 	}
 
-	public static ImmutableList<RankEntry> getEntries()
+	public static Optional<RankEntry> byName(@Nullable String name)
 	{
-		return ImmutableList.copyOf(ENTRIES);
+		return name == null ? Optional.empty() : Optional.ofNullable(NAME_LOOKUP.get(name.toUpperCase()));
+	}
+
+	public static Set<RankEntry> getEntries()
+	{
+		return ImmutableSortedSet.copyOf(ENTRIES);
 	}
 
 	public static class RankEntry implements Comparable<RankEntry>
@@ -79,7 +85,7 @@ public final class MinerRank
 		private final int phase;
 		private final ItemStack iconItem;
 
-		private int entryOrder = -1;
+		private int index = -1;
 		private RankEntry nextEntry = this;
 
 		public RankEntry(String name, String key, int phase, ItemStack iconItem)
@@ -115,9 +121,9 @@ public final class MinerRank
 			return iconItem;
 		}
 
-		public int getEntryOrder()
+		public int getIndex()
 		{
-			return entryOrder;
+			return index;
 		}
 
 		public RankEntry getNextEntry()
@@ -147,7 +153,7 @@ public final class MinerRank
 		@Override
 		public int compareTo(RankEntry o)
 		{
-			int i = Integer.compare(getEntryOrder(), o.getEntryOrder());
+			int i = Integer.compare(getIndex(), o.getIndex());
 
 			if (i == 0)
 			{
@@ -180,15 +186,7 @@ public final class MinerRank
 
 			RankEntry next = entry.getNextEntry();
 
-			if (entry.equals(next))
-			{
-				this.nextPhase = -1;
-			}
-			else
-			{
-				this.nextPhase = next.getPhase();
-			}
-
+			this.nextPhase = entry.equals(next) ? -1 : next.getPhase();
 			this.parent = entry;
 		}
 

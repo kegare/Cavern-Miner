@@ -99,7 +99,7 @@ public class CavemanTradingMessage
 					return;
 				}
 
-				if (miner.getRank().getEntryOrder() < entry.getRank().getEntryOrder())
+				if (miner.getRank().getIndex() < entry.getRank().getIndex())
 				{
 					return;
 				}
