@@ -75,8 +75,6 @@ public class CavernTeleporter implements ITeleporter
 
 		final BlockPos originPos = destPos == null ? entity.getPosition() : destPos;
 
-		destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(originPos), Math.max(Math.floorDiv(radius, 16), 1), originPos);
-
 		boolean placed = false;
 
 		if (GeneralConfig.INSTANCE.posCache.get())
@@ -123,6 +121,13 @@ public class CavernTeleporter implements ITeleporter
 		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
 		{
 			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), LoadingScreenMessage.Stage.DONE.create());
+		}
+
+		if (placed)
+		{
+			BlockPos pos = entity.getPosition();
+
+			destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(pos), 3, pos);
 		}
 
 		return repositionEntity.apply(false);
@@ -216,7 +221,7 @@ public class CavernTeleporter implements ITeleporter
 
 		int i = 0;
 		int j = world.rand.nextInt(4);
-		BlockPos resultPos = null;
+		BlockPos resultPos;
 
 		resultPos = BlockPosHelper.findPos(world, originPos, radius, min, max, o ->
 		{

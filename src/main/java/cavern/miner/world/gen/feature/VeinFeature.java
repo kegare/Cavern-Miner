@@ -3,8 +3,8 @@ package cavern.miner.world.gen.feature;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
-import com.google.common.collect.AbstractIterator;
 import com.mojang.datafixers.Dynamic;
 
 import cavern.miner.world.vein.Vein;
@@ -26,121 +26,79 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 	}
 
 	@Override
-	public boolean place(IWorld world, ChunkGenerator<? extends GenerationSettings> generator, Random rand, BlockPos pos, VeinFeatureConfig config)
+	public boolean place(final IWorld world, final ChunkGenerator<? extends GenerationSettings> generator, final Random rand, final BlockPos pos, final VeinFeatureConfig config)
 	{
-		VeinProvider provider = config.getProvider();
-		int ground = generator.getGroundHeight();
-		int max = generator.getMaxHeight() - 1;
-		boolean result = false;
+		final VeinProvider provider = config.getProvider();
+		final int ground = generator.getGroundHeight();
+		final int max = generator.getMaxHeight() - 1;
 
-		for (Vein vein : provider.getConfigVeins())
-		{
-			for (BlockPos genPos : getPositions(world, vein.isStoneTarget() && ground > 0 ? ground - 1 : max, pos, rand, vein))
-			{
-				if (genPos.equals(BlockPos.ZERO))
-				{
-					continue;
-				}
-
-				if (placeVein(world, rand, genPos, vein))
-				{
-					result = true;
-				}
-			}
-		}
-
-		for (Vein vein : provider.getAutoEntries())
-		{
-			for (BlockPos genPos : getPositions(world, vein.isStoneTarget() && ground > 0 ? ground - 1 : max, pos, rand, vein))
-			{
-				if (genPos.equals(BlockPos.ZERO))
-				{
-					continue;
-				}
-
-				if (placeVein(world, rand, genPos, vein))
-				{
-					result = true;
-				}
-			}
-		}
-
-		return result;
+		return Stream.concat(provider.getConfigVeins().stream(), provider.getAutoEntries().stream()).sorted()
+			.mapToInt(vein -> getPositions(world, vein.isStoneTarget() && ground > 0 ? ground - 1 : max, pos, rand, vein)
+			.mapToInt(o -> placeVein(world, rand, o, vein) ? 1 : 0).sum()).sum() > 0;
 	}
 
-	public Iterable<BlockPos> getPositions(final IWorld world, final int maxHeight, final BlockPos pos, final Random rand, final Vein vein)
+	public Stream<BlockPos> getPositions(final IWorld world, final int maxHeight, final BlockPos pos, final Random rand, final Vein vein)
 	{
-		return () -> new AbstractIterator<BlockPos>()
+		final int size = vein.getSize();
+		final int min = vein.getMinHeight() + size;
+		final int max = vein.getMaxHeight() - size;
+		final IntList targetY = new IntArrayList();
+		final BlockPos.Mutable findPos = new BlockPos.Mutable();
+		final BlockPos.Mutable prevPos = new BlockPos.Mutable();
+
+		return Stream.generate(() ->
 		{
-			final int size = vein.getSize();
-			final int min = vein.getMinHeight() + size;
-			final int max = vein.getMaxHeight() - size;
-			final IntList targetY = new IntArrayList();
-			final BlockPos.Mutable findPos = new BlockPos.Mutable();
-			final BlockPos.Mutable prevPos = new BlockPos.Mutable();
+			int x = rand.nextInt(16) + pos.getX();
+			int z = rand.nextInt(16) + pos.getZ();
 
-			int count = vein.getCount();
+			targetY.clear();
 
-			@Override
-			protected BlockPos computeNext()
+			for (int y = Math.max(min, 1); y <= Math.min(max, maxHeight); ++y)
 			{
-				if (--count <= 0)
+				if (!world.isAirBlock(findPos.setPos(x, y, z)) && vein.isTargetBlock(world.getBlockState(findPos)))
 				{
-					return endOfData();
+					targetY.add(y);
 				}
+			}
 
-				int x = rand.nextInt(16) + pos.getX();
-				int z = rand.nextInt(16) + pos.getZ();
+			if (targetY.isEmpty())
+			{
+				return BlockPos.ZERO;
+			}
 
-				targetY.clear();
+			if (prevPos.equals(BlockPos.ZERO))
+			{
+				findPos.setPos(x, targetY.getInt(rand.nextInt(targetY.size())), z);
+			}
+			else
+			{
+				boolean modified = false;
 
-				for (int y = Math.max(min, 1); y <= Math.min(max, maxHeight); ++y)
+				for (int i = 0, j = targetY.size(); i < j; ++i)
 				{
-					if (!world.isAirBlock(findPos.setPos(x, y, z)) && vein.isTargetBlock(world.getBlockState(findPos)))
+					if (findPos.setPos(x, targetY.getInt(rand.nextInt(j)), z).withinDistance(prevPos, size))
 					{
-						targetY.add(y);
+						x = rand.nextInt(16) + pos.getX();
+						z = rand.nextInt(16) + pos.getZ();
+					}
+					else
+					{
+						modified = true;
+
+						break;
 					}
 				}
 
-				if (targetY.isEmpty())
+				if (!modified)
 				{
 					return BlockPos.ZERO;
 				}
-
-				if (prevPos.equals(BlockPos.ZERO))
-				{
-					findPos.setPos(x, targetY.getInt(rand.nextInt(targetY.size())), z);
-				}
-				else
-				{
-					boolean modified = false;
-
-					for (int i = 0, j = targetY.size(); i < j; ++i)
-					{
-						if (findPos.setPos(x, targetY.getInt(rand.nextInt(j)), z).withinDistance(prevPos, size))
-						{
-							x = rand.nextInt(16) + pos.getX();
-							z = rand.nextInt(16) + pos.getZ();
-						}
-						else
-						{
-							modified = true;
-
-							break;
-						}
-					}
-
-					if (!modified)
-					{
-						return BlockPos.ZERO;
-					}
-				}
-
-				prevPos.setPos(findPos);
-
-				return findPos;
 			}
-		};
+
+			prevPos.setPos(findPos);
+
+			return findPos;
+		}).filter(o -> !o.equals(BlockPos.ZERO)).distinct().limit(vein.getCount());
 	}
 
 	public boolean placeVein(IWorld world, Random rand, BlockPos pos, Vein vein)
@@ -255,9 +213,8 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 										if (!posSet.get(index))
 										{
 											posSet.set(index);
-											pos.setPos(posX, posY, posZ);
 
-											if (vein.isTargetBlock(world.getBlockState(pos)))
+											if (vein.isTargetBlock(world.getBlockState(pos.setPos(posX, posY, posZ))))
 											{
 												world.setBlockState(pos, vein.getBlockState(), 2);
 

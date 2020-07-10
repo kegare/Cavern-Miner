@@ -31,11 +31,6 @@ public class NaturalSpawnConfig extends AbstractEntryConfig
 		this.biomes = biomes;
 	}
 
-	public List<Biome.SpawnListEntry> getEntries(EntityClassification type)
-	{
-		return spawns.computeIfAbsent(type, o -> new ArrayList<>());
-	}
-
 	@Override
 	public boolean isEmpty()
 	{

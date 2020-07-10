@@ -2,7 +2,6 @@ package cavern.miner.util;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,30 +16,17 @@ public class ItemStackTagList implements Iterable<ItemStack>
 	private final NonNullList<ItemStack> entryList;
 	private final NonNullList<Tag<Item>> tagList;
 
-	private boolean changed = true;
+	private NonNullList<ItemStack> allList;
 
-	private NonNullList<ItemStack> cachedList;
-
-	public static ItemStackTagList create()
+	public ItemStackTagList()
 	{
-		return new ItemStackTagList();
+		this(NonNullList.create(), NonNullList.create());
 	}
 
-	public static ItemStackTagList from(ItemStackTagList list)
+	public ItemStackTagList(NonNullList<ItemStack> entries, NonNullList<Tag<Item>> tags)
 	{
-		return new ItemStackTagList(list);
-	}
-
-	protected ItemStackTagList()
-	{
-		this.entryList = NonNullList.create();
-		this.tagList = NonNullList.create();
-	}
-
-	protected ItemStackTagList(ItemStackTagList list)
-	{
-		this.entryList = list.entryList;
-		this.tagList = list.tagList;
+		this.entryList = entries;
+		this.tagList = tags;
 	}
 
 	public NonNullList<ItemStack> getEntryList()
@@ -55,40 +41,59 @@ public class ItemStackTagList implements Iterable<ItemStack>
 
 	public ItemStackTagList add(ItemStack entry)
 	{
-		changed = entryList.add(entry);
+		if (entryList.add(entry))
+		{
+			allList = null;
+		}
 
 		return this;
 	}
 
 	public ItemStackTagList add(IItemProvider entry)
 	{
-		changed = entryList.add(new ItemStack(entry));
+		if (entryList.add(new ItemStack(entry)))
+		{
+			allList = null;
+		}
 
 		return this;
 	}
 
 	public ItemStackTagList add(Tag<Item> tag)
 	{
-		changed = tagList.add(tag);
+		if (tagList.add(tag))
+		{
+			allList = null;
+		}
 
 		return this;
 	}
 
-	public boolean addEntries(Collection<ItemStack> entries)
+	public ItemStackTagList addEntries(Collection<ItemStack> entries)
 	{
-		return entryList.addAll(entries);
+		if (entryList.addAll(entries))
+		{
+			allList = null;
+		}
+
+		return this;
 	}
 
-	public boolean addTags(Collection<Tag<Item>> tags)
+	public ItemStackTagList addTags(Collection<Tag<Item>> tags)
 	{
-		return tagList.addAll(tags);
+		if (tagList.addAll(tags))
+		{
+			allList = null;
+		}
+
+		return this;
 	}
 
 	public boolean remove(ItemStack entry)
 	{
 		if (entryList.remove(entry))
 		{
-			changed = true;
+			allList = null;
 
 			return true;
 		}
@@ -100,7 +105,7 @@ public class ItemStackTagList implements Iterable<ItemStack>
 	{
 		if (tagList.remove(tag))
 		{
-			changed = true;
+			allList = null;
 
 			return true;
 		}
@@ -160,68 +165,28 @@ public class ItemStackTagList implements Iterable<ItemStack>
 		entryList.clear();
 		tagList.clear();
 
-		changed = true;
+		allList = null;
 	}
 
 	public NonNullList<ItemStack> toList()
 	{
-		if (tagList.isEmpty())
-		{
-			return entryList;
-		}
-
-		NonNullList<ItemStack> list = NonNullList.create();
-
-		if (!entryList.isEmpty())
-		{
-			list.addAll(entryList);
-		}
-
-		for (Tag<Item> tag : tagList)
-		{
-			list.addAll(tag.getAllElements().stream().map(ItemStack::new).collect(Collectors.toList()));
-		}
-
-		return list;
+		return tagList.isEmpty() ? entryList :
+			Stream.concat(entryList.stream(), tagList.stream().flatMap(o -> o.getAllElements().stream()).map(ItemStack::new)).collect(Collectors.toCollection(NonNullList::create));
 	}
 
-	public NonNullList<ItemStack> getCachedList()
+	public NonNullList<ItemStack> getAll()
 	{
-		if (changed)
+		if (allList == null)
 		{
-			cachedList = toList();
-
-			changed = false;
+			allList = toList();
 		}
 
-		return cachedList;
-	}
-
-	public ItemStack getRandomElement(Random random)
-	{
-		NonNullList<ItemStack> list = getCachedList();
-
-		if (list.isEmpty())
-		{
-			return ItemStack.EMPTY;
-		}
-
-		return list.get(random.nextInt(list.size()));
+		return allList;
 	}
 
 	@Override
 	public Iterator<ItemStack> iterator()
 	{
-		return getCachedList().iterator();
-	}
-
-	public Stream<ItemStack> stream()
-	{
-		return getCachedList().stream();
-	}
-
-	public Stream<ItemStack> parallelStream()
-	{
-		return getCachedList().parallelStream();
+		return getAll().iterator();
 	}
 }

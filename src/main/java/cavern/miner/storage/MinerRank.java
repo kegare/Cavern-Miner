@@ -1,14 +1,16 @@
 package cavern.miner.storage;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableSortedSet;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
@@ -21,14 +23,23 @@ public final class MinerRank
 {
 	public static final RankEntry BEGINNER = new RankEntry("BEGINNER", 0, new ItemStack(Items.WOODEN_PICKAXE));
 
-	private static final List<RankEntry> ENTRIES = Lists.newArrayList(BEGINNER);
+	private static final List<RankEntry> ENTRIES = new ArrayList<>();
+	private static final Map<String, RankEntry> NAME_LOOKUP = new HashMap<>();
 
 	private MinerRank() {}
 
-	public static void load(Collection<RankEntry> entries)
+	public static void load(Iterable<RankEntry> entries)
 	{
 		ENTRIES.clear();
-		ENTRIES.add(BEGINNER);
+		NAME_LOOKUP.clear();
+
+		int index = 0;
+		RankEntry prevEntry = BEGINNER;
+
+		ENTRIES.add(prevEntry);
+		NAME_LOOKUP.put(prevEntry.getName().toUpperCase(), prevEntry);
+
+		prevEntry.index = index;
 
 		Iterator<RankEntry> iterator = entries.iterator();
 
@@ -40,55 +51,42 @@ public final class MinerRank
 			{
 				iterator.remove();
 			}
-		}
-	}
-
-	public static Optional<RankEntry> byName(String name)
-	{
-		for (RankEntry entry : ENTRIES)
-		{
-			if (entry.getName().equalsIgnoreCase(name))
+			else
 			{
-				return Optional.of(entry);
+				entry.index = ++index;
+				prevEntry.nextEntry = entry;
+
+				prevEntry = entry;
+
+				NAME_LOOKUP.put(entry.getName().toUpperCase(), entry);
 			}
 		}
-
-		return Optional.empty();
 	}
 
-	public static int getOrder(RankEntry rank)
+	public static Optional<RankEntry> byIndex(int index)
 	{
-		return ENTRIES.indexOf(rank);
+		return index < 0 || index >= ENTRIES.size() ? Optional.empty() : Optional.ofNullable(ENTRIES.get(index));
 	}
 
-	public static RankEntry getNextRank(RankEntry rank)
+	public static Optional<RankEntry> byName(@Nullable String name)
 	{
-		int i = ENTRIES.indexOf(rank);
-
-		if (i < 0)
-		{
-			return BEGINNER;
-		}
-
-		if (i < ENTRIES.size() - 1)
-		{
-			return ENTRIES.get(++i);
-		}
-
-		return rank;
+		return name == null ? Optional.empty() : Optional.ofNullable(NAME_LOOKUP.get(name.toUpperCase()));
 	}
 
-	public static ImmutableList<RankEntry> getEntries()
+	public static Set<RankEntry> getEntries()
 	{
-		return ImmutableList.copyOf(ENTRIES);
+		return ImmutableSortedSet.copyOf(ENTRIES);
 	}
 
-	public static class RankEntry
+	public static class RankEntry implements Comparable<RankEntry>
 	{
 		private final String name;
 		private final String translationKey;
 		private final int phase;
 		private final ItemStack iconItem;
+
+		private int index = -1;
+		private RankEntry nextEntry = this;
 
 		public RankEntry(String name, String key, int phase, ItemStack iconItem)
 		{
@@ -123,6 +121,16 @@ public final class MinerRank
 			return iconItem;
 		}
 
+		public int getIndex()
+		{
+			return index;
+		}
+
+		public RankEntry getNextEntry()
+		{
+			return nextEntry;
+		}
+
 		@Override
 		public boolean equals(Object obj)
 		{
@@ -141,14 +149,32 @@ public final class MinerRank
 		{
 			return getName().toUpperCase().hashCode();
 		}
+
+		@Override
+		public int compareTo(RankEntry o)
+		{
+			int i = Integer.compare(getIndex(), o.getIndex());
+
+			if (i == 0)
+			{
+				i = Integer.compare(getPhase(), o.getPhase());
+
+				if (i == 0)
+				{
+					i = getName().compareTo(o.getName());
+				}
+			}
+
+			return i;
+		}
 	}
 
 	public static class DisplayEntry
 	{
-		private String name;
-		private String translationKey;
-		private ItemStack iconItem;
-		private int nextPhase;
+		private final String name;
+		private final String translationKey;
+		private final ItemStack iconItem;
+		private final int nextPhase;
 
 		private RankEntry parent;
 
@@ -158,23 +184,18 @@ public final class MinerRank
 			this.translationKey = entry.getTranslationKey();
 			this.iconItem = entry.getIconItem();
 
-			RankEntry next = getNextRank(entry);
+			RankEntry next = entry.getNextEntry();
 
-			if (entry.equals(next))
-			{
-				this.nextPhase = -1;
-			}
-			else
-			{
-				this.nextPhase = next.getPhase();
-			}
-
+			this.nextPhase = entry.equals(next) ? -1 : next.getPhase();
 			this.parent = entry;
 		}
 
 		public DisplayEntry(PacketBuffer buf)
 		{
-			this.read(buf);
+			this.name = buf.readString();
+			this.translationKey = buf.readString();
+			this.iconItem = buf.readItemStack();
+			this.nextPhase = buf.readInt();
 		}
 
 		public String getName()
@@ -222,14 +243,6 @@ public final class MinerRank
 			buf.writeString(getTranslationKey());
 			buf.writeItemStack(getIconItem());
 			buf.writeInt(getNextPhase());
-		}
-
-		public void read(PacketBuffer buf)
-		{
-			name = buf.readString();
-			translationKey = buf.readString();
-			iconItem = buf.readItemStack();
-			nextPhase = buf.readInt();
 		}
 	}
 }

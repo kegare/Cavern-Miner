@@ -1,17 +1,22 @@
 package cavern.miner.client.gui;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import cavern.miner.entity.CavemanEntity;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.CavemanTradingMessage;
 import cavern.miner.storage.Miner;
@@ -19,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -40,21 +46,16 @@ public class CavemanTradeScreen extends Screen
 	private final int[] inactiveEntries;
 
 	private TradeList list;
+	private TextFieldWidget searchBar;
 	private Button doneButton;
+
+	private String lastFilterText = "";
+	private boolean filtered = true;
 
 	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries, int[] inactiveEntries)
 	{
 		super(new TranslationTextComponent("entity.cavern.caveman"));
-
-		if (caveman == null)
-		{
-			this.caveman = CaveEntities.CAVEMAN.get().create(minecraft.world);
-		}
-		else
-		{
-			this.caveman = caveman;
-		}
-
+		this.caveman = caveman;
 		this.entries = entries;
 		this.inactiveEntries = inactiveEntries;
 	}
@@ -69,23 +70,40 @@ public class CavemanTradeScreen extends Screen
 	protected void init()
 	{
 		list = new TradeList(minecraft);
-		children.add(list);
 
-		doneButton = addButton(new Button(width / 2 - 70, height - 20 - 4, 150, 20, I18n.format("gui.done"), o ->
+		int fieldWidth = 135;
+
+		searchBar = new TextFieldWidget(font, width / 2 - fieldWidth - 5, height - 16 - 6, fieldWidth, 16, searchBar, I18n.format("itemGroup.search"));
+		searchBar.setFocused2(false);
+
+		String text = searchBar.getText();
+
+		if (!text.isEmpty())
 		{
-			int id = -1;
+			list.filterEntries(text);
 
-			if (list.getSelected() != null)
+			lastFilterText = text;
+		}
+
+		doneButton = addButton(new Button(width / 2 + 5, height - 20 - 4, fieldWidth, 20, I18n.format("gui.done"), o ->
+		{
+			if (caveman != null)
 			{
-				id = list.getSelected().entryId;
-			}
+				int id = -1;
 
-			CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), id));
+				if (list.getSelected() != null)
+				{
+					id = list.getSelected().entryId;
+				}
+
+				CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), id));
+			}
 
 			minecraft.displayGuiScreen(null);
 		}));
 
-		super.init();
+		children.add(list);
+		children.add(searchBar);
 	}
 
 	@Override
@@ -104,19 +122,26 @@ public class CavemanTradeScreen extends Screen
 			miner = minecraft.player.getCapability(CaveCapabilities.MINER).orElse(null);
 		}
 
+		TradeList.TradeEntry selected = list.getSelected();
+
 		if (miner != null)
 		{
 			int x = width - 28;
 			int y = height - 22;
-			int cost = list.getSelected() == null ? 0 : list.getSelected().entry.getCost();
-			String point = Integer.toString(miner.getPoint() - cost);
+			int cost = selected == null ? 0 : selected.entry.getCost();
+			int result = miner.getPoint() - cost;
+			String point = Integer.toString(result);
 
 			if (point.length() <= 1)
 			{
 				point = " " + point;
 			}
 
-			if (cost != 0)
+			if (result < 0)
+			{
+				point = TextFormatting.RED + point;
+			}
+			else if (cost != 0)
 			{
 				point = TextFormatting.GRAY + point;
 			}
@@ -129,20 +154,48 @@ public class CavemanTradeScreen extends Screen
 			RenderSystem.disableRescaleNormal();
 		}
 
-		InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
+		if (caveman != null)
+		{
+			InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
+		}
 
 		super.render(mouseX, mouseY, particalTicks);
+
+		searchBar.render(mouseX, mouseY, particalTicks);
+	}
+
+	@Override
+	public void tick()
+	{
+		searchBar.tick();
+
+		final String text = searchBar.getText();
+
+		if (!text.equalsIgnoreCase(lastFilterText))
+		{
+			filtered = false;
+		}
+
+		if (!filtered)
+		{
+			list.filterEntries(text);
+
+			lastFilterText = text;
+			filtered = true;
+		}
 	}
 
 	public void updateSelection()
 	{
-		if (list.getSelected() == null)
+		TradeList.TradeEntry selected = list.getSelected();
+
+		if (selected == null)
 		{
 			doneButton.active = true;
 		}
 		else
 		{
-			CavemanTrade.TradeEntry entry = list.getSelected().entry;
+			CavemanTrade.TradeEntry entry = selected.entry;
 			Miner miner = null;
 
 			if (minecraft.player != null)
@@ -154,7 +207,7 @@ public class CavemanTradeScreen extends Screen
 
 			if (doneButton.active)
 			{
-				doneButton.active = !ArrayUtils.contains(inactiveEntries, list.getSelected().entryId);
+				doneButton.active = !ArrayUtils.contains(inactiveEntries, selected.entryId);
 			}
 		}
 	}
@@ -162,7 +215,10 @@ public class CavemanTradeScreen extends Screen
 	@Override
 	public void onClose()
 	{
-		CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), -1));
+		if (caveman != null)
+		{
+			CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), -1));
+		}
 
 		super.onClose();
 	}
@@ -176,13 +232,39 @@ public class CavemanTradeScreen extends Screen
 	@OnlyIn(Dist.CLIENT)
 	protected class TradeList extends ExtendedList<TradeList.TradeEntry>
 	{
+		protected final List<TradeEntry> entries = new ArrayList<>();
+
+		protected final LoadingCache<String, List<TradeEntry>>  filterCache = CacheBuilder.newBuilder().build(new CacheLoader<String, List<TradeEntry>>()
+		{
+			@Override
+			public List<TradeEntry> load(final String key) throws Exception
+			{
+				return TradeList.this.entries.stream()
+					.filter(o -> StringUtils.containsIgnoreCase(o.getDisplayName().getUnformattedComponentText(), key)).collect(Collectors.toList());
+			}
+		});
+
 		protected TradeList(Minecraft mc)
 		{
 			super(mc, CavemanTradeScreen.this.width, CavemanTradeScreen.this.height, 32, CavemanTradeScreen.this.height - 20 - 8, 18);
 
 			for (int i = 0; i < CavemanTradeScreen.this.entries.size(); ++i)
 			{
-				addEntry(new TradeEntry(i, CavemanTradeScreen.this.entries.get(i)));
+				entries.add(new TradeEntry(i, CavemanTradeScreen.this.entries.get(i)));
+			}
+
+			replaceEntries(entries);
+		}
+
+		protected void filterEntries(final String text)
+		{
+			if (text.isEmpty())
+			{
+				replaceEntries(entries);
+			}
+			else
+			{
+				replaceEntries(filterCache.getUnchecked(text));
 			}
 		}
 
@@ -204,6 +286,19 @@ public class CavemanTradeScreen extends Screen
 			super.moveSelection(diff);
 
 			CavemanTradeScreen.this.updateSelection();
+		}
+
+		@Override
+		public boolean mouseClicked(double mouseX, double mouseY, int particalTicks)
+		{
+			if (super.mouseClicked(mouseX, mouseY, particalTicks))
+			{
+				CavemanTradeScreen.this.searchBar.setFocused2(false);
+
+				return true;
+			}
+
+			return false;
 		}
 
 		@OnlyIn(Dist.CLIENT)

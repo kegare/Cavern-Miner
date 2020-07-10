@@ -51,7 +51,7 @@ public enum BlockStateTagListSerializer implements JsonSerializer<BlockStateTagL
 	public BlockStateTagList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
 		JsonObject object = json.getAsJsonObject();
-		BlockStateTagList list = BlockStateTagList.create();
+		BlockStateTagList list = new BlockStateTagList();
 
 		JsonArray array = object.get("blocks").getAsJsonArray();
 

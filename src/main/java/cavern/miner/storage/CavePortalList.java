@@ -2,6 +2,7 @@ package cavern.miner.storage;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
@@ -73,14 +74,7 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 
 		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
-			ListNBT list = new ListNBT();
-
-			for (BlockPos pos : cavePortals.get(portal))
-			{
-				list.add(NBTUtil.writeBlockPos(pos));
-			}
-
-			nbt.put(portal.getRegistryName().toString(), list);
+			nbt.put(portal.getRegistryName().toString(), cavePortals.get(portal).stream().map(NBTUtil::writeBlockPos).collect(Collectors.toCollection(ListNBT::new)));
 		}
 
 		return nbt;

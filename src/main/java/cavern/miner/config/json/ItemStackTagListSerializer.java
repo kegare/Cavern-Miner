@@ -52,7 +52,7 @@ public enum ItemStackTagListSerializer implements JsonSerializer<ItemStackTagLis
 	public ItemStackTagList deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
 	{
 		JsonObject object = json.getAsJsonObject();
-		ItemStackTagList list = ItemStackTagList.create();
+		ItemStackTagList list = new ItemStackTagList();
 
 		JsonArray array = object.get("items").getAsJsonArray();
 
@@ -73,7 +73,7 @@ public enum ItemStackTagListSerializer implements JsonSerializer<ItemStackTagLis
 
 		for (JsonElement e : array)
 		{
-			list.add(new ItemTags.Wrapper(new ResourceLocation(e.getAsString())));
+			list.add(new ItemTags.Wrapper(ResourceLocation.tryCreate(e.getAsString())));
 		}
 
 		return list;

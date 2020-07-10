@@ -41,7 +41,7 @@ public enum SpawnListEntrySerializer implements JsonSerializer<Biome.SpawnListEn
 	{
 		JsonObject object = json.getAsJsonObject();
 
-		EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(object.get("name").getAsString()));
+		EntityType<?> entityType = ForgeRegistries.ENTITIES.getValue(ResourceLocation.tryCreate(object.get("name").getAsString()));
 
 		if (entityType == null)
 		{
