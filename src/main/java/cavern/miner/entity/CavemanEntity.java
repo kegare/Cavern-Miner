@@ -14,7 +14,6 @@ import cavern.miner.init.CaveItems;
 import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.CavemanTradeMessage;
 import cavern.miner.storage.Miner;
-import cavern.miner.storage.MinerRank;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.entity.CreatureEntity;
@@ -194,21 +193,29 @@ public class CavemanEntity extends CreatureEntity
 
 		setSitting(true);
 
+		final List<CavemanTrade.TradeEntry> list = getTradeEntries();
+
+		if (list.isEmpty())
+		{
+			return false;
+		}
+
+		Collections.sort(list);
+
 		if (player instanceof ServerPlayerEntity)
 		{
-			List<CavemanTrade.TradeEntry> list = getTradeEntries();
-			MinerRank.RankEntry rank = player.getCapability(CaveCapabilities.MINER).map(Miner::getRank).orElse(MinerRank.BEGINNER);
-			IntList inactived = new IntArrayList();
+			final IntList inactived = new IntArrayList();
 
-			for (int i = 0; i < list.size(); ++i)
+			player.getCapability(CaveCapabilities.MINER).map(Miner::getRank).ifPresent(o ->
 			{
-				CavemanTrade.TradeEntry entry = list.get(i);
-
-				if (rank.getIndex() < entry.getRank().getIndex())
+				for (int i = 0; i < list.size(); ++i)
 				{
-					inactived.add(i);
+					if (o.getIndex() < list.get(i).getRank().getIndex())
+					{
+						inactived.add(i);
+					}
 				}
-			}
+			});
 
 			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new CavemanTradeMessage(getEntityId(), list, inactived.toIntArray()));
 		}

@@ -73,7 +73,7 @@ public enum ItemStackTagListSerializer implements JsonSerializer<ItemStackTagLis
 
 		for (JsonElement e : array)
 		{
-			list.add(new ItemTags.Wrapper(new ResourceLocation(e.getAsString())));
+			list.add(new ItemTags.Wrapper(ResourceLocation.tryCreate(e.getAsString())));
 		}
 
 		return list;

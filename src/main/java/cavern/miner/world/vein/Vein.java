@@ -6,7 +6,7 @@ import cavern.miner.util.BlockStateHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 
-public class Vein
+public class Vein implements Comparable<Vein>
 {
 	private final BlockState block;
 	private final Vein.Properties properties;
@@ -20,11 +20,6 @@ public class Vein
 	public BlockState getBlockState()
 	{
 		return block;
-	}
-
-	public Vein.Properties getProperties()
-	{
-		return properties;
 	}
 
 	public ImmutableSet<BlockState> getTargetBlocks()
@@ -81,6 +76,19 @@ public class Vein
 	public boolean isStoneTarget()
 	{
 		return properties.targetBlocks == Properties.NATURAL_STONES || isTargetBlock(Properties.NATURAL_STONES);
+	}
+
+	@Override
+	public int compareTo(Vein o)
+	{
+		int i = Integer.compare(getCount(), o.getCount());
+
+		if (i == 0)
+		{
+			i = Integer.compare(getSize(), o.getSize());
+		}
+
+		return i;
 	}
 
 	public static class Properties

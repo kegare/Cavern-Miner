@@ -61,12 +61,12 @@ public class JsonHelper
 		{
 			JsonObject object = e.getAsJsonObject();
 
-			return new ResourceLocation(object.get("name").getAsString());
+			return ResourceLocation.tryCreate(object.get("name").getAsString());
 		}
 
 		if (e.isJsonPrimitive())
 		{
-			return new ResourceLocation(e.getAsString());
+			return ResourceLocation.tryCreate(e.getAsString());
 		}
 
 		return null;

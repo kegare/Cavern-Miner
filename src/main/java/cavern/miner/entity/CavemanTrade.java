@@ -327,11 +327,11 @@ public final class CavemanTrade
 
 				if (hour > 0)
 				{
-					durationText = String.format("%d:%d:%d", hour, min, sec);
+					durationText = String.format("%d:%d:%02d", hour, min, sec);
 				}
 				else
 				{
-					durationText = String.format("%d:%d", min, sec);
+					durationText = String.format("%d:%02d", min, sec);
 				}
 			}
 			else if (duration > 0)

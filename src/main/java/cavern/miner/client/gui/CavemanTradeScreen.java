@@ -17,7 +17,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import cavern.miner.entity.CavemanEntity;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
-import cavern.miner.init.CaveEntities;
 import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.CavemanTradingMessage;
 import cavern.miner.storage.Miner;
@@ -56,16 +55,7 @@ public class CavemanTradeScreen extends Screen
 	public CavemanTradeScreen(@Nullable CavemanEntity caveman, List<CavemanTrade.TradeEntry> entries, int[] inactiveEntries)
 	{
 		super(new TranslationTextComponent("entity.cavern.caveman"));
-
-		if (caveman == null)
-		{
-			this.caveman = CaveEntities.CAVEMAN.get().create(minecraft.world);
-		}
-		else
-		{
-			this.caveman = caveman;
-		}
-
+		this.caveman = caveman;
 		this.entries = entries;
 		this.inactiveEntries = inactiveEntries;
 	}
@@ -97,14 +87,17 @@ public class CavemanTradeScreen extends Screen
 
 		doneButton = addButton(new Button(width / 2 + 5, height - 20 - 4, fieldWidth, 20, I18n.format("gui.done"), o ->
 		{
-			int id = -1;
-
-			if (list.getSelected() != null)
+			if (caveman != null)
 			{
-				id = list.getSelected().entryId;
-			}
+				int id = -1;
 
-			CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), id));
+				if (list.getSelected() != null)
+				{
+					id = list.getSelected().entryId;
+				}
+
+				CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), id));
+			}
 
 			minecraft.displayGuiScreen(null);
 		}));
@@ -161,7 +154,10 @@ public class CavemanTradeScreen extends Screen
 			RenderSystem.disableRescaleNormal();
 		}
 
-		InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
+		if (caveman != null)
+		{
+			InventoryScreen.drawEntityOnScreen(65, height / 2 + 80, 50, 65 - mouseX, height / 2 - 25 - mouseY, caveman);
+		}
 
 		super.render(mouseX, mouseY, particalTicks);
 
@@ -219,7 +215,10 @@ public class CavemanTradeScreen extends Screen
 	@Override
 	public void onClose()
 	{
-		CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), -1));
+		if (caveman != null)
+		{
+			CaveNetworkConstants.PLAY.send(PacketDistributor.SERVER.noArg(), new CavemanTradingMessage(caveman.getEntityId(), -1));
+		}
 
 		super.onClose();
 	}
