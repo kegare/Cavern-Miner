@@ -14,6 +14,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -110,15 +111,13 @@ public class CavebornEventHandler
 
 	public static boolean placeEntity(final IWorldReader world, final BlockPos originPos, final Entity entity)
 	{
-		BlockPos resultPos = BlockPosHelper.findPos(world, originPos, 128, pos ->
-		{
-			int x = pos.getX();
-			int y = pos.getY();
-			int z = pos.getZ();
+		final BlockPos.Mutable pos = new BlockPos.Mutable();
 
-			if (world.isAirBlock(pos) && world.isAirBlock(pos.setPos(x, y + 1, z)))
+		BlockPos resultPos = BlockPosHelper.findPos(world, originPos, 128, o ->
+		{
+			if (world.isAirBlock(pos.setPos(o)) && world.isAirBlock(pos.move(Direction.UP)))
 			{
-				return world.getBlockState(pos.setPos(x, y - 1, z)).isSolid();
+				return world.getBlockState(pos.setPos(o).move(Direction.DOWN)).isSolid();
 			}
 
 			return false;

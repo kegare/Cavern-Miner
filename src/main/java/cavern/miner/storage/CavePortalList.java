@@ -10,7 +10,6 @@ import com.google.common.collect.SetMultimap;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.init.CaveBlocks;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
@@ -85,12 +84,8 @@ public class CavePortalList implements INBTSerializable<CompoundNBT>
 	{
 		for (CavernPortalBlock portal : CaveBlocks.CAVE_PORTALS.get())
 		{
-			ListNBT list = nbt.getList(portal.getRegistryName().toString(), NBT.TAG_COMPOUND);
-
-			for (INBT entry : list)
-			{
-				cavePortals.put(portal, NBTUtil.readBlockPos((CompoundNBT)entry));
-			}
+			nbt.getList(portal.getRegistryName().toString(), NBT.TAG_COMPOUND).stream()
+				.map(o -> NBTUtil.readBlockPos((CompoundNBT)o)).forEach(o -> cavePortals.put(portal, o));
 		}
 	}
 }

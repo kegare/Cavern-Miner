@@ -120,7 +120,7 @@ public class CavernDimension extends Dimension
 
 		if (portalList == null || portalList.isPortalEmpty())
 		{
-			return BlockPos.ZERO;
+			return BlockPos.ZERO.up(50);
 		}
 
 		CavernPortalBlock portal = CaveDimensions.getPortalBlock(getType());
@@ -135,7 +135,7 @@ public class CavernDimension extends Dimension
 			}
 		}
 
-		return portalList.getPortalPositions().stream().findAny().orElse(BlockPos.ZERO);
+		return portalList.getPortalPositions().stream().findAny().orElse(BlockPos.ZERO.up(50));
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class CavernDimension extends Dimension
 
 		if (portalList == null || portalList.isPortalEmpty())
 		{
-			return BlockPos.ZERO;
+			return null;
 		}
 
 		final BlockPos originPos = chunkPos.asBlockPos().add(8, 50, 8);
@@ -163,7 +163,7 @@ public class CavernDimension extends Dimension
 			}
 		}
 
-		return portalList.getPortalPositions().stream().min(comparator).orElse(BlockPos.ZERO);
+		return portalList.getPortalPositions().stream().min(comparator).orElse(null);
 	}
 
 	@Override
@@ -173,7 +173,7 @@ public class CavernDimension extends Dimension
 
 		if (portalList == null || portalList.isPortalEmpty())
 		{
-			return BlockPos.ZERO;
+			return null;
 		}
 
 		final BlockPos originPos = new BlockPos(posX, 50, posZ);
@@ -191,7 +191,7 @@ public class CavernDimension extends Dimension
 			}
 		}
 
-		return portalList.getPortalPositions().stream().min(comparator).orElse(BlockPos.ZERO);
+		return portalList.getPortalPositions().stream().min(comparator).orElse(null);
 	}
 
 	@Override

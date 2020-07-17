@@ -49,6 +49,35 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 	}
 
 	@Override
+	public void makeBase(IWorld world, IChunk chunk)
+	{
+		BlockPos.Mutable posCache = new BlockPos.Mutable();
+		int xStart = chunk.getPos().getXStart();
+		int zStart = chunk.getPos().getZStart();
+		CavernGenSettings settings = getSettings();
+		int floor = settings.getBedrockFloorHeight() + 1;
+		int roof = settings.getBedrockRoofHeight() - 1;
+		int ground = getGroundHeight();
+
+		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
+		{
+			for (int y = roof; y >= floor; --y)
+			{
+				posCache.setPos(pos.getX(), y, pos.getZ());
+
+				if (ground > 0 && y >= ground)
+				{
+					chunk.setBlockState(posCache, settings.getGroundUnderBlock(), false);
+				}
+				else
+				{
+					chunk.setBlockState(posCache, settings.getDefaultBlock(), false);
+				}
+			}
+		}
+	}
+
+	@Override
 	public void generateSurface(WorldGenRegion region, IChunk chunk)
 	{
 		ChunkPos pos = chunk.getPos();
@@ -116,35 +145,6 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 					{
 						chunk.setBlockState(posCache.setPos(pos.getX(), y, pos.getZ()), settings.getGroundUnderBlock(), false);
 					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public void makeBase(IWorld world, IChunk chunk)
-	{
-		BlockPos.Mutable posCache = new BlockPos.Mutable();
-		int xStart = chunk.getPos().getXStart();
-		int zStart = chunk.getPos().getZStart();
-		CavernGenSettings settings = getSettings();
-		int floor = settings.getBedrockFloorHeight() + 1;
-		int roof = settings.getBedrockRoofHeight() - 1;
-		int ground = getGroundHeight();
-
-		for (BlockPos pos : BlockPos.getAllInBoxMutable(xStart, 0, zStart, xStart + 15, 0, zStart + 15))
-		{
-			for (int y = roof; y >= floor; --y)
-			{
-				posCache.setPos(pos.getX(), y, pos.getZ());
-
-				if (ground > 0 && y >= ground)
-				{
-					chunk.setBlockState(posCache, settings.getGroundUnderBlock(), false);
-				}
-				else
-				{
-					chunk.setBlockState(posCache, settings.getDefaultBlock(), false);
 				}
 			}
 		}

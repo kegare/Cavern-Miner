@@ -10,13 +10,13 @@ import net.minecraft.world.IBlockReader;
 public class BlockPosHelper
 {
 	@Nullable
-	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, Predicate<BlockPos.Mutable> predicate)
+	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, Predicate<BlockPos> predicate)
 	{
 		return findPos(reader, originPos, radius, 1, reader.getHeight() - 1, predicate);
 	}
 
 	@Nullable
-	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, int min, int max, Predicate<BlockPos.Mutable> predicate)
+	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, int min, int max, Predicate<BlockPos> predicate)
 	{
 		BlockPos.Mutable findPos = new BlockPos.Mutable(originPos);
 		int maxHeight = reader.getHeight();
