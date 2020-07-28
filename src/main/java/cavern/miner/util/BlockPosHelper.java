@@ -5,21 +5,21 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 
 public class BlockPosHelper
 {
 	@Nullable
-	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, Predicate<BlockPos> predicate)
+	public static BlockPos findPos(IWorld world, BlockPos originPos, int radius, Predicate<BlockPos> predicate)
 	{
-		return findPos(reader, originPos, radius, 1, reader.getHeight() - 1, predicate);
+		return findPos(world, originPos, radius, 1, world.getMaxHeight() - 1, predicate);
 	}
 
 	@Nullable
-	public static BlockPos findPos(IBlockReader reader, BlockPos originPos, int radius, int min, int max, Predicate<BlockPos> predicate)
+	public static BlockPos findPos(IWorld world, BlockPos originPos, int radius, int min, int max, Predicate<BlockPos> predicate)
 	{
 		BlockPos.Mutable findPos = new BlockPos.Mutable(originPos);
-		int maxHeight = reader.getHeight();
+		int maxHeight = world.getMaxHeight();
 
 		for (int i = 1; i <= radius; ++i)
 		{
@@ -31,6 +31,12 @@ public class BlockPosHelper
 
 					int x = originPos.getX() + j;
 					int z = originPos.getZ() + k;
+
+					if (!world.getWorldBorder().contains(findPos.setPos(x, 0, z)))
+					{
+						continue;
+					}
+
 					int dist = 0;
 					boolean minFlag = false;
 					boolean maxFlag = false;

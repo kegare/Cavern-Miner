@@ -27,9 +27,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.server.TicketType;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.network.PacketDistributor;
 
@@ -66,41 +66,48 @@ public class CavernTeleporter implements ITeleporter
 	@Override
 	public Entity placeEntity(final Entity entity, final ServerWorld currentWorld, final ServerWorld destWorld, final float yaw, final Function<Boolean, Entity> repositionEntity)
 	{
-		final int radius = GeneralConfig.INSTANCE.findRadius.get();
+		final Entity transported = repositionEntity.apply(false);
 
-		if (destPos != null && !destPos.equals(entity.getPosition()))
+		if (transported == null)
 		{
-			entity.moveToBlockPosAndAngles(destPos, yaw, entity.rotationPitch);
+			return entity;
 		}
 
-		final BlockPos originPos = destPos == null ? entity.getPosition() : destPos;
+		final int radius = GeneralConfig.INSTANCE.findRadius.get();
+
+		if (destPos != null && !destPos.equals(transported.getPosition()))
+		{
+			transported.moveToBlockPosAndAngles(destPos, yaw, transported.rotationPitch);
+		}
+
+		final BlockPos originPos = destPos == null ? transported.getPosition() : destPos;
 
 		boolean placed = false;
 
 		if (GeneralConfig.INSTANCE.posCache.get())
 		{
-			placed = entity.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, entity, yaw, radius, o)).orElse(false);
+			placed = transported.getCapability(CaveCapabilities.TELEPORTER_CACHE).map(o -> placeInCachedPortal(destWorld, transported, yaw, radius, o)).orElse(false);
 		}
 
 		if (!placed)
 		{
-			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, entity, yaw, radius, originPos, o)).orElse(false);
+			placed = destWorld.getCapability(CaveCapabilities.CAVE_PORTAL_LIST).map(o -> placeInStoredPortal(destWorld, transported, yaw, radius, originPos, o)).orElse(false);
 		}
 
 		boolean toCave = destWorld.getDimension() instanceof CavernDimension;
-		boolean isPlayer = entity instanceof ServerPlayerEntity;
+		boolean isPlayer = transported instanceof ServerPlayerEntity;
 		boolean loading = false;
 
 		if (!placed)
 		{
 			if (toCave && isPlayer)
 			{
-				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), LoadingScreenMessage.Stage.LOAD.create());
+				CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)transported), LoadingScreenMessage.Stage.LOAD.create());
 
 				loading = true;
 			}
 
-			placed = placeInPortal(destWorld, entity, yaw, radius, originPos);
+			placed = placeInPortal(destWorld, transported, yaw, radius, originPos);
 
 			if (!placed)
 			{
@@ -108,29 +115,22 @@ public class CavernTeleporter implements ITeleporter
 
 				if (pos != null)
 				{
-					placed = placeInPortal(destWorld, entity, yaw, radius, pos);
+					placed = placeInPortal(destWorld, transported, yaw, radius, pos);
 				}
 			}
 		}
 
 		if (!placed)
 		{
-			placed = CavebornEventHandler.placeEntity(destWorld, originPos, entity);
+			placed = CavebornEventHandler.placeEntity(destWorld, originPos, transported);
 		}
 
 		if (loading || toCave && isPlayer && destWorld.getServer().isSinglePlayer())
 		{
-			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)entity), LoadingScreenMessage.Stage.DONE.create());
+			CaveNetworkConstants.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)transported), LoadingScreenMessage.Stage.DONE.create());
 		}
 
-		if (placed)
-		{
-			BlockPos pos = entity.getPosition();
-
-			destWorld.getChunkProvider().registerTicket(TicketType.PORTAL, new ChunkPos(pos), 3, pos);
-		}
-
-		return repositionEntity.apply(false);
+		return transported;
 	}
 
 	public boolean placeInCachedPortal(final ServerWorld world, final Entity entity, final float yaw, final int radius, final TeleporterCache cache)
@@ -207,14 +207,33 @@ public class CavernTeleporter implements ITeleporter
 
 		entity.setMotion(portalInfo.motion);
 		entity.rotationYaw = yaw + portalInfo.rotation;
-		entity.moveForced(portalInfo.pos.x, portalInfo.pos.y, portalInfo.pos.z);
+
+		double posX = portalInfo.pos.x;
+		double posY = portalInfo.pos.y;
+		double posZ = portalInfo.pos.z;
+
+		if (entity instanceof ServerPlayerEntity)
+		{
+			((ServerPlayerEntity)entity).connection.setPlayerLocation(posX, posY, posZ, entity.rotationYaw, entity.rotationPitch);
+		}
+		else
+		{
+			entity.setLocationAndAngles(posX, posY, posZ, entity.rotationYaw, entity.rotationPitch);
+		}
 
 		return true;
+	}
+
+	private void loadSurroundingArea(final IWorld world, final BlockPos pos, final int radius)
+	{
+		ChunkPos.getAllInBox(new ChunkPos(pos), Math.max(radius, 1)).filter(o -> !world.getWorldBorder().contains(o)).forEach(o -> world.getChunk(o.x, o.z));
 	}
 
 	@Nullable
 	public BlockPos makePortal(final ServerWorld world, final BlockPos originPos, final int radius)
 	{
+		loadSurroundingArea(world, originPos, radius >> 4);
+
 		final int min = 10;
 		final int max = world.getActualHeight() - 10;
 		final BlockPos.Mutable pos = new BlockPos.Mutable();
