@@ -3,6 +3,7 @@ package cavern.miner.world.gen.feature;
 import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import com.mojang.datafixers.Dynamic;
@@ -39,6 +40,13 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 
 	public Stream<BlockPos> getPositions(final IWorld world, final int maxHeight, final BlockPos pos, final Random rand, final Vein vein)
 	{
+		final int count = vein.getCount();
+
+		if (count <= 0 || maxHeight <= 0)
+		{
+			return Stream.empty();
+		}
+
 		final int size = vein.getSize();
 		final int min = vein.getMinHeight() + size;
 		final int max = vein.getMaxHeight() - size;
@@ -46,7 +54,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 		final BlockPos.Mutable findPos = new BlockPos.Mutable();
 		final BlockPos.Mutable prevPos = new BlockPos.Mutable();
 
-		return Stream.generate(() ->
+		return IntStream.range(0, count).mapToObj(c ->
 		{
 			int x = rand.nextInt(16) + pos.getX();
 			int z = rand.nextInt(16) + pos.getZ();
@@ -55,7 +63,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 
 			for (int y = Math.max(min, 1); y <= Math.min(max, maxHeight); ++y)
 			{
-				if (!world.isAirBlock(findPos.setPos(x, y, z)) && vein.isTargetBlock(world.getBlockState(findPos)))
+				if (vein.isTargetBlock(world.getBlockState(findPos.setPos(x, y, z))))
 				{
 					targetY.add(y);
 				}
@@ -98,7 +106,7 @@ public class VeinFeature extends Feature<VeinFeatureConfig>
 			prevPos.setPos(findPos);
 
 			return findPos;
-		}).filter(o -> !o.equals(BlockPos.ZERO)).distinct().limit(vein.getCount());
+		}).filter(o -> !o.equals(BlockPos.ZERO));
 	}
 
 	public boolean placeVein(IWorld world, Random rand, BlockPos pos, Vein vein)
