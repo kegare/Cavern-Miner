@@ -1,9 +1,6 @@
 package cavern.miner.command;
 
-import java.io.File;
 import java.util.Arrays;
-
-import org.apache.commons.io.FileUtils;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -27,10 +24,8 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.DimensionManager;
 
 public final class CavernCommand
@@ -107,42 +102,9 @@ public final class CavernCommand
 			return;
 		}
 
-		MinecraftServer server = context.getSource().getServer();
-		ServerWorld world = DimensionManager.getWorld(server, dim, false, false);
+		DimensionManager.markForDeletion(dim);
 
-		if (world != null && !world.getPlayers().isEmpty())
-		{
-			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.error.player").appendText(" : " + name));
-
-			return;
-		}
-
-		File folder = CaveDimensions.getSaveFolder(server, dim);
-
-		if (folder == null)
-		{
-			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.error.folder").appendText(" : " + name));
-
-			return;
-		}
-
-		DimensionManager.unloadWorld(world);
-		DimensionManager.unloadWorlds(server, false);
-
-		try
-		{
-			FileUtils.deleteDirectory(folder);
-		}
-		catch (Exception e)
-		{
-			context.getSource().sendErrorMessage(new TranslationTextComponent("cavern.message.regenerate.error.unknown").appendText(" : " + name));
-
-			return;
-		}
-
-		DimensionManager.initWorld(server, dim);
-
-		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.regenerate.success").appendText(" : " + name), true);
+		context.getSource().sendFeedback(new TranslationTextComponent("cavern.message.regenerate.success", name), true);
 	}
 
 	private static void reloadConfig(CommandContext<CommandSource> context) throws CommandSyntaxException

@@ -55,7 +55,7 @@ public class HugeCavernConfig
 		String serverSide = "Note: If multiplayer, server-side only.";
 
 		builder.push("render");
-		lightBrightness = builder.comment("The brightness of natural light.").defineInRange("light_brightness", 0.1D, 0.0D, 1.0D);
+		lightBrightness = builder.comment("The brightness of natural light.").defineInRange("light_brightness", 0.03D, 0.0D, 1.0D);
 		builder.pop();
 
 		builder.push("decoration");

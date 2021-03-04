@@ -23,7 +23,7 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 public class CavernModConfig
 {
-	private static final String INTERNAL_VERSION = "2";
+	private static final String INTERNAL_VERSION = "3";
 
 	public static File getConfigDir()
 	{

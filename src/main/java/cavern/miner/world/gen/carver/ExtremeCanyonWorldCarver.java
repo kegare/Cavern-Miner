@@ -21,7 +21,7 @@ public class ExtremeCanyonWorldCarver extends CavernCanyonWorldCarver
 	@Override
 	public boolean carveRegion(IChunk chunk, Function<BlockPos, Biome> biomePos, Random rand, int seaLevel, int chunkXOffset, int chunkZOffset, int chunkX, int chunkZ, BitSet carvingMask, ProbabilityConfig config)
 	{
-		int i = (func_222704_c() * 2 - 1) * 16;
+		int i = (getRandomNumber() * 2 - 1) * 16;
 		double x = chunkXOffset * 16 + rand.nextInt(16);
 		double y = rand.nextInt(rand.nextInt(10) + 8) + 70;
 		double z = chunkZOffset * 16 + rand.nextInt(16);

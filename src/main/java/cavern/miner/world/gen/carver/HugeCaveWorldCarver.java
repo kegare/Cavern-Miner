@@ -15,7 +15,7 @@ public class HugeCaveWorldCarver extends CavernWorldCarver
 	}
 
 	@Override
-	public int func_222704_c()
+	public int getRandomNumber()
 	{
 		return 1;
 	}

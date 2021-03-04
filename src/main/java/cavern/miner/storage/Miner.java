@@ -105,7 +105,7 @@ public class Miner implements INBTSerializable<CompoundNBT>
 				CaveCriteriaTriggers.MINER_RANK.trigger((ServerPlayerEntity)player, getRank().getName());
 			}
 
-			player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), CaveSounds.MINER_RANKUP.get(), SoundCategory.AMBIENT, 0.5F, 1.0F);
+			player.world.playSound(null, player.getPosX(), player.getPosY() + 1.0D, player.getPosZ(), CaveSounds.MINER_RANKUP.get(), SoundCategory.PLAYERS, 0.5F, 1.0F);
 		}
 
 		return this;

@@ -4,12 +4,11 @@ showAsResourcePack=false
 
 [[mods]]
 modId="cavern"
-version="3.0.6"
+version="3.0.7"
 displayName="Cavern: Miner"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/cavern-miner"
 updateJSONURL="https://raw.githubusercontent.com/kegare/Cavern-Miner/master/cavern.json"
 logoFile="logo.png"
-credits=""
 authors="kegare"
 description='''
 Adds new cave dimension to make mining more fun!

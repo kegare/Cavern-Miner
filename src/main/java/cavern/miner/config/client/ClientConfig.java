@@ -33,7 +33,7 @@ public class ClientConfig
 		builder.pop();
 
 		builder.push("dimension");
-		caveFog = builder.comment("When true, render the cave fog.").define("cave_fog", true);
+		caveFog = builder.comment("When true, render the cave fog.").define("cave_fog", false);
 		caveMusic = builder.comment("When true, play the original music for caverns.").define("cave_music", true);
 		builder.pop();
 	}

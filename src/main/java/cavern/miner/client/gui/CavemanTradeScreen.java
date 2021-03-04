@@ -14,12 +14,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 
+import cavern.miner.client.ItemStackCache;
 import cavern.miner.entity.CavemanEntity;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveItems;
 import cavern.miner.init.CaveNetworkConstants;
 import cavern.miner.network.CavemanTradingMessage;
-import cavern.miner.storage.Miner;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -115,44 +116,40 @@ public class CavemanTradeScreen extends Screen
 
 		drawCenteredString(font, getTitle().getFormattedText(), width / 2, 16, 0xFFFFFF);
 
-		Miner miner = null;
-
-		if (minecraft.player != null)
-		{
-			miner = minecraft.player.getCapability(CaveCapabilities.MINER).orElse(null);
-		}
-
 		TradeList.TradeEntry selected = list.getSelected();
+		int cost = selected == null ? 0 : selected.entry.getCost();
+		int result = minecraft.player == null ? 0 : minecraft.player.inventory.count(CaveItems.CAVENIC_ORB.get()) - cost;
+		int x = width - 28;
+		int y = height - 22;
+		String point = Integer.toString(result);
 
-		if (miner != null)
+		if (point.length() <= 1)
 		{
-			int x = width - 28;
-			int y = height - 22;
-			int cost = selected == null ? 0 : selected.entry.getCost();
-			int result = miner.getPoint() - cost;
-			String point = Integer.toString(result);
-
-			if (point.length() <= 1)
-			{
-				point = " " + point;
-			}
-
-			if (result < 0)
-			{
-				point = TextFormatting.RED + point;
-			}
-			else if (cost != 0)
-			{
-				point = TextFormatting.GRAY + point;
-			}
-
-			ItemStack stack = miner.getDisplayRank().getIconItem();
-
-			RenderSystem.enableRescaleNormal();
-			itemRenderer.renderItemIntoGUI(stack, x, y);
-			itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, point);
-			RenderSystem.disableRescaleNormal();
+			point = " " + point;
 		}
+
+		if (result < 0)
+		{
+			point = TextFormatting.RED + point;
+		}
+		else if (cost != 0)
+		{
+			point = TextFormatting.GRAY + point;
+		}
+
+		ItemStack stack = ItemStackCache.get(CaveItems.CAVENIC_ORB.get());
+
+		RenderSystem.enableRescaleNormal();
+		itemRenderer.renderItemIntoGUI(stack, x - 20, y);
+		itemRenderer.renderItemOverlayIntoGUI(font, stack, x - 20, y, point);
+		RenderSystem.disableRescaleNormal();
+
+		minecraft.player.getCapability(CaveCapabilities.MINER).ifPresent(o ->
+		{
+			RenderSystem.enableRescaleNormal();
+			itemRenderer.renderItemIntoGUI(o.getDisplayRank().getIconItem(), x, y);
+			RenderSystem.disableRescaleNormal();
+		});
 
 		if (caveman != null)
 		{
@@ -195,15 +192,7 @@ public class CavemanTradeScreen extends Screen
 		}
 		else
 		{
-			CavemanTrade.TradeEntry entry = selected.entry;
-			Miner miner = null;
-
-			if (minecraft.player != null)
-			{
-				miner = minecraft.player.getCapability(CaveCapabilities.MINER).orElse(null);
-			}
-
-			doneButton.active = miner == null || miner.getPoint() >= entry.getCost();
+			doneButton.active = minecraft.player != null && minecraft.player.inventory.count(CaveItems.CAVENIC_ORB.get()) >= selected.entry.getCost();
 
 			if (doneButton.active)
 			{
@@ -327,13 +316,10 @@ public class CavemanTradeScreen extends Screen
 
 				if (mc.player != null)
 				{
-					mc.player.getCapability(CaveCapabilities.MINER).ifPresent(o ->
+					if (mc.player.inventory.count(CaveItems.CAVENIC_ORB.get()) < entry.getCost() || ArrayUtils.contains(CavemanTradeScreen.this.inactiveEntries, entryId))
 					{
-						if (o.getPoint() < entry.getCost() || ArrayUtils.contains(CavemanTradeScreen.this.inactiveEntries, entryId))
-						{
-							result.applyTextStyle(TextFormatting.GRAY);
-						}
-					});
+						result.applyTextStyle(TextFormatting.GRAY);
+					}
 				}
 
 				displayNameText = result;
@@ -362,13 +348,25 @@ public class CavemanTradeScreen extends Screen
 				itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, null);
 				RenderSystem.disableRescaleNormal();
 
-				stack = entry.getRankIconItem();
 				x = TradeList.this.width / 2 + 90;
 
-				RenderSystem.enableRescaleNormal();
-				itemRenderer.renderItemIntoGUI(stack, x, y);
-				itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, Integer.toString(entry.getCost()));
-				RenderSystem.disableRescaleNormal();
+				if (ArrayUtils.contains(CavemanTradeScreen.this.inactiveEntries, entryId))
+				{
+					stack = entry.getRankIconItem();
+
+					RenderSystem.enableRescaleNormal();
+					itemRenderer.renderItemIntoGUI(stack, x, y);
+					RenderSystem.disableRescaleNormal();
+				}
+				else
+				{
+					stack = ItemStackCache.get(CaveItems.CAVENIC_ORB.get());
+
+					RenderSystem.enableRescaleNormal();
+					itemRenderer.renderItemIntoGUI(stack, x, y);
+					itemRenderer.renderItemOverlayIntoGUI(font, stack, x, y, Integer.toString(entry.getCost()));
+					RenderSystem.disableRescaleNormal();
+				}
 			}
 
 			@Override

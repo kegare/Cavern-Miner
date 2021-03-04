@@ -38,9 +38,9 @@ public class CavenicSkeletonEntity extends AbstractSkeletonEntity
 	{
 		super.registerAttributes();
 
-		getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(40.0D);
+		getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
 		getAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(0.75D);
-		getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+		getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.215D);
 		getAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(24.0D);
 	}
 

@@ -6,6 +6,7 @@ import cavern.miner.CavernMod;
 import cavern.miner.entity.CavemanEntity;
 import cavern.miner.entity.CavemanTrade;
 import cavern.miner.init.CaveCapabilities;
+import cavern.miner.init.CaveItems;
 import cavern.miner.storage.Miner;
 import io.netty.buffer.ByteBufUtil;
 import net.minecraft.entity.Entity;
@@ -92,19 +93,37 @@ public class CavemanTradingMessage
 				}
 
 				int cost = entry.getCost();
+
+				if (player.inventory.count(CaveItems.CAVENIC_ORB.get()) < cost)
+				{
+					return;
+				}
+
 				Miner miner = player.getCapability(CaveCapabilities.MINER).orElse(null);
 
-				if (miner == null || miner.getPoint() < cost)
+				if (miner == null || miner.getRank().getIndex() < entry.getRank().getIndex())
 				{
 					return;
 				}
 
-				if (miner.getRank().getIndex() < entry.getRank().getIndex())
+				for (int i = 0; i < player.inventory.getSizeInventory(); ++i)
 				{
-					return;
-				}
+					ItemStack stack = player.inventory.getStackInSlot(i);
 
-				miner.addPoint(-cost).sendToClient();
+					if (stack.getItem().equals(CaveItems.CAVENIC_ORB.get()))
+					{
+						int count = stack.getCount();
+
+						stack.shrink(count < cost ? count : cost);
+
+						cost -= count;
+
+						if (cost <= 0)
+						{
+							break;
+						}
+					}
+				}
 
 				if (entry instanceof CavemanTrade.EffectEntry)
 				{

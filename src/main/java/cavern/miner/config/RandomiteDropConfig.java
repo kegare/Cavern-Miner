@@ -10,6 +10,7 @@ import com.google.gson.JsonParseException;
 
 import cavern.miner.block.RandomiteDrop;
 import cavern.miner.config.json.RandomiteDropSerializer;
+import cavern.miner.init.CaveItems;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.WeightedRandom;
 import net.minecraftforge.common.Tags;
@@ -86,6 +87,7 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 	public void setToDefault()
 	{
 		entries.clear();
+
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.INGOTS, 20, 1, 3));
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.NUGGETS, 20, 1, 3));
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.GEMS, 10, 1, 2));
@@ -98,6 +100,8 @@ public class RandomiteDropConfig extends AbstractEntryConfig
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.SEEDS, 20, 3, 5));
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.CROPS, 20, 3, 5));
 		entries.add(new RandomiteDrop.TagEntry(Tags.Items.DYES, 10, 2, 5));
+
+		entries.add(new RandomiteDrop.ItemEntry(CaveItems.CAVENIC_ORB.get(), 10, 1));
 	}
 
 	public RandomiteDrop.DropEntry getRandomDrop(Random random)

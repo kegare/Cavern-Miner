@@ -17,6 +17,7 @@
 	"item.cavern.aquamarine_pickaxe": "アクアマリンのツルハシ",
 	"item.cavern.aquamarine_axe": "アクアマリンの斧",
 	"item.cavern.aquamarine_shovel": "アクアマリンのシャベル",
+	"item.cavern.cavenic_orb": "ケイブニックオーブ",
 	"item.cavern.caveman_spawn_egg": "ケイブマンのスポーンエッグ",
 	"item.cavern.cavenic_skeleton_spawn_egg": "ケイブニックスケルトンのスポーンエッグ",
 	"entity.cavern.caveman": "ケイブマン",
@@ -57,11 +58,8 @@
 	"advancements.cavern.god_miner.title": "採掘の神",
 	"advancements.cavern.god_miner.description": "採掘を極める",
 	"cavern.message.update_version": "Cavern: Minerの新しいバージョンが利用できます",
-	"cavern.message.regenerate.success": "ディメンションを再生成しました",
+	"cavern.message.regenerate.success": "%s ディメンションは次回のセーブデータのロード時に再生成されます。",
 	"cavern.message.regenerate.invalid": "無効なディメンションです",
-	"cavern.message.regenerate.error.player": "プレイヤーがまだディメンションに残っています",
-	"cavern.message.regenerate.error.folder": "ディメンションのセーブフォルダを検出できません",
-	"cavern.message.regenerate.error.unknown": "再生成中に不明なエラーが発生しました",
-	"cavern.message.reload": "Cavern: Minerのjson設定ファイルをリロードしました",
+	"cavern.message.reload": "Cavern: Minerのjson設定ファイルをリロードしました。",
 	"cavern.message.miner.invalid": "指定されたプレイヤーの炭鉱夫ステータスにアクセスできません。"
 }

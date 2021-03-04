@@ -17,6 +17,7 @@
 	"item.cavern.aquamarine_pickaxe": "Aquamarine Pickaxe",
 	"item.cavern.aquamarine_axe": "Aquamarine Axe",
 	"item.cavern.aquamarine_shovel": "Aquamarine Shovel",
+	"item.cavern.cavenic_orb": "Cavenic Orb",
 	"item.cavern.caveman_spawn_egg": "Caveman Spawn Egg",
 	"item.cavern.cavenic_skeleton_spawn_egg": "Cavenic Skeleton Spawn Egg",
 	"entity.cavern.caveman": "Caveman",
@@ -58,11 +59,8 @@
 	"advancements.cavern.god_miner.title": "The God of Miner",
 	"advancements.cavern.god_miner.description": "Master of Mining",
 	"cavern.message.update_version": "A new version of Cavern: Miner is available",
-	"cavern.message.regenerate.success": "Dimension regenerated",
+	"cavern.message.regenerate.success": "%s dimension will be regenerated upon next reload of the save.",
 	"cavern.message.regenerate.invalid": "Invalid dimension",
-	"cavern.message.regenerate.error.player": "Player is still in the dimension",
-	"cavern.message.regenerate.error.folder": "Cannot detect the dimension save folder",
-	"cavern.message.regenerate.error.unknown": "An unknown error occurred during regeneration",
 	"cavern.message.reload": "Cavern: Miner json config files reloaded.",
 	"cavern.message.miner.invalid": "Cannot access the specified miner status provider."
 }

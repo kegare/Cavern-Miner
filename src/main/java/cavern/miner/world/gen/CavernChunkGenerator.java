@@ -52,8 +52,9 @@ public class CavernChunkGenerator extends ChunkGenerator<CavernGenSettings>
 	public void makeBase(IWorld world, IChunk chunk)
 	{
 		BlockPos.Mutable posCache = new BlockPos.Mutable();
-		int xStart = chunk.getPos().getXStart();
-		int zStart = chunk.getPos().getZStart();
+		ChunkPos chunkPos = chunk.getPos();
+		int xStart = chunkPos.getXStart();
+		int zStart = chunkPos.getZStart();
 		CavernGenSettings settings = getSettings();
 		int floor = settings.getBedrockFloorHeight() + 1;
 		int roof = settings.getBedrockRoofHeight() - 1;

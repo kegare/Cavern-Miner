@@ -161,9 +161,9 @@ public class CavemanEntity extends CreatureEntity
 			{
 				RandomiteDrop.DropEntry entry = GeneralConfig.INSTANCE.randomiteDrops.getRandomDrop(rand);
 
-				if (entry != RandomiteDrop.EMPTY)
+				if (entry != RandomiteDrop.EMPTY && !entry.getDropItem().getItem().equals(CaveItems.CAVENIC_ORB.get()))
 				{
-					tradeEntries.add(new CavemanTrade.ItemStackEntry(entry.getDropItem(), entry.itemWeight, 30 + 10 * rand.nextInt(3), "STONE"));
+					tradeEntries.add(new CavemanTrade.ItemStackEntry(entry.getDropItem(), entry.itemWeight, 1, "STONE"));
 				}
 			}
 		}

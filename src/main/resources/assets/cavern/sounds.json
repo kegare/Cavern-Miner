@@ -20,7 +20,7 @@
     ]
   },
   "miner_rankup": {
-    "category": "ambient",
+    "category": "player",
     "sounds": [
       {
         "name": "cavern:rankup",

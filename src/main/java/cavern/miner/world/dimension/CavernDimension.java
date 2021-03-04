@@ -323,20 +323,6 @@ public class CavernDimension extends Dimension
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public boolean isSkyColored()
-	{
-		return false;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public IRenderHandler getSkyRenderer()
-	{
-		return EmptyRenderer.INSTANCE;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
 	public IRenderHandler getCloudRenderer()
 	{
 		return EmptyRenderer.INSTANCE;
