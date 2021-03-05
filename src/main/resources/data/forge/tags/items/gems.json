@@ -1,6 +1,7 @@
 {
     "replace": false,
     "values": [
-      "#forge:gems/aquamarine"
+      "#forge:gems/aquamarine",
+      "#forge:gems/cavenic"
     ]
 }

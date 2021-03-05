@@ -38,6 +38,7 @@ public final class CaveTags
 		public static final Tag<Item> NUGGETS_MAGNITE = tag("nuggets/magnite");
 
 		public static final Tag<Item> GEMS_AQUAMARINE = tag("gems/aquamarine");
+		public static final Tag<Item> GEMS_CAVENIC = tag("gems/cavenic");
 
 		private static Tag<Item> tag(String name)
 		{

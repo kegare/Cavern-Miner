@@ -10,7 +10,8 @@ import net.minecraft.util.LazyValue;
 public class CaveItemTier implements IItemTier
 {
 	public static final IItemTier MAGNITE = new CaveItemTier(3, 10, 100.0F, 11.0F, 50, () -> Ingredient.fromTag(CaveTags.Items.INGOTS_MAGNITE));
-	public static final IItemTier AQUAMARINE = new CaveItemTier(2, 200, 8.0F, 1.5F, 15, () -> Ingredient.fromTag(CaveTags.Items.GEMS_AQUAMARINE));
+	public static final IItemTier AQUAMARINE = new CaveItemTier(2, 200, 8.0F, 1.5F, 20, () -> Ingredient.fromTag(CaveTags.Items.GEMS_AQUAMARINE));
+	public static final IItemTier CAVENIC = new CaveItemTier(3, 900, 6.0F, 3.0F, 10, () -> Ingredient.fromTag(CaveTags.Items.GEMS_CAVENIC));
 
 	private final int harvestLevel;
 	private final int maxUses;

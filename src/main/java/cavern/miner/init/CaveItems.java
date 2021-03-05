@@ -3,6 +3,9 @@ package cavern.miner.init;
 import cavern.miner.block.CavernPortalBlock;
 import cavern.miner.item.CaveItemTier;
 import cavern.miner.item.CaveSpawnEggItem;
+import cavern.miner.item.CavenicAxeItem;
+import cavern.miner.item.CavenicPickaxeItem;
+import cavern.miner.item.CavenicShovelItem;
 import cavern.miner.item.CavernItemGroup;
 import cavern.miner.item.CavernPortalItem;
 import net.minecraft.block.Block;
@@ -45,6 +48,9 @@ public final class CaveItems
 	public static final RegistryObject<ShovelItem> AQUAMARINE_SHOVEL = REGISTRY.register("aquamarine_shovel", () -> new ShovelItem(CaveItemTier.AQUAMARINE, 1.5F, -2.8F, createProperties()));
 
 	public static final RegistryObject<Item> CAVENIC_ORB = REGISTRY.register("cavenic_orb", () -> new Item(createProperties()));
+	public static final RegistryObject<PickaxeItem> CAVENIC_PICKAXE = REGISTRY.register("cavenic_pickaxe", () -> new CavenicPickaxeItem(CaveItemTier.CAVENIC, 2, -2.4F, createProperties()));
+	public static final RegistryObject<AxeItem> CAVENIC_AXE = REGISTRY.register("cavenic_axe", () -> new CavenicAxeItem(CaveItemTier.CAVENIC, 5.5F, -2.8F, createProperties()));
+	public static final RegistryObject<ShovelItem> CAVENIC_SHOVEL = REGISTRY.register("cavenic_shovel", () -> new CavenicShovelItem(CaveItemTier.CAVENIC, 1.5F, -2.8F, createProperties()));
 
 	public static final RegistryObject<SpawnEggItem> CAVEMAN_SPAWN_EGG = REGISTRY.register("caveman_spawn_egg",
 		() -> new CaveSpawnEggItem<>(CaveEntities.CAVEMAN, EntityType.PLAYER, 0xAAAAAA, 0xCCCCCC, createProperties()));
